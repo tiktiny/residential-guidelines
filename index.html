@@ -1,0 +1,1372 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="light">
+<title>הכנה אוטומטית של הנחיות חשמל לפרויקט מגורים ועירוב שימושים – משרד טיקטין</title>
+<link rel="icon" href="assets/tiktin-logo.png">
+<style>[hidden]{display:none!important}</style>
+<script data-goatcounter="https://tiktin-apps.goatcounter.com/count" async src="https://gc.zgo.at/count.js"></script>
+</head>
+<body>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Hebrew:wght@400;500;600;700&display=swap">
+<style>
+:root{
+  --ink:#1e2226; --ink-2:#4a5058; --ink-3:#7a8089;
+  --paper:#f3f2f1; --card:#ffffff; --line:#dedbd8; --line-2:#ebe9e7;
+  --brand:#b8232f; --brand-2:#e8742a; --brand-soft:#fbeceb;
+  --ok:#2e7d4f; --ok-soft:#e6f3ea; --warn:#a15c00; --warn-soft:#fdf1dc;
+  --sheet:#ffffff; --sheet-ink:#1a1a1a;
+  --focus:#1d5fd1;
+  color-scheme:light;
+  font-family:"IBM Plex Sans Hebrew",Arial,"Segoe UI",sans-serif;
+}
+*{box-sizing:border-box}
+body{background:var(--paper);color:var(--ink);font-size:15px;line-height:1.5;direction:rtl;padding-inline:16px;padding-block:0 40px}
+.wrap{max-width:1380px;margin:0 auto}
+header.top{display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;padding-block:16px 12px;border-bottom:3px solid var(--brand);margin-bottom:18px}
+header.top .logo{height:54px;width:auto;background:#fff;border-radius:6px;padding:3px}
+header.top h1{font-size:22px;margin:0;font-weight:700;text-wrap:balance}
+header.top p{margin:2px 0 0;color:var(--ink-3);font-size:13px}
+.head-actions{display:flex;gap:8px;flex-wrap:wrap}
+.layout{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.05fr);gap:22px;align-items:start}
+@media (max-width:1000px){.layout{grid-template-columns:1fr}}
+.form{display:flex;flex-direction:column;gap:14px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:16px}
+.card h2{font-size:16px;margin:0 0 12px;display:flex;align-items:center;gap:8px}
+.card h2 .step{display:inline-grid;place-items:center;width:24px;height:24px;border-radius:50%;background:var(--brand);color:#fff;font-size:13px;font-variant-numeric:tabular-nums}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:10px 12px}
+label.f{display:flex;flex-direction:column;gap:4px;font-size:13px;color:var(--ink-2);font-weight:500}
+input[type=text],input[type=number],select{font:inherit;font-size:15px;color:#1e2226;background:#ffffff;border:1px solid var(--line);border-radius:7px;padding:8px 10px;width:100%;min-width:0}
+input:focus-visible,select:focus-visible,button:focus-visible,summary:focus-visible{outline:2px solid var(--focus);outline-offset:2px}
+input[type=number]{font-variant-numeric:tabular-nums}
+.seg{display:flex;flex-wrap:wrap;gap:6px}
+.seg label{position:relative}
+.seg input{position:absolute;opacity:0;pointer-events:none}
+.seg span{display:inline-block;padding:7px 12px;border:1px solid var(--line);border-radius:999px;font-size:14px;cursor:pointer;background:var(--card);color:var(--ink-2);user-select:none}
+.seg input:checked+span{background:var(--brand);border-color:var(--brand);color:#fff}
+.seg input:focus-visible+span{outline:2px solid var(--focus);outline-offset:2px}
+.fieldset{display:flex;flex-direction:column;gap:6px}
+.fieldset>.lbl{font-size:13px;color:var(--ink-2);font-weight:500}
+details.help{font-size:13px;color:var(--ink-2)}
+details.help summary{cursor:pointer;color:var(--brand);font-weight:500;list-style:none;display:inline-flex;align-items:center;gap:4px}
+details.help summary::-webkit-details-marker{display:none}
+details.help summary::before{content:"ⓘ";font-size:13px}
+details.help[open] summary{margin-bottom:6px}
+details.help .body{background:var(--paper);border-radius:7px;padding:8px 10px}
+.bld{border:1px solid #c9c4bf;border-top:4px solid #5b6470;border-radius:9px;padding:12px;display:flex;flex-direction:column;gap:12px;background:var(--card);box-shadow:0 1px 3px rgba(0,0,0,.06)}
+.bld+.bld{margin-top:18px}
+.grp-sep{display:flex;align-items:center;gap:10px;margin:26px 0 12px;color:#c42635;font-weight:700;font-size:15px}
+.grp-sep:first-child{margin-top:4px}
+.grp-sep::before,.grp-sep::after{content:"";flex:1;height:0;border-top:3px solid #c42635}
+.grp-sep+.bld{margin-top:0}
+.ver{font-size:12px;color:var(--ink-3)}
+.clr-wrap{position:relative;display:block;width:100%}
+.clr-wrap>input{padding-inline-end:30px}
+.clr-x{position:absolute;inset-inline-end:4px;top:50%;transform:translateY(-50%);width:22px;height:22px;border:0;border-radius:50%;background:#eceae8;color:#555;font-size:14px;line-height:22px;padding:0;cursor:pointer;display:none}
+.clr-wrap.has>.clr-x{display:block}
+.clr-x:hover{background:#dcd8d4;color:#111}
+.mplan{border:1px solid var(--line);border-radius:8px;padding:6px;background:#fff;overflow:auto}
+.mplan svg{max-height:340px}
+.bld-head{display:flex;align-items:center;gap:10px}
+.bld-head .tag{background:var(--brand-soft);color:var(--brand);font-weight:700;border-radius:6px;padding:2px 9px;font-size:13px;white-space:nowrap}
+.sub{border-top:1px dashed var(--line);padding-top:10px;display:flex;flex-direction:column;gap:10px}
+.sub h4{margin:0;font-size:13px;color:var(--ink-3);font-weight:600;letter-spacing:.02em}
+.msg{font-size:13px;border-radius:7px;padding:7px 10px}
+.msg.ok{background:var(--ok-soft);color:var(--ok)}
+.msg.warn{background:var(--warn-soft);color:var(--warn)}
+.msg.info{background:var(--paper);color:var(--ink-2)}
+.tbl-wrap{overflow-x:auto}
+table.floors{border-collapse:collapse;width:100%;font-size:14px}
+table.floors th,table.floors td{border-bottom:1px solid var(--line-2);padding:5px 6px;text-align:right}
+table.floors th{font-weight:600;color:var(--ink-3);font-size:12px}
+table.floors td.hint{color:var(--ink-3);font-size:12px;font-variant-numeric:tabular-nums;white-space:nowrap}
+table.floors input{padding:5px 7px}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chk{display:inline-flex;align-items:center;gap:6px;font-size:14px;border:1px solid var(--line);border-radius:7px;padding:5px 9px;cursor:pointer}
+.chk input{accent-color:var(--brand)}
+.btn{display:inline-block;font:inherit;font-size:14px;font-weight:600;border-radius:8px;padding:9px 14px;border:1px solid var(--line);background:var(--card);color:var(--ink);cursor:pointer}
+.btn:hover{border-color:var(--ink-3)}
+.btn.primary{background:var(--brand);border-color:var(--brand);color:#fff}
+.btn.primary:hover{filter:brightness(1.07)}
+.btn:disabled{opacity:.55;cursor:wait}
+.export{position:sticky;top:env(safe-area-inset-top,0px);z-index:3;background:var(--card);border:1px solid var(--line);border-radius:10px;padding:12px 14px;display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:12px}
+.export .t{font-weight:700;margin-inline-end:auto}
+.export .status{flex-basis:100%;font-size:13px;color:var(--ink-3);min-height:1em}
+.internal{border:1px dashed var(--brand-2)}
+.internal h2{color:var(--brand-2)}
+.internal ol{margin:6px 0;padding-inline-start:20px}
+.internal li{margin:3px 0}
+/* ---------- document sheet ---------- */
+.preview-col{position:relative}
+.sheet{background:var(--sheet);color:var(--sheet-ink);border-radius:4px;box-shadow:0 1px 3px rgba(0,0,0,.08),0 10px 30px rgba(0,0,0,.08);padding:34px 38px;font-family:Arial,"IBM Plex Sans Hebrew",sans-serif;font-size:13.5px;line-height:1.55;direction:rtl;color-scheme:light}
+@media (max-width:560px){.sheet{padding:20px 16px}}
+.sheet .doc-head{display:flex;justify-content:space-between;align-items:flex-start;gap:14px;border-bottom:2px solid #b8232f;padding-bottom:10px;margin-bottom:14px;flex-wrap:wrap}
+.sheet .doc-head img{height:46px;width:auto}
+.sheet .doc-head .date{font-size:12px;color:#555}
+.sheet h1{font-size:21px;margin:4px 0 10px;color:#1a1a1a;text-wrap:balance}
+.sheet h2{font-size:16.5px;margin:22px 0 8px;color:#b8232f;border-bottom:1px solid #e3d6d6;padding-bottom:3px;break-after:avoid;page-break-after:avoid}
+.sheet h3{font-size:14.5px;margin:14px 0 6px;color:#1a1a1a;break-after:avoid;page-break-after:avoid}
+.sheet h4{font-size:13.5px;margin:10px 0 4px;color:#444;break-after:avoid;page-break-after:avoid}
+.sheet p{margin:5px 0}
+.sheet ul{margin:4px 0;padding-inline-start:18px;list-style:none}
+.sheet ul li{position:relative}
+.sheet ul li::before{content:"";position:absolute;inset-inline-start:-12px;top:.62em;width:5px;height:5px;border-radius:50%;background:#b8232f}
+.sheet li{margin:3px 0}
+.sheet .note{background:#f6f2ee;border-right:3px solid #e8742a;padding:6px 10px;margin:8px 0;font-size:12.5px;break-inside:avoid;page-break-inside:avoid}
+.sheet .key{background:#fbeceb;border-right:3px solid #b8232f;padding:7px 10px;margin:8px 0;font-weight:700;break-inside:avoid;page-break-inside:avoid}
+.sheet table{border-collapse:collapse;width:100%;margin:6px 0 10px;font-size:12.5px;break-inside:avoid;page-break-inside:avoid}
+.sheet th,.sheet td{border:1px solid #cfcfcf;padding:4px 6px;text-align:right;vertical-align:top}
+.sheet th{background:#f1eeee;font-weight:700}
+.sheet td.num{font-variant-numeric:tabular-nums;white-space:nowrap}
+.sheet .meta td:first-child{background:#f7f5f5;font-weight:700;width:30%}
+.sheet figure{margin:10px 0;text-align:center;break-inside:avoid;page-break-inside:avoid}
+.sheet figure img{max-width:100%;height:auto;border:1px solid #e2e2e2}
+.sheet figcaption{font-size:12px;color:#444;margin-top:4px;font-weight:700}
+.sheet .pb{break-before:page;page-break-before:always}
+.sheet .foot{margin-top:24px;border-top:1px solid #ddd;padding-top:8px;font-size:11.5px;color:#666}
+.sheet .ph{color:#a0a0a0}
+.sheet ol.items{list-style:none;margin:4px 0 8px;padding:0}
+.sheet ol.items li{display:grid;grid-template-columns:52px 1fr;gap:6px;margin:3px 0;break-inside:avoid;page-break-inside:avoid}
+.sheet ol.items .no{color:#777;font-variant-numeric:tabular-nums}
+.sheet ol.items .nt{color:#444}
+details.ov{margin-top:4px}
+details.ov table{width:100%;border-collapse:collapse;font-size:13px}
+details.ov td,details.ov th{border-bottom:1px solid var(--line-2);padding:4px 5px;text-align:right}
+details.ov th{font-size:12px;color:var(--ink-3);font-weight:600}
+details.ov input{width:72px;padding:4px 6px;font-size:14px}
+details.ov td.lv{color:var(--ink-3);font-size:12px;white-space:nowrap}
+.sheet.for-pdf,.sheet.for-pdf *{letter-spacing:.2px}
+.toast{position:fixed;inset-inline:0;bottom:calc(16px + env(safe-area-inset-bottom,0px));display:flex;justify-content:center;pointer-events:none;z-index:9}
+.toast div{background:var(--ink);color:var(--paper);padding:9px 16px;border-radius:8px;font-size:14px;box-shadow:0 6px 20px rgba(0,0,0,.2)}
+@media (prefers-reduced-motion:no-preference){.toast div{animation:up .2s ease-out}@keyframes up{from{transform:translateY(8px);opacity:0}}}
+.muted{color:var(--ink-3);font-size:13px}
+.hg{display:inline-block;width:16px;height:22px;position:relative;animation:hgflip 1.6s ease-in-out infinite}
+.hg::before,.hg::after{content:"";position:absolute;inset-inline-start:0;width:0;height:0;border-inline:8px solid transparent}
+.hg::before{top:0;border-top:11px solid var(--brand);animation:hgtop 1.6s linear infinite}
+.hg::after{bottom:0;border-bottom:11px solid var(--brand-2);animation:hgbot 1.6s linear infinite}
+@keyframes hgflip{0%,80%{transform:rotate(0)}100%{transform:rotate(180deg)}}
+@keyframes hgtop{0%{opacity:1}80%,100%{opacity:.35}}
+@keyframes hgbot{0%{opacity:.35}80%,100%{opacity:1}}
+@media (prefers-reduced-motion:reduce){.hg,.hg::before,.hg::after{animation:none}}
+.modal{position:fixed;inset:0;z-index:50;background:rgba(20,20,22,.45);display:flex;align-items:center;justify-content:center;padding:16px}
+.modal-box{background:var(--card);border-radius:12px;padding:18px;max-width:420px;width:100%;box-shadow:0 20px 50px rgba(0,0,0,.25)}
+.modal-box h3{margin:0 0 6px;font-size:17px}
+.modal-box p{margin:0 0 14px;color:var(--ink-2)}
+.modal-actions{display:flex;flex-direction:column;gap:8px}
+.btn.danger{border-color:var(--brand);color:var(--brand)}
+.timer{font-variant-numeric:tabular-nums;font-weight:600;color:var(--brand);font-size:14px;background:var(--brand-soft);border-radius:6px;padding:2px 8px}
+.savebox{position:relative}
+.savebox>summary{list-style:none;display:inline-block}
+.savebox>summary::-webkit-details-marker{display:none}
+.savepanel{position:absolute;inset-inline-end:0;top:calc(100% + 6px);z-index:20;background:var(--card);border:1px solid var(--line);border-radius:10px;box-shadow:0 10px 30px rgba(0,0,0,.12);padding:12px;width:min(340px,calc(100vw - 32px));display:flex;flex-direction:column;gap:12px}
+.sp-sec{display:flex;flex-direction:column;gap:8px}
+.sp-sec+.sp-sec{border-top:1px solid var(--line-2);padding-top:10px}
+.sp-row{display:flex;gap:8px;flex-wrap:wrap}
+.pill{display:inline-block;font-size:12px;border-radius:999px;padding:1px 8px;white-space:nowrap}
+.pill.warn{background:var(--warn-soft);color:var(--warn)}.pill.info{background:var(--paper);color:var(--ink-2)}.pill.ok{background:var(--ok-soft);color:var(--ok)}
+table.cmp tr.diff td{background:var(--warn-soft)}
+table.cmp td:first-child{width:28px}
+</style>
+
+<div class="wrap">
+  <header class="top">
+    <div style="display:flex;align-items:center;gap:14px;flex-wrap:wrap">
+      <img class="logo" src="assets/tiktin-logo.png" alt="טיקטין תכנון חשמל">
+      <div>
+        <h1>הכנה אוטומטית של הנחיות חשמל לפרויקט מגורים ועירוב שימושים</h1>
+        <p>הנחיות ראשוניות לאדריכל · טופס לכל מגרש · <span class="ver">גרסה V1 · 05.10.2026</span></p>
+      </div>
+    </div>
+    <div class="head-actions">
+      <details class="savebox" id="savebox">
+        <summary class="btn">שמירה ופתיחה</summary>
+        <div class="savepanel">
+          <div class="sp-sec" id="sp-cloud" hidden>
+            <b>בענן (לאנשי המשרד)</b>
+            <div class="sp-row"><button type="button" class="btn primary" id="c-save">שמירה בענן</button><button type="button" class="btn" id="c-savenew">שמירה כפרויקט חדש</button></div>
+            <label class="f">פרויקטים שמורים<select id="c-list"><option value="">טוען…</option></select></label>
+            <div class="sp-row"><button type="button" class="btn" id="c-open">פתיחה</button><button type="button" class="btn" id="c-del">מחיקה</button></div>
+            <div class="muted" id="c-msg"></div>
+          </div>
+          <div class="sp-sec">
+            <b>במחשב</b>
+            <div class="sp-row"><button type="button" class="btn" id="f-save">שמירה למחשב</button><label class="btn" for="f-open" style="cursor:pointer">פתיחה מקובץ</label><input type="file" id="f-open" accept=".json,application/json" hidden></div>
+            <div class="muted">הקובץ נשמר בפורמט JSON וניתן לפתוח אותו כאן בכל עת.</div>
+          </div>
+        </div>
+      </details>
+      <button type="button" class="btn" id="btn-reset" title="מחיקת כל הנתונים שהוזנו">טופס חדש</button>
+    </div>
+  </header>
+
+  <div class="layout">
+    <form class="form" id="form" autocomplete="off" onsubmit="return false">
+      <section class="card" id="imp-card" hidden>
+        <h2>ייבוא נתונים ממצגת הפרויקט</h2>
+        <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">
+          <label class="btn primary" for="imp-file" style="cursor:pointer">בחירת קובץ PDF</label>
+          <input type="file" id="imp-file" accept="application/pdf,.pdf" hidden>
+          <button type="button" class="btn" id="imp-stop" hidden>עצירה</button>
+          <span class="hg" id="imp-hg" hidden aria-hidden="true"></span><span class="muted" id="imp-status" role="status"></span><span class="timer" id="imp-timer" hidden></span>
+        </div>
+        <div id="imp-result" style="margin-top:10px"></div>
+        <details class="help" style="margin-top:6px"><summary>הסבר</summary><div class="body">המערכת קוראת את המצגת ומחפשת שם פרויקט, יזם, אדריכל, עיר, בניינים (קומות, יח"ד, דירות בקומה, גובה, מסחר, תעסוקה, ציבור) וחניון (שטח, קומות, חניות). אם הטופס ריק – הנתונים שנמצאו ממלאים אותו. אם כבר הוקלדו נתונים – מוצגת השוואה בין מה שהוקלד למה שבמצגת, ובוחרים מה לעדכן. הקריאה נעשית ע"י Claude דרך מפתח API (ראו "הגדרות קריאה").</div></details>
+      </section>
+      <section class="card">
+        <h2><span class="step">1</span>פרטי הפרויקט</h2>
+        <div class="grid">
+          <label class="f">שם הפרויקט<input type="text" id="p-name" data-k="project.name"></label>
+          <label class="f">מספר ISO<input type="text" id="p-iso" data-k="project.iso" inputmode="numeric"></label>
+          <label class="f">היזם<input type="text" id="p-dev" data-k="project.dev"></label>
+          <label class="f">שם האדריכל<input type="text" id="p-arch" data-k="project.arch"></label>
+          <label class="f">עיר<input type="text" id="p-city" data-k="project.city" list="cities"></label>
+          <label class="f">מחוז חח"י
+            <select id="p-district" data-k="project.district">
+              <option value="דן">דן</option><option value="שרון">שרון</option><option value="שפלה">שפלה</option><option value="אחר">אחר</option>
+            </select>
+          </label>
+        </div>
+        <datalist id="cities"></datalist><datalist id="structs"></datalist><datalist id="pubtypes"><option value="גן ילדים"><option value="בית ספר"><option value="מתנ״ס"><option value="מעון יום"><option value="בית כנסת"><option value="מבנה ציבור"></datalist>
+      </section>
+
+      <section class="card">
+        <h2><span class="step">2</span>בניינים במגרש</h2>
+        <div class="grid" style="margin-bottom:12px">
+          <label class="f">מספר בניינים
+            <select id="b-count"></select>
+          </label>
+        </div>
+        <div id="buildings"></div>
+      </section>
+
+      <section class="card">
+        <h2><span class="step">3</span>חניון / מרתף משותף</h2>
+        <div id="parking"></div>
+      </section>
+
+      <section class="card">
+        <h2><span class="step">4</span>חדר שנאים חח"י</h2>
+        <div id="trafo"></div>
+      </section>
+
+      <section class="card internal">
+        <h2>לשימוש פנימי · תהליך אישור תחנה</h2>
+        <div id="process"></div>
+      </section>
+    </form>
+
+    <div class="preview-col">
+      <div class="export">
+        <span class="t">הפקת מסמך לאדריכל</span>
+        <button type="button" class="btn primary" id="x-docx">Word</button>
+        <button type="button" class="btn" id="x-pdf">PDF</button>
+        <button type="button" class="btn" id="x-xlsx">Excel</button>
+        <div class="status" id="x-status"></div>
+      </div>
+      <div class="sheet" id="sheet"></div>
+    </div>
+  </div>
+</div>
+<div class="toast" id="toast" hidden><div></div></div>
+<div class="modal" id="ask-modal" hidden role="dialog" aria-modal="true" aria-labelledby="ask-title">
+  <div class="modal-box"><h3 id="ask-title">חיבור ציבורי מרתף משותף</h3><p id="ask-text"></p>
+    <div class="modal-actions"><button type="button" class="btn primary" id="ask-yes">כן, להעביר</button><button type="button" class="btn" id="ask-no">ביטול</button></div></div>
+</div>
+<div class="modal" id="reset-modal" hidden role="dialog" aria-modal="true" aria-labelledby="rm-title">
+  <div class="modal-box">
+    <h3 id="rm-title">טופס חדש</h3>
+    <p>כל הנתונים שהוזנו בטופס יימחקו. האם לשמור אותם לפני המחיקה?</p>
+    <div class="modal-actions">
+      <button type="button" class="btn primary" id="rm-cloud" hidden>שמירה בענן ואז טופס חדש</button>
+      <button type="button" class="btn" id="rm-file">שמירה למחשב ואז טופס חדש</button>
+      <button type="button" class="btn danger" id="rm-wipe">מחיקה בלי שמירה</button>
+      <button type="button" class="btn" id="rm-cancel">ביטול</button>
+    </div>
+    <div class="muted" id="rm-msg"></div>
+  </div>
+</div>
+
+<script>
+/* GitHub version: replaces the claude.ai runtime (downloads + PDF reading). No cloud save. */
+(function(){
+  const KEY="tiktin-anthropic-key",MOD="tiktin-anthropic-model",DEF_MODEL="claude-sonnet-4-5";
+  const get=k=>{try{return localStorage.getItem(k)||""}catch(e){return ""}};
+  const b64=blob=>new Promise((r,j)=>{const f=new FileReader();f.onload=()=>r(String(f.result).split(",")[1]);f.onerror=j;f.readAsDataURL(blob)});
+  const downloads={save:async({filename,data})=>{const blob=data instanceof Blob?data:new Blob([data]);const u=URL.createObjectURL(blob);
+    const a=document.createElement("a");a.href=u;a.download=filename;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(u),4000)}};
+  const sample={limits:async()=>({images:{maxCount:10,mediaTypes:["image/jpeg"]}}),
+    json:async(prompt,o={})=>{const key=get(KEY).trim();if(!key)throw {code:"nokey"};
+      const content=[];for(const im of (o.images||[]))content.push({type:"image",source:{type:"base64",media_type:"image/jpeg",data:await b64(im)}});
+      content.push({type:"text",text:prompt+"\n\nהחזר/י אך ורק JSON תקין, ללא טקסט נוסף."});
+      let r;try{r=await fetch("https://api.anthropic.com/v1/messages",{method:"POST",signal:o.signal,headers:{"content-type":"application/json","x-api-key":key,"anthropic-version":"2023-06-01","anthropic-dangerous-direct-browser-access":"true"},
+        body:JSON.stringify({model:get(MOD).trim()||DEF_MODEL,max_tokens:8000,messages:[{role:"user",content}]})})}
+      catch(e){if(e&&e.name==="AbortError")throw {code:"cancelled"};throw {code:"net"}}
+      if(r.status===401)throw {code:"badkey"};if(r.status===429||r.status===529)throw {code:"rate_limited"};if(r.status===413)throw {code:"too_large"};
+      if(!r.ok){let m="";try{m=(await r.json()).error.message}catch(e){}throw {code:"api",msg:m}}
+      const d=await r.json();const t=(d.content||[]).filter(c=>c.type==="text").map(c=>c.text).join("");
+      const s=t.indexOf("{"),e=t.lastIndexOf("}");if(s<0||e<s)throw {code:"api",msg:"no json"};return JSON.parse(t.slice(s,e+1))}};
+  window.claude={use:async n=>n==="downloads"?downloads:n==="sample"?sample:null};
+  document.addEventListener("DOMContentLoaded",()=>{const card=document.getElementById("imp-card");if(!card)return;
+    const d=document.createElement("details");d.className="help";d.style.marginTop="6px";
+    d.innerHTML=`<summary>הגדרות קריאה (מפתח API)</summary><div class="body" style="display:flex;flex-direction:column;gap:8px">
+      <div>קריאת המצגת נעשית ע"י Claude דרך מפתח API של Anthropic (בתשלום לפי שימוש). המפתח נשמר רק בדפדפן שלך במחשב הזה ולא נשלח לשום מקום מלבד Anthropic.</div>
+      <label>מפתח API<input type="password" id="gh-key" autocomplete="off" placeholder="sk-ant-..."></label>
+      <label>מודל<input type="text" id="gh-model" placeholder="${DEF_MODEL}"></label>
+      <div style="display:flex;gap:8px"><button type="button" class="btn primary" id="gh-save">שמירה</button><button type="button" class="btn" id="gh-del">מחיקת המפתח</button><span class="muted" id="gh-msg"></span></div></div>`;
+    card.appendChild(d);const k=d.querySelector("#gh-key"),m=d.querySelector("#gh-model"),msg=d.querySelector("#gh-msg");k.value=get(KEY);m.value=get(MOD);
+    if(!get(KEY))d.open=true;
+    d.querySelector("#gh-save").onclick=()=>{try{localStorage.setItem(KEY,k.value.trim());localStorage.setItem(MOD,m.value.trim())}catch(e){}msg.textContent="נשמר"};
+    d.querySelector("#gh-del").onclick=()=>{try{localStorage.removeItem(KEY)}catch(e){}k.value="";msg.textContent="נמחק"}});
+})();
+</script>
+<script src="https://cdn.jsdelivr.net/npm/docx@9.6.1/dist/index.iife.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js"></script>
+<script>
+"use strict";
+/* ================= reference data ================= */
+const CATS=[{v:"low",t:"עד 29 מ'"},{v:"mid",t:"29–42 מ'"},{v:"high",t:"42–128 מ'"}];
+const catText=v=>(CATS.find(c=>c.v===v)||CATS[0]).t;
+const DISTRICT_OF={"תל אביב":"דן","תל אביב-יפו":"דן","תל אביב יפו":"דן","רמת גן":"דן","גבעתיים":"דן","חולון":"דן","בת ים":"דן","בני ברק":"דן",
+ "רחובות":"שפלה","נס ציונה":"שפלה","אשדוד":"שפלה","ראשון לציון":"שפלה","אשקלון":"שפלה",
+ "נתניה":"שרון","הרצליה":"שרון","רעננה":"שרון"};
+const IMG={ // natural sizes
+ "assets/tiktin-logo.png":[435,189],"assets/grid-access.jpg":[1026,1824],
+ "assets/iec-4.png":[968,1328],"assets/iec-5.png":[947,1144],"assets/iec-6.png":[870,1084],"assets/iec-7.png":[911,1107],
+ "assets/trafo-2.png":[1248,1225],"assets/trafo-3.png":[1486,1378],"assets/trafo-4.png":[1599,1030],"assets/trafo-5.png":[1588,1419],
+ "assets/trafo-6.png":[1502,1150],"assets/trafo-7.png":[1161,1143],"assets/trafo-8.png":[913,598],"assets/trafo-9.png":[1526,1270]};
+const TRAFO=[
+ {id:1,name:"שנאי אחד",under:"5.05X6.9",surf:"4.1X4.4",air:"3.2",radRes:"3",radCom:"3",door:"בפאה של 4.1 מ'",img:[["assets/trafo-2.png","דוגמה 1ג – שנאי אחד תת-קרקעי, פתח הורדת ציוד וכניסת כבלים בתוך התחנה"]]},
+ {id:2,name:"שני שנאים",under:"5.1X9.1",surf:"4.1X6.6",air:"6.4",radRes:"5",radCom:"3",door:"בפאה של 4.1 מ'",img:[["assets/trafo-3.png","דוגמה 2ג – שני שנאים תת-קרקעי, פתח הורדת ציוד וכניסת כבלים מחוץ לתחנה"]]},
+ {id:3,name:"שלושה שנאים",under:"5.2X13.5",surf:"4.1X11",air:"9.6",radRes:"6",radCom:"4",door:"בפאה של 4.1 מ'",img:[["assets/trafo-4.png","דוגמה 3ג – שלושה שנאים תת-קרקעי"]]},
+ {id:4,name:"שנאי אחד + חיבור מתח גבוה",under:"5.1X8.7",surf:"4.1X6.2",air:"6.4",radRes:"3",radCom:"3",door:"בפאה של 4.1 מ'",img:[["assets/trafo-5.png","דוגמה 4ג – שנאי אחד ומונה מתח גבוה תת-קרקעי"]]},
+ {id:5,name:"שני שנאים + חיבור מתח גבוה + 2 יחידות SF6",under:"5.2X11.2",surf:"4.1X8.7",air:"6.4",radRes:"5",radCom:"3",door:"בפאה של 4.1 מ'",img:[["assets/trafo-6.png","דוגמה 5ג – שני שנאים, מונה מתח גבוה ו-2 יחידות SF6 תת-קרקעי"]]},
+ {id:6,name:"חדר מיתוג – SF6 אחד",under:"5.7X4.45",surf:"3.2X3.6",air:"0.6",radRes:"2.5",radCom:"2.5",door:"בפאה של 3.6 מ'",img:[["assets/trafo-7.png","דוגמה 6ג אופציה א – חדר מיתוג SF6 אחד, פתח ציוד וכבלים בתוך התחנה"],["assets/trafo-8.png","דוגמה 6ג אופציה ב – חדר מיתוג SF6 אחד ללא מבואה"]]},
+ {id:7,name:"חדר מיתוג – שני SF6",under:"4.45X7.45",surf:"3.9X5",air:"0.6",radRes:"2.5",radCom:"2.5",door:"בפאה של 3.9 מ'",img:[["assets/trafo-9.png","דוגמה 7ג – חדר מיתוג שני SF6 תת-קרקעי"]]}];
+const CABINETS=[["ארון 6 מונים","315","62","34","204","62"],["ארון 12 מונים","315","115","34","204","60"],["פילר 1000 (פילר 2 מורחב)","910","144","42","153","73"],
+ ["פילר 2","630","115","36","135","60"],["פילר 0","630","62","36","135","62"],["ארון מדידה קטן","315","68","42","115","68"],["ארון מדידה גדול","910","68","42","170","68"]];
+const PROCESS={
+ "דן":["מסמך חח\"י ברישוי זמין: האם נדרשת תחנה. אם לא נדרשת – המסמך יכול לשמש להיתר הבנייה. אם נדרשת תחנה או שהפרויקט גדול – ממשיכים.",
+      "פגישת סיכום תחנה עם מתכנן רשת וחל\"ב ותחנות פנימיות. בסיום מחליטים כמה שנאים / מיתוג. מתכנן התחנות הפנימיות מודיע למתכנן הרשת שהתחנה בשלה לסיכום (לרוב נדרשים תיקונים ופגישות נוספות).",
+      "קבלת סיכום תחנה ממתכנן רשת וחל\"ב.","פגישות לאישור התחנה להיתר, עד קבלת תוכנית חתומה.","לאחר קבלת היתר הבנייה – פגישות לאישור התחנה לביצוע."],
+ "שפלה":["פגישת הצגת פרויקט מול המתכנן בלבד (ללא תחנות פנימיות) או משלוח תוכניות, וקבלת טופס תיאום אדריכלי שעובר בדרך כלל אלינו ולתחנות פנימיות.",
+      "פגישות זום עם תחנות פנימיות עד לאישור סיכום תחנה מהן למתכנן (ללא מתכנן רשת וחל\"ב); אז המתכנן מוציא סיכום תחנה.",
+      "פגישות זום עם תחנות פנימיות לקבלת אישור להיתר.","לאחר קבלת היתר – פגישות זום עם תחנות פנימיות לקבלת אישור לביצוע."],
+ "שרון":[],"אחר":[]};
+
+/* ================= state ================= */
+const LS="tiktin-arch-guidelines-v1";
+const PUBTYPES=[{v:"",t:"לא ידוע"},{v:"אין",t:"אין"},{v:"גן ילדים",t:"גן ילדים"},{v:"מעון יום",t:"מעון יום"},{v:"בית ספר",t:"בית ספר"},{v:"מתנ״ס",t:"מתנ״ס"},{v:"בית כנסת",t:"בית כנסת"},{v:"מבנה ציבור",t:"מבנה ציבור אחר"}];
+const hasPub=b=>(num(b.pubArea)||0)>0||(!!String(b.pubType||"").trim()&&b.pubType!=="אין");
+const pubName=b=>(b.pubType&&b.pubType!=="אין")?b.pubType:"שטח ציבורי";
+const GRP_RE=/^(מבנן|מבנה|אגף|מתחם|מגרש|בלוק|שלב)/;
+const grpLabel=k=>{k=String(k||"").trim();return !k?"":GRP_RE.test(k)?k:`מבנן ${k}`};
+const bldLabel=nm=>{nm=String(nm||"").trim();return /^(בניין|בנין|מגדל)/.test(nm)?nm:`בניין ${nm}`};
+function newBuilding(i){return {name:"ABCDEFGHIJKL"[i]||String(i+1),struct:"",cat:"low",units:"",floors:"",perFloor:"",meters:"down",sides:"two",msides:"",mtype:"",roomLen:"",shaftW:"",com:false,comArea:"",offArea:"",pubArea:"",pubType:"",genReq:false,kva:"",genLoc:"basement",lux:false,ov:{}}}
+function defaults(){return {project:{name:"",iso:"",dev:"",arch:"",city:"",district:"דן"},
+ buildings:[newBuilding(0)],
+ parking:{has:true,area:"",floors:"1",total:"",perFloor:[{area:"",spaces:""}],over:[0],dev:false,devCount:"",ov:{},baseBld:-1,baseSize:"3X400"},
+ trafo:{req:false,type:1}}}
+let S=defaults();
+try{const raw=localStorage.getItem(LS);if(raw){const o=JSON.parse(raw);if(o&&o.project&&Array.isArray(o.buildings))S=Object.assign(defaults(),o)}}catch(e){}
+S.buildings.forEach(b=>{b.ov=b.ov||{};["struct","floors","perFloor","offArea","pubArea","pubType"].forEach(k=>{if(b[k]==null)b[k]=""})});S.parking.ov=S.parking.ov||{};
+function save(){try{localStorage.setItem(LS,JSON.stringify(S))}catch(e){}}
+
+/* ================= helpers ================= */
+const $=s=>document.querySelector(s);
+const esc=s=>String(s??"").replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const num=v=>{const n=parseFloat(String(v).replace(/,/g,""));return isFinite(n)?n:null};
+const fmt=n=>n==null?"":Number(n).toLocaleString("he-IL",{maximumFractionDigits:2});
+const high=b=>b.cat!=="low";
+function setPath(path,val){const ks=path.split(".");let o=S;for(let i=0;i<ks.length-1;i++)o=o[ks[i]];o[ks[ks.length-1]]=val}
+function getPath(path){return path.split(".").reduce((o,k)=>o==null?o:o[k],S)}
+let GEN=[];
+/* ===== קוטר אגזוז – החישוב מאפליקציית "בחירת גנרטור" של המשרד (tiktin-generator-selector) ===== */
+const EXH_STD=[4,5,6,8,10,12,14,16,18,20,22,24];
+const EXH_OD_MM={4:114.3,5:141.3,6:168.3,8:219.1,10:273,12:323.9,14:355.6,16:406.4,18:457.2,20:508,22:559,24:610};
+
+
+const EXH_ENGINE={
+  220:{engine:"Baudouin 6M16G220/5",q:38.15,t:600,bp:6.0,direct:true},
+  250:{engine:"Baudouin 6M16G250/5",q:44.4,t:600,bp:6.0,direct:true},
+  275:{engine:"Baudouin 6M16G275/5",q:50.6,t:600,bp:6.0,direct:true},
+  300:{engine:"Baudouin 6M16G300/5",q:53.0,t:700,bp:6.0,direct:true},
+  330:{engine:"Baudouin 6M16G350/5",q:58.2,t:550,bp:11.0,direct:true},
+  360:{engine:"Hyundai/Doosan DP126LB",q:58.3,t:590,bp:5.9,direct:true},
+  400:{engine:"Baudouin 6M21G400/5",q:65.0,t:580,bp:12.0,direct:true},
+  440:{engine:"Baudouin 6M21G440/5",q:69.0,t:580,bp:12.0,direct:true},
+  450:{engine:"Baudouin 6M21G440/5",q:69.0,t:580,bp:12.0,direct:true},
+  500:{engine:"Baudouin 6M21G500/5",q:99.0,t:580,bp:12.0,direct:true},
+  580:{engine:"Hyundai/Doosan DP180LA",q:106.0,t:562,bp:5.9,direct:true},
+  630:{engine:"Hyundai/Doosan DP180LA",q:106.0,t:562,bp:5.9,direct:true},
+  715:{engine:"Baudouin 6M33G715/5",q:140.7,t:550,bp:7.5,direct:true},
+  750:{engine:"Hyundai/Doosan DP222LC",q:108.0,t:502,bp:5.9,direct:true},
+  825:{engine:"Hyundai/Doosan DP222LC",q:108.0,t:502,bp:5.9,direct:true},
+  900:{engine:"Hyundai/Doosan DP222CB",q:136.0,t:570,bp:5.9,direct:true},
+  1000:{engine:"Hyundai/Doosan DP222CC",q:147.0,t:575,bp:5.9,direct:true},
+  1100:{engine:"Perkins 4008-30TAG2",q:201.0,t:500,bp:8.0,direct:true},
+  1250:{engine:"Perkins 4008-30TAG3",q:203.0,t:473,bp:7.0,direct:true},
+  1400:{engine:"Mitsubishi S12R-PTA-C",q:258.0,t:520,bp:5.9,direct:true},
+  1540:{engine:"Mitsubishi S12R-PTAA2",q:312.0,t:520,bp:5.88,direct:true},
+  1650:{engine:"Mitsubishi S12R-PTAA2",q:343.0,t:520,bp:5.9,direct:true},
+  1915:{engine:"Mitsubishi S16R-PTA",q:339.0,t:539,bp:5.9,direct:true},
+  2100:{engine:"Mitsubishi S16R-PTA2",q:343.0,t:524,bp:5.9,direct:true},
+  2200:{engine:"Mitsubishi S16R-PTA2 class",q:360.0,t:524,bp:5.9,direct:false},
+  2500:{engine:"Mitsubishi S16R2-PTAW",q:506.0,t:550,bp:5.88,direct:true},
+  2800:{engine:"Mitsubishi S16R2-PTAW-E",q:536.0,t:550,bp:5.9,direct:true}
+};
+function exhaustBase(g){const v=parseFloat(g?.room65?.exhaust);return Number.isFinite(v)&&v>0?v:4}
+function exhaustOutsideMm(d){const od=EXH_OD_MM[d]||d*25.4,add=d<=8?100:d<=16?150:200;return Math.ceil((od+add)/10)*10}
+function exhaustProfile(g){
+  const kva=Number(g?.kva)||0;
+  if(EXH_ENGINE[kva])return EXH_ENGINE[kva];
+  if(kva<220)return {engine:"אומדן לפי הספק",q:Math.max(1.8,kva*0.18),t:600,bp:6.0,direct:false};
+  const keys=Object.keys(EXH_ENGINE).map(Number).sort((a,b)=>a-b);
+  if(kva<=keys[0])return EXH_ENGINE[keys[0]];
+  if(kva>=keys.at(-1))return EXH_ENGINE[keys.at(-1)];
+  let lo=keys[0],hi=keys.at(-1);
+  for(let i=0;i<keys.length-1;i++){
+    if(kva>keys[i]&&kva<keys[i+1]){lo=keys[i];hi=keys[i+1];break}
+  }
+  const a=EXH_ENGINE[lo],b=EXH_ENGINE[hi],r=(kva-lo)/(hi-lo);
+  return {engine:"אינטרפולציה בין נתוני מנוע",q:a.q+(b.q-a.q)*r,t:a.t+(b.t-a.t)*r,bp:Math.min(a.bp,b.bp),direct:false};
+}
+function exhaustPipeState(dIn,profile,straight,bends){
+  const D=dIn*0.0254,area=Math.PI*D*D/4;
+  const velocity=(profile.q/60)/area;
+  const tempK=profile.t+273.15;
+  const rho=1.184*298.15/tempK;
+  const mu=1.716e-5*Math.pow(tempK/273.15,1.5)*(273.15+111)/(tempK+111);
+  const re=Math.max(4000,rho*velocity*D/mu);
+  const rough=0.00015;
+  const friction=0.25/Math.pow(Math.log10(rough/(3.7*D)+5.74/Math.pow(re,0.9)),2);
+  const equivLength=straight+bends*16*D+1.0;
+  const dpKPa=friction*(equivLength/D)*(rho*velocity*velocity/2)/1000;
+  return {velocity,dpKPa,equivLength};
+}
+function exhaustEstimate(g,horiz,vert,bends){
+  const base=exhaustBase(g);
+  const straight=Math.max(0,Number(horiz)||0)+Math.max(0,Number(vert)||0);
+  const n=Math.max(1,Math.min(4,Math.round(Number(bends)||4)));
+  const profile=exhaustProfile(g);
+  const pipeBudget=Math.max(0.8,profile.bp*0.35);
+  const maxVelocity=40;
+  let dia=EXH_STD.at(-1),state=null;
+  for(const d of EXH_STD){
+    if(d<base)continue;
+    const s=exhaustPipeState(d,profile,straight,n);
+    if(s.dpKPa<=pipeBudget&&s.velocity<=maxVelocity){dia=d;state=s;break}
+  }
+  if(!state)state=exhaustPipeState(dia,profile,straight,n);
+  return {base,dia,outside:exhaustOutsideMm(dia),bends:n,direct:!!profile.direct};
+}
+
+// exhaust route for a generator room: 20 m horizontal, 4 bends, vertical = basement + building height to the roof outlet
+function genExhaust(b){const g=pickGen(b.kva);if(!g||!g.g||b.genLoc==="roof")return null;
+  const fl=num(b.floors);const roof=fl?4.5+(fl-1)*3.2+3.2+2:({low:31,mid:46,high:62}[b.cat]||40);const depth=b.genLoc==="basement"?3.5:0;
+  const vert=Math.ceil(roof+depth),horiz=20,bends=4;const r=exhaustEstimate(g.g,horiz,vert,bends);
+  const shaft=Math.max(40,Math.ceil((r.outside/10+20)/10)*10);return {...r,vert,horiz,shaft,kva:g.g.kva}}
+function pickGen(kva){const n=num(kva);if(!n||!GEN.length)return null;const exact=GEN.find(g=>g.kva===n);return {g:exact||GEN.find(g=>g.kva>=n)||null,exact:!!exact,n}}
+const dims=s=>{if(!s)return null;const p=String(s).split(/x/i).map(x=>x.trim());return p.length===3?p:null};
+function toast(t){const el=$("#toast");el.firstElementChild.textContent=t;el.hidden=false;clearTimeout(toast.t);toast.t=setTimeout(()=>el.hidden=true,2600)}
+function seg(name,path,opts,cur){return `<div class="seg" role="radiogroup">${opts.map(o=>`<label><input type="radio" name="${name}" value="${o.v}" data-k="${path}" ${String(cur)===String(o.v)?"checked":""}><span>${o.t}</span></label>`).join("")}</div>`}
+function help(html){return `<details class="help"><summary>הסבר</summary><div class="body">${html}</div></details>`}
+
+/* ================= form rendering ================= */
+function renderBuildings(){
+  {const st=[...new Set(S.buildings.map(b=>(b.struct||"").trim()).filter(Boolean))];const dl=document.getElementById("structs");if(dl)dl.innerHTML=st.map(s=>`<option value="${esc(s)}">`).join("")}
+  $("#b-count").innerHTML=Array.from({length:12},(_,i)=>`<option value="${i+1}" ${S.buildings.length===i+1?"selected":""}>${i+1}</option>`).join("");
+  $("#buildings").innerHTML=S.buildings.map((b,i)=>{
+    const p=`buildings.${i}`;const g=pickGen(b.kva);const needGen=high(b)||b.genReq;
+    const genMsg=needGen?genMsgHtml(b):"";
+    const units=num(b.units);
+    let meterMsg="";
+    if(b.meters==="down"&&units!=null&&!canChooseMType(b)){meterMsg=isRoom(b)?`<div class="msg ok">${fmt(units)} יח"ד – נדרש חדר מונים</div>`:`<div class="msg info">פחות מ-36 יח"ד – נישות מונים (אלא אם נדרש פילר 0)</div>`}
+    const w=roomWidth(b);const st=String(b.struct||"").trim(),pst=i>0?String(S.buildings[i-1].struct||"").trim():null;
+    const sep=(st&&st!==pst)||(!st&&pst)?`<div class="grp-sep">${st?esc(grpLabel(st)):"ללא מבנן"}</div>`:"";
+    return `${sep}<div class="bld">
+      <div class="bld-head"><span class="tag">בניין ${i+1}</span>
+        <label class="f" style="flex:1">שם הבניין<input type="text" id="b${i}-name" data-k="${p}.name" value="${esc(b.name)}" placeholder="A / 1 / מזרחי"></label>
+        <label class="f" style="width:90px">יח"ד<input type="number" min="0" id="b${i}-units" data-k="${p}.units" value="${esc(b.units)}"></label>
+      </div>
+      <div class="grid"><label class="f">מבנן / מבנה (אם כמה בניינים יחד)<input type="text" id="b${i}-st" data-k="${p}.struct" value="${esc(b.struct||"")}" placeholder="למשל A או מבנן 1" list="structs"></label></div>
+      <div class="grid"><label class="f">קומות מעל הקרקע<input type="number" min="0" id="b${i}-fl" data-k="${p}.floors" value="${esc(b.floors)}"></label>
+        <label class="f">מקסימום דירות בקומה<input type="number" min="0" id="b${i}-pf" data-k="${p}.perFloor" value="${esc(b.perFloor)}"></label></div>
+      <div class="fieldset"><span class="lbl">קטגוריית גובה</span>${seg(`cat${i}`,`${p}.cat`,CATS,b.cat)}
+        ${(()=>{const cf=catFromFloors(b.floors,b.com);return cf&&cf!==b.cat?`<div class="msg warn">לפי ${esc(b.floors)} קומות${b.com?" עם מסחר":""} צפוי: ${catText(cf)} – יש לבדוק מול הגובה הקובע בחתכים.</div>`:""})()}
+        ${help(`הגובה הקובע: מרצפת קומת הקרקע עד רצפת קומת המגורים האחרונה.<br>הערכה לפי קומות מעל הקרקע (כ-3 מ' לקומה): עד 9 – עד 29 מ'; 10 – עד 29 מ' (מעל 29 מ' כשיש מסחר גבוה בקרקע); 11–14 – 29–42 מ' (14 קומות עם מסחר בקרקע – מעל 42 מ'); 15 ומעלה – מעל 42 מ'. הגובה בחתכים קובע.<br>בבניין מעל 29 מ' נדרשים 2 חדרי מדרגות.`)}</div>
+      <div class="sub"><h4>מוני חח"י</h4>
+        ${seg(`met${i}`,`${p}.meters`,[{v:"down",t:"למטה (קרקע / מרתף עליון)"},{v:"floors",t:"בקומות"}],b.meters)}
+        ${b.meters==="down"?`
+          ${canChooseMType(b)?`<div class="fieldset"><span class="lbl">ריכוז מונים (עד 36 יח"ד)</span>${seg(`mt${i}`,`${p}.mtype`,[{v:"niche",t:"נישה במרתף עליון (ברירת מחדל)"},{v:"room",t:"חדר מונים"}],b.mtype==="room"?"room":"niche")}</div>`:""}
+          ${isRoom(b)?(()=>{const c=mrCalc(b);return `<div class="fieldset"><span class="lbl">העמדת ארונות בחדר המונים</span>${seg(`sd${i}`,`${p}.msides`,[{v:"one",t:`צד אחד (${high(b)?200:180})`},{v:"two",t:"שני צדדים (320)"}],mSides(b))}</div>
+          <div class="fieldset"><span class="lbl">חיבור ציבורי מרתף משותף (חניון) בחדר זה</span>${seg(`bs${i}`,`base.${i}`,[{v:"false",t:"לא"},{v:"true",t:"כן"}],S.parking.baseBld===i)}
+            ${S.parking.baseBld===i?`<div class="grid"><label class="f">גודל החיבור הציבורי של המרתף<select id="b${i}-bsz" data-k="parking.baseSize">${MR_SIZES.map(z=>`<option ${S.parking.baseSize===z?"selected":""}>${z}</option>`).join("")}</select></label></div>`:(S.parking.baseBld>=0&&S.buildings[S.parking.baseBld]?`<div class="muted">החיבור המשותף נמצא כרגע ב${esc(bldLabel(S.buildings[S.parking.baseBld].name||("בניין "+(S.parking.baseBld+1))))}.</div>`:"")}</div>
+          ${c?`<div class="msg ok">גודל החדר לפי אפליקציית תכנון חדר המונים: ${fmt(c.L/100)} × ${fmt(c.W/100)} מ' · ${esc(c.sg.msg)} · ${c.r.n12} ארונות 12${c.r.n6?" + ארון 6":""}</div>`:`<div class="msg info">יש להזין יח"ד כדי לחשב את החדר.</div>`}
+          <div class="grid"><label class="f">אורך אחר לחדר (ס"מ)<input type="number" min="0" id="b${i}-rl" data-k="${p}.roomLen" value="${esc(b.roomLen||"")}" placeholder="${c?c.L:""}"></label>
+            <label class="f">רוחב אחר לחדר (ס"מ)<input type="number" min="0" id="b${i}-rw" data-k="${p}.roomWid" value="${esc(b.roomWid||"")}" placeholder="${c?c.W:""}"></label></div>
+          <div class="fieldset"><span class="lbl">תוכנית העמדה בחדר במסמך</span>${seg(`mp${i}`,`${p}.mplan`,[{v:"false",t:"לא לצרף"},{v:"true",t:"לצרף"}],!!b.mplan)}</div>
+          ${c?`<details class="help"><summary>תוכנית העמדה בחדר</summary><div class="body mplan">${mrPlanSVG(c,num(b.roomLen),num(b.roomWid))}</div></details>`:""}`})():`<div class="msg info">נישת מונים בגרעין הבניין, במרתף העליון.</div>`}
+          ${meterMsg}
+          ${help(`גודל החדר מחושב כמו באפליקציית "תיכנון חדר מונים של חברת חשמל בבניני מגורים": פילר ראשי לפי גובה הבניין ומספר הדירות, ארונות 12 ו-6 מונים, חיבור ציבורי לפי גובה הבניין (עד 29 מ' – 3X63, 29–42 מ' – 3X200, מעל 42 מ' – 3X400), מרווחים 15 ס"מ, רזרבה 10 ס"מ, 65 ס"מ מול דלת ארון פתוחה ומילוט 65 ס"מ ליד דלת 90.<br>ברירת המחדל: עד 29 מ' – ארונות בצד אחד; מעל 29 מ' – שני צדדים (320 ס"מ). מסחר – נוסף ארון 6 מונים.<br>אפשר להזין אורך ורוחב אחרים לחדר; הם יופיעו במסמך במקום החישוב.`)}`
+        :`<div class="fieldset"><span class="lbl">רמת גמר</span>${seg(`lux${i}`,`${p}.lux`,[{v:"false",t:"בניין רגיל (עומק ארון 45)"},{v:"true",t:"בניין יוקרה (עומק 60)"}],!!b.lux)}</div>
+          <div class="msg info">נישת כבלי חח"י, ארון מונים קומתי וחדר פילרים – לפי יח"ד, קומות ודירות בקומה (ניתן לשנות ב"מידות הפריטים").</div>`}
+      </div>
+      <div class="sub"><h4>שימושים נוספים</h4>
+        ${seg(`com${i}`,`${p}.com`,[{v:"false",t:"אין"},{v:"true",t:"יש מסחר"}],b.com)}
+        ${b.com?`<div class="grid"><label class="f">שטח מסחר – עיקרי + שירות (מ"ר)<input type="number" min="0" id="b${i}-com" data-k="${p}.comArea" value="${esc(b.comArea)}"></label></div>`:""}
+        <div class="grid"><label class="f">שטח תעסוקה / משרדים (מ"ר)<input type="number" min="0" id="b${i}-off" data-k="${p}.offArea" value="${esc(b.offArea)}" placeholder="אין"></label>
+          <label class="f">שטח ציבורי (מ"ר)<input type="number" min="0" id="b${i}-pub" data-k="${p}.pubArea" value="${esc(b.pubArea)}" placeholder="אין"></label>
+          <label class="f">מבנה ציבור<select id="b${i}-pubt" data-k="${p}.pubType">${PUBTYPES.map(o=>`<option value="${esc(o.v)}" ${String(b.pubType||"")===o.v?"selected":""}>${esc(o.t)}</option>`).join("")}${b.pubType&&!PUBTYPES.some(o=>o.v===b.pubType)?`<option value="${esc(b.pubType)}" selected>${esc(b.pubType)}</option>`:""}</select></label></div>
+      </div>
+      <div class="sub"><h4>גנרטור</h4>
+        ${high(b)?`<div class="muted">בניין מעל 29 מ' – גנרטור נדרש תמיד</div>`:seg(`gr${i}`,`${p}.genReq`,[{v:"false",t:"לא נדרש"},{v:"true",t:"נדרש"}],b.genReq)}
+        ${needGen?`<div class="grid">
+            <label class="f">גודל גנרטור נדרש (KVA)<input type="number" min="0" id="b${i}-kva" data-k="${p}.kva" value="${esc(b.kva)}"></label>
+          </div>
+          <div class="fieldset"><span class="lbl">מיקום</span>${seg(`gl${i}`,`${p}.genLoc`,[{v:"basement",t:"חדר במרתף"},{v:"ground",t:"חדר בקרקע"},{v:"roof",t:"גג (חופה)"}],b.genLoc)}</div>
+          <div data-genmsg="${i}">${genMsg}</div>
+          ${help(`הטופס בוחר מקטלוג שמרלינג את הגודל שהוזן או את הגודל הבא כלפי מעלה, כמו באפליקציית בחירת הגנרטור.<br>חדר במרתף או בקרקע – חדר מושתק. גג – חופה אקוסטית 65dB (מגורים).<br>בחדר – קוטר האגזוז מחושב כמו באפליקציית בחירת הגנרטור, לתוואי עד הגג: 4 כיפופים, 20 מ' אופקי, ואורך אנכי לפי הקומות (קרקע 4.5 מ', קומה 3.2 מ', קומת גג ויציאה 5.2 מ', מרתף 3.5 מ'). רוחב הפיר: הקוטר החיצוני עם הבידוד ועוד 10 ס"מ מכל צד, מעוגל ל-10 ס"מ, לפחות 40 ס"מ.`)}`:""}
+      </div>
+      ${ovTable(String(i),buildingItems(b,i),b.ov||{})}
+    </div>`}).join("");
+}
+function ovRows(id,items,ov){
+  const lvName={ground:"קרקע",typical:"טיפוסית",upper:"מרתף עליון",lower:"מרתף תחתון"};const seen={};const list=[];
+  Object.entries(items).forEach(([lv,arr])=>arr.forEach(it=>{if(it.text||it.key==="mroom")return;if(seen[it.key]){seen[it.key].lv.push(lvName[lv]||lv);return}const r={it,lv:[lvName[lv]||lv]};seen[it.key]=r;list.push(r)}));
+  return list.map(({it,lv})=>{const o=ov[it.key]||{};const dv=it.room?it.l:it.d;
+    return `<tr><td class="lv">${esc([...new Set(lv)].join(", "))}</td><td>${esc(it.name)}</td>
+      <td><input type="number" min="0" aria-label="${it.room?"רוחב":"רוחב"} ${esc(it.name)}" data-ov="${id}|${it.key}|w" value="${esc(o.w??"")}" placeholder="${it.w}"></td>
+      <td><input type="number" min="0" aria-label="${it.room?"אורך":"עומק"} ${esc(it.name)}" data-ov="${id}|${it.key}|d" value="${esc(o.d??"")}" placeholder="${dv}"></td></tr>`}).join("")}
+function ovTable(id,items,ov){return `<details class="ov"><summary class="muted" style="cursor:pointer">מידות הפריטים – ברירת מחדל (ניתן לשנות)</summary>
+  <div class="tbl-wrap"><table><thead><tr><th>מפלס</th><th>פריט</th><th>רוחב (ס"מ)</th><th>עומק / אורך (ס"מ)</th></tr></thead><tbody data-ovbody="${id}">${ovRows(id,items,ov)}</tbody></table></div>
+  <div class="muted" style="margin-top:4px">שדה ריק = ברירת המחדל המוצגת באפור. <button type="button" class="btn" style="padding:4px 10px;font-size:13px" data-ovreset="${id}">חזרה לברירות המחדל</button></div></details>`}
+function refreshOv(){S.buildings.forEach((b,i)=>{const tb=document.querySelector(`[data-ovbody="${i}"]`);if(tb)tb.innerHTML=ovRows(String(i),buildingItems(b,i),b.ov||{})});
+  const tp=document.querySelector('[data-ovbody="P"]');if(tp)tp.innerHTML=ovRows("P",commonItems(),S.parking.ov||{})}
+function canChooseMType(b){const u=num(b.units);return b.meters==="down"&&!high(b)&&u!=null&&u>0&&u<=36}
+function isRoom(b){if(b.meters!=="down")return false;if(high(b))return true;const u=num(b.units);if(u==null)return true;if(canChooseMType(b))return b.mtype==="room";return u>=36}
+function mSides(b){return b.msides||(high(b)?"two":"one")}
+function roomWidth(b){const c=mrCalc(b);return num(b.roomWid)||(c?c.W:(mSides(b)==="two"?320:(high(b)?200:180)))}
+/* ===== חדר מונים – הלוגיקה מאפליקציית המשרד "תיכנון חדר מונים של חברת חשמל בבניני מגורים" (meter-room) ===== */
+const MR_EQ={f1000:{n:"פילר 1000",s:"1000",w:144,d:48,dr:[80,64],c:"#7c4dff"},f2:{n:"פילר 2",s:"פ2",w:115,d:34,dr:[60,60],c:"#9b7bff"},f0:{n:"פילר 0",s:"פ0",w:62,d:34,dr:[61],c:"#c3b3ff"},
+  c12:{n:"ארון 12 מונים",s:"12",w:115,d:34,dr:[60,60],c:"#4f8ef7"},c6:{n:"ארון 6 מונים",s:"6",w:62,d:34,dr:[62],c:"#8fb7fb"},me:{n:"ארון מדידה",s:"מד",w:68,d:42,dr:[68],c:"#f0a53c"},mb:{n:"מפסק ראשי",s:"מפ",w:60,d:30,dr:[60],c:"#e5484d"}};
+const MR={DOOR:90,ESC:65,CLR:65,GAP:15,RES:10,SG:10,WALL:20};
+const MR_PUB={low:"3X63",mid:"3X200",high:"3X400"};
+const MR_SIZES=["3X25","3X40","3X63","3X80","3X100","3X125","3X160","3X200","3X250","3X315","3X400","3X500","3X630","3X800","3X910"];
+const mrAmps=sz=>parseInt(String(sz).split("X")[1])||0;
+const mrDoorLen=k=>Math.max(0,...MR_EQ[k].dr);
+const mrOff=k=>k==="mb"?0:4;
+const mrDep=x=>(x.k==="mb"&&x.amps)?(x.amps<=160?30:x.amps<=500?40:50):MR_EQ[x.k].d;
+const mrReach=x=>mrOff(x.k)+mrDep(x)+mrDoorLen(x.k);
+function mrSuggest(u,cat){const s={f1000:0,f2:0,f0:0,msg:""};
+  if(cat==="low"){if(u<36)s.msg="עד 29 מ' ופחות מ-36 דירות – ללא פילר ראשי";else if(u<=70){s.f0=1;s.msg="עד 29 מ', 36–70 דירות – פילר 0"}else{s.f1000=Math.ceil(u/100);s.msg=`עד 29 מ', מעל 70 דירות – פילר 1000 לכל 100 דירות (${s.f1000})`}}
+  else if(cat==="mid"){if(u<=70){s.f2=1;s.msg="29–42 מ' עד 70 דירות – פילר 2"}else{s.f1000=Math.ceil(u/100);s.msg=`29–42 מ', מעל 70 דירות – פילר 1000 לכל 100 דירות (${s.f1000})`}}
+  else{s.f1000=Math.max(1,Math.ceil(u/100));s.msg=`מעל 42 מ' – פילר 1000 לכל 100 דירות (${s.f1000})`}
+  return s}
+function mrLayoutWall(items,gap,startGap,endGap){if(!items.length)return{items:[],len:0};let x=0;const out=[];
+  items.forEach((it,i)=>{const g=i===0?startGap:(it.gapBefore!==undefined?it.gapBefore:gap);const start=x+g,w=MR_EQ[it.k].w;out.push({...it,name:MR_EQ[it.k].n+(it.label?" – "+it.label:""),w,start,end:start+w});x=Math.max(x,start+w)});
+  return{items:out,len:x+endGap}}
+function mrEscGap(it,width){const dy=width/2+MR.DOOR/2-mrReach(it);return dy>=MR.ESC?0:Math.ceil(Math.sqrt(MR.ESC*MR.ESC-Math.max(0,dy)**2))}
+function mrBuild(p,oneSide){
+  const meters=p.units+(p.pubSlot||0);
+  const n12=meters<=0?0:Math.floor(meters/12)+(meters%12>6?1:0);
+  const n6=(meters>0&&meters%12!==0&&meters%12<=6)?1:0;
+  const fixedA=[];for(let i=0;i<p.f1000;i++)fixedA.push({k:"f1000"});for(let i=0;i<p.f2;i++)fixedA.push({k:"f2"});for(let i=0;i<p.f0;i++)fixedA.push({k:"f0"});
+  const tailB=[];for(let i=0;i<n6;i++)tailB.push({k:"c6"});
+  (p.extras||[]).forEach(e=>{if(e.pair){tailB.push({k:"me",label:e.label});tailB.push({k:"mb",gapBefore:e.gt?10:MR.SG,label:e.label,amps:e.amps})}else tailB.push({k:e.k,comm:true,meters:e.meters,label:e.label})});
+  let best=null;
+  if(oneSide){const itA=[...fixedA,...Array(n12).fill(0).map(()=>({k:"c12"})),...tailB];
+    const sA=itA.length?Math.max(p.gap,mrEscGap(itA[0],p.width)):p.gap;const A=mrLayoutWall(itA,p.gap,sA,p.gap);best={a:n12,b:0,A,B:{items:[],len:0},L:A.len,d:0}}
+  else for(let a=0;a<=n12;a++){
+    const itA=[...fixedA,...Array(a).fill(0).map(()=>({k:"c12"}))];const itB=[...Array(n12-a).fill(0).map(()=>({k:"c12"})),...tailB];
+    const sA=itA.length?Math.max(p.gap,mrEscGap(itA[0],p.width)):p.gap;const eB=itB.length?Math.max(p.gap,mrEscGap(itB[itB.length-1],p.width)):p.gap;
+    const A=mrLayoutWall(itA,p.gap,sA,p.gap),B=mrLayoutWall(itB,p.gap,p.gap,eB);
+    const L=Math.max(A.len,B.len),d=Math.abs(A.len-B.len);if(!best||L<best.L||(L===best.L&&d<best.d))best={a,b:n12-a,A,B,L,d}}
+  best.n12=n12;best.n6=n6;best.raw=best.L;best.L=Math.ceil(best.raw/10)*10+p.reserve;
+  best.B.items.forEach(it=>{const s0=it.start;it.start=best.L-it.end;it.end=best.L-s0});
+  let no=0;[...best.A.items,...best.B.items].filter(it=>!it.comm&&(it.k==="c12"||it.k==="c6")).forEach(it=>{no++;const from=(no-1)*12+1,to=Math.min(no*12,meters);const aTo=Math.min(to,p.units),hasPub=to>p.units&&from<=meters;
+    const apt=from<=aTo?(from===aTo?`${from}`:`${from}–${aTo}`):"";it.no=no;it.apts=apt+(hasPub?(apt?" + ציבורי":"ציבורי"):"")});
+  let cn=0;[...best.A.items,...best.B.items].filter(it=>it.comm).forEach(it=>{no++;it.no=no;const n=it.k==="c12"?Math.min(12,it.meters):it.meters;it.apts=`מסחר ${cn+1}–${cn+n}`;cn+=n});
+  return best}
+// room for one building: length / width / layout, as the meter-room app calculates it
+function mrCalc(b){
+  const u=Math.max(0,Math.floor(num(b.units)||0));if(!u)return null;
+  const one=mSides(b)==="one";const sg=mrSuggest(u,b.cat);const pubSz=MR_PUB[b.cat]||"3X63",pa=mrAmps(pubSz);
+  const extras=[];let pubSlot=0;if(pa<=100)pubSlot=1;else extras.push({pair:true,gt:pa>315,amps:pa,label:"ציבורי בניין"});
+  const bi=S.buildings.indexOf(b);if(bi>=0&&S.parking.baseBld===bi){const ba=mrAmps(S.parking.baseSize||"3X400");if(ba<=100)pubSlot++;else extras.push({pair:true,gt:ba>315,amps:ba,label:"מרתף"})}
+  if(b.com)extras.push({k:"c6",meters:6,label:"מסחר"});
+  let width=one?(high(b)?200:180):320;
+  const p={units:u,width,extras,pubSlot,f1000:sg.f1000,f2:sg.f2,f0:sg.f0,gap:MR.GAP,reserve:MR.RES};
+  let r=mrBuild(p,one);
+  if(one){const reach=Math.max(...r.A.items.map(mrReach),0);const need=Math.ceil((reach+MR.CLR)/10)*10;if(need>width){width=need;p.width=width;r=mrBuild(p,true)}}
+  return{L:r.L,W:width,r,one,sg,pub:pubSz}}
+function mrPlanSVG(c,roomL,roomW){
+  const r=c.r,width=roomW||c.W,L=Math.max(roomL||0,r.L,100);const sc=1000/L,T=MR.WALL*sc,pad=46+T,Wpx=L*sc,Hpx=width*sc,vw=Wpx+pad*2,vh=Hpx+pad*2+10;
+  const dw=MR.DOOR*sc;const ink="#222",mut="#666";
+  let s=`<svg xmlns="http://www.w3.org/2000/svg" viewBox="${-dw-T} 0 ${vw+dw+T} ${vh}" width="${Math.round(vw+dw+T)}" height="${Math.round(vh)}" style="display:block;width:100%;height:auto;direction:ltr;font-family:Arial,sans-serif;background:#fff">`;
+  s+=`<rect x="${-dw-T}" y="0" width="${vw+dw+T}" height="${vh}" fill="#fff"/>`;
+  s+=`<path d="M ${pad-T} ${pad-T} h ${Wpx+2*T} v ${Hpx+2*T} h ${-(Wpx+2*T)} Z M ${pad} ${pad} v ${Hpx} h ${Wpx} v ${-Hpx} Z" fill="#c9ced6" fill-rule="evenodd" stroke="${ink}" stroke-width="1.2"/>`;
+  if(roomL&&r.L>roomL)s+=`<rect x="${pad+roomL*sc}" y="${pad}" width="${(r.L-roomL)*sc}" height="${Hpx}" fill="#fdecec" stroke="#c42635" stroke-dasharray="5 4"/>`;
+  const wall=(w,top)=>w.items.forEach(it=>{const x=pad+it.start*sc,wd=it.w*sc,d=mrDep(it)*sc,off=mrOff(it.k)*sc,y=top?pad+off:pad+Hpx-d-off;
+    const front=top?y+d:y,dir=top?1:-1,L2=MR_EQ[it.k].dr;
+    const hs=L2.length===1?[{h:x,len:L2[0],a:true}]:[{h:x,len:L2[0],a:true},{h:x+wd,len:L2[1],a:false}];
+    hs.forEach(({h,len,a})=>{const ll=len*sc;s+=`<line x1="${h}" y1="${front}" x2="${h}" y2="${front+dir*ll}" stroke="#000" stroke-opacity=".4" stroke-width="1.1" stroke-dasharray="4 3"/>`;const ex=a?x+ll:x+wd-ll;s+=`<path d="M ${ex} ${front} A ${ll} ${ll} 0 0 ${a===top?1:0} ${h} ${front+dir*ll}" fill="none" stroke="#000" stroke-opacity=".28" stroke-width=".8" stroke-dasharray="2 3"/>`});
+    const tip=front+dir*mrDoorLen(it.k)*sc,z=MR.CLR*sc;s+=`<rect x="${x}" y="${top?tip:tip-z}" width="${wd}" height="${z}" fill="#e5484d" fill-opacity=".06"/>`;
+    s+=`<rect x="${x}" y="${y}" width="${wd}" height="${d}" fill="${MR_EQ[it.k].c}" stroke="${ink}" stroke-width=".8"/>`;
+    const fs=Math.min(13,Math.max(9,11*sc));const sh=MR_EQ[it.k].s;
+    if(it.no){s+=`<text x="${x+wd/2}" y="${y+d/2-1}" font-size="${fs}" font-weight="bold" text-anchor="middle" fill="#111">#${it.no} · ${sh}</text><text x="${x+wd/2}" y="${y+d/2+fs}" font-size="${fs*.85}" text-anchor="middle" fill="#111" direction="${it.comm?"rtl":"ltr"}">${it.apts}</text>`}
+    else s+=`<text x="${x+wd/2}" y="${y+d/2+4}" font-size="${fs}" font-weight="bold" text-anchor="middle" direction="rtl" fill="#111">${sh}</text>`});
+  wall(r.A,true);wall(r.B,false);
+  const cy=pad+Hpx/2,y1=cy-dw/2,y2=cy+dw/2,xo=pad-T;
+  s+=`<rect x="${xo-1}" y="${y1}" width="${T+2.5}" height="${dw}" fill="#fff"/><line x1="${xo}" y1="${y1}" x2="${pad}" y2="${y1}" stroke="${ink}" stroke-width="1.2"/><line x1="${xo}" y1="${y2}" x2="${pad}" y2="${y2}" stroke="${ink}" stroke-width="1.2"/>`;
+  s+=`<line x1="${xo}" y1="${y1}" x2="${xo-dw}" y2="${y1}" stroke="${ink}" stroke-width="2"/><path d="M ${xo-dw} ${y1} A ${dw} ${dw} 0 0 0 ${xo} ${y2}" fill="none" stroke="${ink}" stroke-dasharray="4 3"/>`;
+  s+=`<text x="${xo-dw*.55}" y="${cy+4}" font-size="11" text-anchor="middle" direction="rtl" fill="${ink}">דלת ${MR.DOOR}</text>`;
+  s+=`<text x="${pad+Wpx/2}" y="${pad+Hpx/2+5}" font-size="15" font-weight="bold" text-anchor="middle" fill="${ink}" stroke="#fff" stroke-width="4" paint-order="stroke">${(Math.max(roomL||0,r.L)/100).toFixed(2)} × ${(width/100).toFixed(2)} מטר</text>`;
+  s+=`<text x="${pad+Wpx/2}" y="${pad-T-10}" font-size="12" text-anchor="middle" fill="${mut}">${Math.max(roomL||0,r.L)}</text><text x="${pad+Wpx+T+14}" y="${pad+Hpx/2}" font-size="12" text-anchor="middle" fill="${mut}" transform="rotate(-90 ${pad+Wpx+T+14} ${pad+Hpx/2})">${width}</text>`;
+  return s+"</svg>"}
+
+function renderParking(){
+  const P=S.parking;const floors=Math.max(1,Math.min(8,parseInt(P.floors)||1));
+  while(P.perFloor.length<floors)P.perFloor.push({area:"",spaces:""});P.perFloor.length=floors;
+  let html=seg("phas","parking.has",[{v:"true",t:"יש חניון תת-קרקעי"},{v:"false",t:"אין חניון"}],P.has);
+  if(P.has){
+    html+=`<div class="grid" style="margin-top:10px">
+      <label class="f">שטח חניון כולל (מ"ר)<input type="number" min="0" id="pk-area" data-k="parking.area" value="${esc(P.area)}"></label>
+      <label class="f">מספר קומות<select id="pk-floors" data-k="parking.floors">${Array.from({length:8},(_,i)=>`<option ${floors===i+1?"selected":""}>${i+1}</option>`).join("")}</select></label>
+      <label class="f">סה"כ חניות<input type="number" min="0" id="pk-total" data-k="parking.total" value="${esc(P.total)}"></label>
+    </div>
+    <div class="tbl-wrap" style="margin-top:10px"><table class="floors"><thead><tr><th>קומה</th><th>שטח (מ"ר)</th><th>חניות</th><th>הצעה (1 ל-45 מ"ר)</th></tr></thead><tbody>
+      ${P.perFloor.map((f,i)=>`<tr><td>מינוס ${i+1}</td><td><input type="number" min="0" id="pf${i}-a" data-k="parking.perFloor.${i}.area" value="${esc(f.area)}"></td><td><input type="number" min="0" id="pf${i}-s" data-k="parking.perFloor.${i}.spaces" value="${esc(f.spaces)}"></td><td class="hint" data-sug="${i}"></td></tr>`).join("")}
+    </tbody></table></div>
+    <div id="pk-checks" style="display:flex;flex-direction:column;gap:6px;margin-top:8px"></div>
+    <div class="fieldset" style="margin-top:10px"><span class="lbl">בניינים מעל המרתף המשותף</span>
+      <div class="chips">${S.buildings.map((b,i)=>`<label class="chk"><input type="checkbox" data-over="${i}" ${P.over.includes(i)?"checked":""}>${esc(b.name||("בניין "+(i+1)))}</label>`).join("")}</div></div>`;
+  }
+  html+=`<div class="fieldset" style="margin-top:12px"><span class="lbl">חניות בפיתוח</span>${seg("pdev","parking.dev",[{v:"false",t:"אין"},{v:"true",t:"יש"}],P.dev)}
+    ${P.dev?`<div class="grid"><label class="f">מספר חניות בפיתוח<input type="number" min="0" id="pk-dev" data-k="parking.devCount" value="${esc(P.devCount)}"></label></div>`:""}
+    ${help(`החניות בפיתוח נכנסות לחישוב גודל החיבור הציבורי של המרתף: 0.9A לכל חניה, יחד עם חניות החניון.`)}</div>`;
+  if(P.has)html+=`<div style="margin-top:10px">${ovTable("P",commonItems(),P.ov||{})}</div>`;
+  $("#parking").innerHTML=html;updateParkingChecks();
+}
+function updateParkingChecks(){
+  const P=S.parking;if(!P.has){return}
+  P.perFloor.forEach((f,i)=>{const a=num(f.area);const el=document.querySelector(`[data-sug="${i}"]`);if(el)el.textContent=a?`${Math.floor(a/45)} חניות`:""});
+  const box=$("#pk-checks");if(!box)return;const out=[];
+  const tA=num(P.area),sA=P.perFloor.reduce((s,f)=>s+(num(f.area)||0),0),anyA=P.perFloor.some(f=>num(f.area)!=null);
+  if(tA!=null&&anyA){const d=Math.round((sA-tA)*100)/100;out.push(d===0?`<div class="msg ok">סכום שטחי הקומות תואם לשטח הכולל (${fmt(tA)} מ"ר)</div>`:`<div class="msg warn">סכום שטחי הקומות ${fmt(sA)} מ"ר, השטח הכולל ${fmt(tA)} מ"ר – פער של ${fmt(Math.abs(d))} מ"ר</div>`)}
+  if(tA!=null&&!anyA)out.push(`<div class="msg info">הצעה לסה"כ חניות: ${Math.floor(tA/45)} (1 ל-45 מ"ר)</div>`);
+  const tS=num(P.total),sS=P.perFloor.reduce((s,f)=>s+(num(f.spaces)||0),0),anyS=P.perFloor.some(f=>num(f.spaces)!=null);
+  if(tS!=null&&anyS){const d=sS-tS;out.push(d===0?`<div class="msg ok">סכום החניות בקומות תואם לסה"כ (${fmt(tS)})</div>`:`<div class="msg warn">סכום החניות בקומות ${fmt(sS)}, סה"כ שהוזן ${fmt(tS)} – פער של ${fmt(Math.abs(d))}</div>`)}
+  {const bb=S.buildings[P.baseBld];if(bb&&isRoom(bb))out.push(`<div class="msg ok">חיבור ציבורי מרתף משותף (${esc(P.baseSize||"3X400")}) – בחדר המונים של ${esc(bldLabel(bb.name||("בניין "+(P.baseBld+1))))}</div>`);
+   else if(S.buildings.some(isRoom))out.push(`<div class="msg warn">לא נבחר חדר מונים לחיבור הציבורי המשותף של המרתף – בוחרים בכרטיס הבניין, תחת "מוני חח"י".</div>`)}
+  box.innerHTML=out.join("");
+}
+function renderTrafo(){
+  const T=S.trafo;
+  $("#trafo").innerHTML=seg("treq","trafo.req",[{v:"false",t:"לא נדרש"},{v:"true",t:"נדרש חדר שנאים"}],T.req)+
+   (T.req?`<div class="grid" style="margin-top:10px"><label class="f">סוג התחנה (תת-קרקעית)<select id="t-type" data-k="trafo.type">${TRAFO.map(t=>`<option value="${t.id}" ${Number(T.type)===t.id?"selected":""}>${t.id}. ${t.name}</option>`).join("")}</select></label></div>
+   ${S.project.district!=="דן"?`<div class="msg warn" style="margin-top:8px">המידות לפי מחוז דן. במסמך תתווסף הערה לתיאום מול מחוז ${esc(S.project.district)}.</div>`:""}
+   ${help(`המידות, פתחי האוורור ומרחקי הקרינה לקוחים ממסמך "ריכוז הנחיות חדרי טרפו במחוז דן" של המשרד. במסמך יופיע גם תרשים הדוגמה המתאים.`)}`:"");
+}
+function renderProcess(){
+  const d=S.project.district;const steps=PROCESS[d]||[];
+  $("#process").innerHTML=`<details class="help"><summary>תהליך אישור תחנת שנאים – מחוז ${esc(d)}</summary><div class="body">${steps.length?`<ol>${steps.map(s=>`<li>${esc(s)}</li>`).join("")}</ol>`:`תהליך למחוז זה טרם הוגדר.`}<div class="muted" style="margin-top:6px">מוצג בטופס בלבד ואינו נכלל במסמך לאדריכל.</div></div></details>`;
+}
+function renderAll(){renderBuildings();renderParking();renderTrafo();renderProcess();renderDoc()}
+
+/* ================= sizing engine (defaults derived from office letters) ================= */
+const r5=x=>Math.ceil(x/5)*5, r10=x=>Math.ceil(x/10)*10;
+function hasGen(b){return high(b)||b.genReq}
+function inBasement(i){return S.parking.has&&S.parking.over.includes(i)}
+function mrLen(u,com){let L=u<=42?450:u<=53?500:u<=72?600:u<=92?700:u<=120?900:u<=185?1100:r10(u*6);return L+(com?120:0)}
+// item: {key,name,w,d,h,room,l,count,note,text}
+function applyOv(it,ov){const o=ov&&ov[it.key];if(!o)return it;const c=Object.assign({},it);if(num(o.w)!=null)c.w=num(o.w);if(num(o.d)!=null){if(c.room)c.l=num(o.d);else c.d=num(o.d)}return c}
+function spec(it){
+  if(it.text)return it.text;
+  if(it.room)return `במידות ${fmt(it.l/100)}X${fmt(it.w/100)} מ'`+(it.h?`, גובה ${fmt(it.h/100)} מ'`:"");
+  return `${it.count>1?`${it.count} פירים, כל אחד `:""}ברוחב ${fmt(it.w)} עומק ${fmt(it.d)} ס"מ`+(it.h?`, גובה ${fmt(it.h)} ס"מ`:"");
+}
+function buildingItems(b,i){
+  const u=num(b.units)||0, hi=high(b), tower=b.cat==="high", down=b.meters==="down";
+  const com=!!b.com, off=(num(b.offArea)||0)>0, pub=hasPub(b);
+  const gen=hasGen(b), genRoom=gen&&b.genLoc!=="roof", roofGen=gen&&b.genLoc==="roof";
+  const G=[],T=[],U=[],Lb=[];const push=(arr,it)=>arr.push(it);
+  // apartment / IEC shafts
+  let apt=null,iecS=null,iecC=null,iecC0=null;
+  if(down){ if(u>100)apt={key:"apt",name:"פיר כבלים לדירות",w:r5(Math.max(80,0.75*u)),d:50,count:2,note:"עדיפות לפיר בכל צד של המבואה. לא צמוד לדירה ולא צמוד לפיר גז."};
+    else if(u>50)apt={key:"apt",name:"פיר כבלים לדירות",w:r5(Math.max(100,1.4*u)),d:u>=90?50:40,note:"לא צמוד לדירה ולא צמוד לפיר גז."};
+    else apt={key:"apt",name:"פיר כבלים לדירות",w:Math.max(30,r5(2*u)),d:40,note:"לא צמוד לדירה ולא צמוד לפיר גז."};}
+  else{ const pf=num(b.perFloor)||0, fl=num(b.floors)||0;
+    const byFloors=!!(pf&&fl);const cab=byFloors?Math.ceil(fl/Math.max(1,Math.floor(16/pf))):Math.ceil(Math.max(u,1)/16);const spare=byFloors?2:3;const nC=cab+spare;
+    iecS={key:"iecs",name:"נישת כבלי חח\"י",w:Math.max(60,r5(nC*11)),d:50,h:240,note:(byFloors?`${cab} כבלי 95 (עד 16 דירות בקומות שלמות לכבל: ${fl} קומות × ${pf} דירות)`:`${cab} כבלי 95 (${fmt(u)} יח"ד ÷ 16, ללא חלוקה לקומות)`)+` + ${spare} כבלי ספר = ${nC} כבלים × 11 ס"מ = ${nC*11} ס"מ, מינימום 60. יאומת במחשבון חח"י. רציפה מחדר הפילרים עד הקומה העליונה, במרחק 1 מ' לפחות מדירה.`};
+    const cw=pf>6?145:90;
+    iecC={key:"iecc",name:`ארון מוני חח"י קומתי (${pf>6?"ארון 12":"ארון 6"})`,w:cw,d:b.lux?60:45,h:240,note:(b.lux?"בניין יוקרה – עומק 60 לדלתות כפולות לגמר, איחוד דירות וחיבורים מעל 100 אמפר (ארון מדידה). ":"")+"בהמשך לנישת כבלי חח\"י, בלובי הקומה, לא על קיר משותף עם דירה."};
+    iecC0={key:"iecc0",name:`ארון מוני חח"י קומתי (${pf>6?"ארון 12":"ארון 6"})`,w:cw,d:50,h:240,note:"עומק 50 כולל דלת אש. בהמשך לנישת כבלי חח\"י, לא על קיר משותף עם דירה."};}
+  const pubS={key:"pubs",name:"פיר חשמל ציבורי",w:u>=160?50:tower?40:30,d:tower||u>=160?30:40,note:"לא צמוד לדירה ולא צמוד לפיר גז."};
+  const emS=hi?{key:"ems",name:"פיר כבלי חירום",w:u>=160?50:40,d:40,note:"לא על קיר משותף עם דירה."}:null;
+  const comm={key:"comm",name:"ארון תקשורת קומתי",w:u<=34?70:u<=90?80:u<=127?90:120,d:30};
+  const ex=genRoom?genExhaust(b):null;
+  const exh=genRoom?{key:"exh",name:"פיר אגזוז לגנרטור",w:ex?ex.shaft:60,d:ex?ex.shaft:60,note:(ex?`לאגזוז בקוטר ${ex.dia}" (קוטר חיצוני עם בידוד כ-${ex.outside} מ"מ). `:"")+"רציף מהמרתף עד הגג, פאה אחת פתוחה לביצוע ותיסגר בסוף. יש לוודא 50 מ' מקצה האגזוז לבניין שכן."}:null;
+  const fuel=roofGen?{key:"fuel",name:"פיר לצינור דלק לגג",w:30,d:30}:null;
+  // ground
+  if(apt)push(G,Object.assign({},apt,{note:"עם דלת אש. "+apt.note}));
+  if(iecS){push(G,Object.assign({},iecS,{note:"עם דלת אש. "+iecS.note}));push(G,Object.assign({},iecC0))}
+  push(G,{key:"gfp",name:"לוח חשמל קומת קרקע",w:tower?120:u<=60?80:100,d:50,note:"עם דלת אש."});
+  push(G,Object.assign({},pubS));if(emS)push(G,Object.assign({},emS));
+  if(com)push(G,{key:"coms",name:"פיר חשמל למסחר",w:30,d:30,note:"נדרש אם יש מעבים או הזנות למסחר בגג."});
+  if(off)push(G,{key:"offs",name:"פיר חשמל תעסוקה",w:30,d:30});
+  push(G,Object.assign({},comm));
+  push(G,{key:"fire",name:"פנל כבאים",w:tower?160:hi?100:80,d:40,note:"עד 10 מ' מהכניסה הראשית ובקשר עין, בתיאום עם יועץ הבטיחות."});
+  if(exh)push(G,Object.assign({},exh));
+  if(fuel){push(G,Object.assign({},fuel));push(G,{key:"fuelc",name:"ארון תדלוק",w:60,d:40,note:"בחדר האשפה או לידו."})}
+  if(com){push(G,{key:"comp",name:"לוח חשמל למסחר",w:120,d:50,note:"באזור משותף של המסחר, עם דלת פח. לא על קיר משותף עם יחידת מסחר."});push(G,{key:"comc",name:"ארון תקשורת למסחר",w:120,d:50,note:"באזור משותף של המסחר, עם דלת פח."})}
+  if(pub)push(G,{key:"pubp",name:`לוח חשמל ל${pubName(b)}`,w:100,d:50,note:"בתוך השטח הציבורי או בסמוך לו, מונה נפרד."});
+  // typical
+  if(apt)push(T,Object.assign({},apt));
+  if(iecS){push(T,Object.assign({},iecS));push(T,Object.assign({},iecC))}
+  push(T,{key:"flp",name:"ארון חשמל קומתי",w:u>=110?60:50,d:u>=110?40:30,note:hi?"ליד פיר החירום.":""});
+  push(T,Object.assign({},pubS));if(emS)push(T,Object.assign({},emS));
+  if(com)push(T,{key:"coms",name:"פיר חשמל למסחר",w:30,d:30,note:"נדרש אם יש מעבים או הזנות למסחר בגג."});
+  if(off){push(T,{key:"offs",name:"פיר חשמל תעסוקה",w:30,d:30});push(T,{key:"offc",name:"פיר תקשורת תעסוקה",w:30,d:30})}
+  push(T,Object.assign({},comm));
+  if(exh)push(T,Object.assign({},exh));if(fuel)push(T,Object.assign({},fuel));
+  push(T,{key:"aptp",name:"לוח חשמל דירתי (בכל דירה)",w:70,d:20,note:"שקוע בקיר. לא על קיר משותף עם חדר שינה או דירה אחרת, לא מאחורי ברז ולא בתוך המטבח."});
+  // upper basement (or ground if no basement)
+  if(down){
+    if(isRoom(b)){const c=mrCalc(b);const man=num(b.roomLen)||num(b.roomWid);const w=num(b.roomWid)||(c?c.W:roomWidth(b)),l=num(b.roomLen)||(c?c.L:mrLen(u,com));
+      const eq=c?[c.sg.f1000?`${c.sg.f1000} פילר 1000`:"",c.sg.f2?"פילר 2":"",c.sg.f0?"פילר 0":"",c.r.n12?`${c.r.n12} ארונות 12 מונים`:"",c.r.n6?"ארון 6 מונים":"",mrAmps(c.pub)>100?`ארון מדידה ומפסק ראשי לחיבור הציבורי ${c.pub}`:"",S.parking.baseBld===i?`ארון מדידה ומפסק ראשי לחיבור הציבורי המשותף של המרתף ${S.parking.baseSize||"3X400"}`:""].filter(Boolean).join(", "):"";
+      push(U,{key:"mroom",name:`חדר מוני חח"י ל-${fmt(u)} יח"ד`,room:true,w,l,
+      note:(man?"מידות לפי קביעת המתכנן. ":c?`לפי חישוב אפליקציית תכנון חדר המונים (${c.one?"ארונות בצד אחד":"ארונות בשני הצדדים"}): ${eq}. `:"")+`רצפה כפולה 80 ס"מ לפחות, דלת אש 30/90 נפתחת החוצה לכיוון לובי הבניין עם מנעול כפול חח"י + דיירים. מתחת לפיר הכבלים לדירות.`})}
+    else{push(U,{key:"mniche",name:`נישת מוני חח"י ל-${fmt(u)} מונים`,w:Math.ceil(Math.max(u,1)/12)*150+5,d:50,h:240,note:"באזור לובי הבניין, 1.4 מ' פנוי מול הנישה, קרוב לפיר הכבלים מהדירות."});
+      push(U,{key:"mainp",name:"לוח חשמל ראשי בניין",w:100,d:50})}
+  }else push(U,{key:"proom",name:"חדר פילרים של חח\"י",room:true,w:320,l:u>100?550:450,note:"רצפה כפולה 80 ס\"מ, מתחת לפיר חח\"י. דלת אש 30/90 נפתחת החוצה עם מנעול כפול חח\"י + דיירים."});
+  push(U,{key:"bzq",name:"נישה לארון בזק ראשי",w:u<=60?100:120,d:40});
+  push(U,{key:"hot",name:"נישה לארון הוט",w:60,d:40});
+  push(U,{key:"fib",name:"נישה לארון סיבים אופטיים",w:120,d:40});
+  if(hi)push(U,{key:"emr",name:"חדר חשמל חירום",room:true,w:200,l:300,note:"דלת אש 30/90 נפתחת החוצה לכיוון לובי הבניין."});
+  if(off){push(U,{key:"offp",name:"לוח חשמל תעסוקה (באזור משותף)",w:160,d:60});push(U,{key:"offcm",name:"ארון תקשורת תעסוקה (באזור משותף)",w:120,d:60})}
+  // lower basements
+  if(inBasement(i)&&(parseInt(S.parking.floors)||1)>=2){
+    push(Lb,{key:"lpub",name:"פיר חשמל ציבורי",w:30,d:30});push(Lb,{key:"lcom",name:"פיר תקשורת",w:30,d:30});
+    if(hi)push(Lb,{key:"lem",name:"פיר כבלי חירום",w:30,d:30});
+    push(Lb,{key:"lpan",name:"ארון חשמל לתאורה ושקעים",w:70,d:50});
+  }
+  const ov=b.ov||{};const f=a=>a.map(it=>applyOv(it,ov));
+  return {ground:f(G),typical:f(T),upper:f(U),lower:f(Lb)};
+}
+function commonItems(){
+  const P=S.parking;if(!P.has)return {upper:[],lower:[]};const anyGen=S.buildings.some(hasGen);
+  const U=[{key:"cemr",name:"חדר חשמל חירום",room:true,w:200,l:300,note:"בעיקר החניון, דלת אש 30/90 נפתחת החוצה."},
+    {key:"cpub",name:"חדר חשמל ראשי ציבורי",room:true,w:200,l:400,note:"בעיקר החניון, דלת אש 30/90 נפתחת החוצה."},
+    {key:"ngn",name:"ארון NGN של בזק",w:200,d:60},{key:"chot",name:"ארון ראשי של הוט",w:100,d:40},
+    {key:"ev",name:"לוחות טעינת רכבים",w:150,d:50,note:"בכל מפלס חניה; מיקום ומספר יינתנו בשלב מאוחר יותר."},
+    {key:"cab",name:"חדרי כבלים לחח\"י",room:true,w:200,l:200,note:"דלת אש 30/90, לפי תכנון כניסת הכבלים של חח\"י (מהרחוב, ליד תחנת השנאים וחדר הפילרים). יינתנו בהמשך."}];
+  if(!anyGen)U.shift();
+  const L=(parseInt(P.floors)||1)>=2?[{key:"cln",name:"נישה ללוח ראשי קומה",w:200,d:50,note:"מתחת לחדר החשמל שבקומה מעל."},{key:"clp",name:"פיר חשמל ציבורי",w:50,d:30},{key:"cle",name:"פיר חשמל חירום",w:30,d:30},{key:"clc",name:"פיר תקשורת",w:50,d:30}]:[];
+  const ov=P.ov||{};return {upper:U.map(it=>applyOv(it,ov)),lower:L.map(it=>applyOv(it,ov))};
+}
+
+/* ================= document model ================= */
+function buildDoc(){
+  const B=[];const P=S.project;const push=(t,o={})=>B.push(Object.assign({t},o));
+  const today=new Intl.DateTimeFormat("he-IL",{day:"2-digit",month:"2-digit",year:"numeric"}).format(new Date());
+  const bn=(b,i)=>b.name||("בניין "+(i+1));
+  const catLong=c=>c==="low"?"בניין גבוה (עד 29 מ')":c==="mid"?"בניין רב קומות (29–42 מ')":"בניין רב קומות מעל 42 מ' ועד 128 מ'";
+  push("head",{date:today});
+  push("h1",{text:"הנחיות חשמל ראשוניות"});
+  push("meta",{rows:[["שם הפרויקט",P.name],["מספר ISO",P.iso],["יזם",P.dev],["אדריכל",P.arch],["עיר",P.city],["תאריך",today],["הוכן ע\"י","משרד טיקטין תכנון חשמל"]]});
+  let n=1;
+  const groups=[];S.buildings.forEach((b,i)=>{const k=String(b.struct||"").trim();let g=groups.find(x=>x.k===k);if(!g){g={k,idx:[]};groups.push(g)}g.idx.push(i)});
+  const cmpN=(a,c)=>String(a).localeCompare(String(c),"he",{numeric:true});const useGroups=groups.some(g=>g.k);if(useGroups){groups.sort((a,c)=>(a.k?0:1)-(c.k?0:1)||cmpN(a.k,c.k));groups.forEach(g=>g.idx.sort((a,c)=>cmpN(bn(S.buildings[a],a),bn(S.buildings[c],c))))}
+  const order=groups.flatMap(g=>g.idx);
+  const gTitle=g=>g.k?grpLabel(g.k):"בניינים נוספים";
+  // basic data
+  push("h2",{text:`${n}. נתוני יסוד`});
+  const Pk=S.parking;const devN=Pk.dev?(num(Pk.devCount)||0):0;const tot=num(Pk.total);
+  push("ul",{items:[...order.map(i=>[S.buildings[i],i]).map(([b,i])=>`${useGroups&&b.struct?`${grpLabel(b.struct)} – `:""}${bldLabel(bn(b,i))}${b.floors?` – ${b.floors} קומות מעל קומת הקרקע`:""}, ${b.units?fmt(num(b.units))+" יח\"ד":"מספר יח\"ד טרם הוזן"}${b.perFloor?` (עד ${b.perFloor} דירות בקומה)`:""} – ${catLong(b.cat)}.`+
+      (b.com?` מסחר${b.comArea?` ${fmt(num(b.comArea))} מ"ר`:""}.`:"")+(num(b.offArea)?` תעסוקה ${fmt(num(b.offArea))} מ"ר.`:"")+(hasPub(b)?` ${pubName(b)}${num(b.pubArea)?` ${fmt(num(b.pubArea))} מ"ר`:""}.`:"")),
+    ...(Pk.has?[`חניון תת-קרקעי משותף: ${Pk.floors} קומות${Pk.area?`, ${fmt(num(Pk.area))} מ"ר`:""}${tot!=null?`, ${fmt(tot)} חניות`:""}${Pk.dev?`, ועוד ${fmt(devN)} חניות בפיתוח`:""}.`]:Pk.dev?[`חניות בפיתוח: ${fmt(devN)}.`]:[])]});
+  n++;
+  // assumptions
+  push("h2",{text:`${n}. הנחות יסוד`});n++;
+  const downB=S.buildings.filter(b=>b.meters==="down").map((b,i)=>bn(b,S.buildings.indexOf(b))),floorB=S.buildings.filter(b=>b.meters!=="down").map(b=>bn(b,S.buildings.indexOf(b)));
+  const tRow0=S.trafo.req?(TRAFO.find(t=>t.id===Number(S.trafo.type))||TRAFO[0]):null;
+  push("ul",{items:[
+    ...(downB.length?[`מוני חח"י בחדר או בנישה במרתף העליון, בגרעין הבניין: ${downB.join(", ")}.`]:[]),
+    ...(floorB.length?[`מוני חח"י בקומות: ${floorB.join(", ")}.`]:[]),
+    "לכל בניין מונה לכל דירה ומונה ציבורי לשירותי בית."+(S.buildings.some(b=>b.com)?" מונה נפרד למסחר.":"")+(S.buildings.some(b=>num(b.offArea))?" מונה נפרד לתעסוקה.":"")+(S.buildings.some(hasPub)?" מונה נפרד למבנה הציבור.":"")+(Pk.has?" מונה לחניון כולל טעינת רכבים.":""),
+    tRow0?`תחנת שנאים של חח"י: ${tRow0.name} – ראה פרק חדרי שנאים.`:"תחנת שנאים: יש לקבל תיק מידע מהעירייה / מחח\"י כדי לדעת אם יידרש חדר שנאים או פילר רשת בחזית המגרש.",
+    ...S.buildings.map((b,i)=>{if(!hasGen(b))return null;const g=pickGen(b.kva);const loc=b.genLoc==="roof"?"על הגג בחופה":b.genLoc==="ground"?"בחדר בקומת הקרקע":"בחדר במרתף";return `גנרטור ל${bldLabel(bn(b,i))} ${loc}${g&&g.g?` – ${fmt(g.g.kva)} KVA (הערכה)`:""}. הגודל הסופי ייקבע לאחר קבלת עומסי היועצים.`}).filter(Boolean)]});
+  // buildings (grouped by structure when defined)
+  const bTitle=(b,i)=>`הנחיות ל${bldLabel(bn(b,i))}${b.units?` – ${fmt(num(b.units))} יח"ד`:""}, ${b.meters==="down"?"מונים במרתף":"מונים בקומות"}`;
+  const bBody=(b,i,sec,hL)=>{const it=buildingItems(b,i);push("p",{text:catLong(b.cat)+"."});
+    let s=1;const lvl=(title,arr)=>{if(!arr.length)return;push(hL,{text:`${sec}.${s}. ${title}`});push("items",{prefix:`${sec}.${s}`,bld:(useGroups&&b.struct?grpLabel(b.struct)+" · ":"")+bldLabel(bn(b,i)),level:title,items:arr});s++};
+    lvl("קומת קרקע",it.ground);lvl("קומה טיפוסית",it.typical);
+    lvl(inBasement(i)?"קומת מרתף עליונה – בגרעין הבניין":"קומת קרקע – חדרי מונים ותקשורת (אין מרתף מתחת לבניין)",it.upper);
+    lvl("קומות מרתף תחתונות – בגרעין הבניין",it.lower);
+    if(isRoom(b)&&b.mplan){const c=mrCalc(b);if(c)push("svg",{svg:mrPlanSVG(c,num(b.roomLen),num(b.roomWid)),cap:`תוכנית העמדה בחדר המונים – ${bldLabel(bn(b,i))} (לפי אפליקציית תכנון חדר המונים)`})}};
+  if(useGroups){groups.forEach((g,gi)=>{
+      const names=g.idx.map(i=>bn(S.buildings[i],i));const u=g.idx.reduce((s,i)=>s+(num(S.buildings[i].units)||0),0);
+      push("h2",{text:`${n}. ${gTitle(g)} – ${names.map(bldLabel).join(", ")}${u?` (${fmt(u)} יח"ד)`:""}`,pb:gi>0});
+      g.idx.forEach((i,k)=>{const b=S.buildings[i];push("h3",{text:`${n}.${k+1}. ${bTitle(b,i)}`});bBody(b,i,`${n}.${k+1}`,"h4")});
+      n++;});}
+  else S.buildings.forEach((b,i)=>{push("h2",{text:`${n}. ${bTitle(b,i)}`,pb:i>0});bBody(b,i,String(n),"h3");n++;});
+  // common basement
+  const C=commonItems();
+  if(C.upper.length){push("h2",{text:`${n}. מרתף משותף`,pb:true});let s=1;
+    push("h3",{text:`${n}.${s}. מפלס מרתף עליון`});push("items",{prefix:`${n}.${s}`,bld:"מרתף משותף",level:"מפלס עליון",items:C.upper});s++;
+    if(C.lower.length){push("h3",{text:`${n}.${s}. קומות מרתף תחתונות`});push("items",{prefix:`${n}.${s}`,bld:"מרתף משותף",level:"מפלסים תחתונים",items:C.lower})}
+    n++;}
+  // basement guidelines (meter rooms + parking)
+  const anyRoom=S.buildings.some(b=>isRoom(b));
+  const single=S.buildings.length===1&&Pk.has;
+  if(anyRoom||Pk.has){
+    push("h2",{text:`${n}. הנחיות למרתף`,pb:true});let s=1;
+    if(Pk.has){push("h3",{text:`${n}.${s}. חניון`});s++;
+      push("table",{head:["קומה","שטח (מ\"ר)","חניות"],rows:[...Pk.perFloor.map((f,k)=>[`מינוס ${k+1}`,f.area?fmt(num(f.area)):"—",f.spaces?fmt(num(f.spaces)):"—"]),["סה\"כ",Pk.area?fmt(num(Pk.area)):"—",tot!=null?fmt(tot):"—"]],num:true});
+      const over=Pk.over.filter(k=>S.buildings[k]).map(k=>bn(S.buildings[k],k));if(over.length)push("p",{text:`בניינים מעל המרתף המשותף: ${over.join(", ")}.`});
+      {const bb=S.buildings[Pk.baseBld];if(bb&&isRoom(bb))push("key",{text:`החיבור הציבורי המשותף של המרתף (${Pk.baseSize||"3X400"}) – בחדר המונים של ${bldLabel(bn(bb,Pk.baseBld))}: ארון מדידה ומפסק ראשי.`})}
+      if(tot!=null||devN){const m=(tot||0)+devN;push("note",{text:`לחישוב גודל החיבור הציבורי של המרתף: ${fmt(m)} חניות${devN?` (כולל ${fmt(devN)} בפיתוח)`:""} × 0.9A = ${fmt(Math.round(m*0.9*10)/10)} A, בנוסף לעומסי המרתף.`})}}
+    if(anyRoom){
+      const cityRestrict=/הרצליה|ראשון/.test(P.city||"");const anyCom=S.buildings.some(b=>b.com);
+      push("h3",{text:`${n}.${s}. חדרי מוני חח"י – הנחיות כלליות`});s++;
+      push("ul",{items:["חדר מונים נדרש עבור 36 יח\"ד ומעלה; בפחות מ-36 יח\"ד – נישת מונים. אם נדרש פילר 0 (חיבור דירות או ציבורי מעל 100 אמפר) – רצוי חדר מונים גם בפחות מ-36 יח\"ד.",
+        "מפלס – מרתף עליון או קומת קרקע (בפרויקטים עם גלריה בין מרתף מינוס 1 לקרקע ניתן גם בגלריה). ימוקם ככל שניתן מתחת לפיר הכבלים העולה לדירות, ויאפשר הגעה בדרך הקצרה ביותר עם תשתית חח\"י (צנרת \"6 מבוטנת) מחדר השנאים או מהרחוב.",
+        ...(single&&S.trafo.req?["בבניין אחד על מרתף עם תחנת שנאים בבניין – ניתן למקם את החדר צמוד לתחנת השנאים עם רצפה כפולה משותפת."]:[]),
+        "גובה החדר לפחות 2.5 מ' נטו. אם יש דירות או מסחר מעל החדר – גובה 3.5 מ' נטו (ציוד וכבלי חח\"י עד 2.5 מ' ועוד 1 מ' עד רצפת הדירה).",
+        "רצפה כפולה מבטון בגובה נטו 80 ס\"מ לפחות, עדיף 90 ס\"מ. פתח אדם 80X80 ס\"מ צמוד לקיר; עדיף פתח היקפי ברוחב 30 ס\"מ (40 ס\"מ באזור פילר 1000). אם אין רצפה כפולה – ההזנה חייבת להגיע מתחת לפילר הראשי; ניתן רצפה פריקה מפלדה 40 ס\"מ לפי פרטי חח\"י.",
+        "אוורור: דמפר כלפי החניון או פתח של 1 מ\"ר מעל הדלת; בחדר עם קיר חוץ – רפפה לחוץ. אם הדלת נפתחת ללובי במרתף/בקרקע או שהחדר 40 מ\"ר ומעלה – נדרש שחרור עשן (או חלוקה בדלת אש NO לחלקים של פחות מ-40 מ\"ר).",
+        "רוחב החדר: ארונות בצד אחד – 180 ס\"מ (200 ס\"מ בבניין מעל 29 מ' עם ארון מדידה); ארונות בשני הצדדים – 320 ס\"מ.",
+        "העמדה: פילר 1000 ראשון משמאל לדלת, אחריו ארונות 12 מונים בסדר עולה משמאל לימין, ארון 6 מונים, מונה ציבורי בניין ואז מונה ציבורי מרתף. ליד כל מונה מעל 100 אמפר – מקום למפסק ראשי. ארונות 4 ס\"מ מקיר הגב (מפסק ראשי צמוד לקיר), 15 ס\"מ בין פילרים ומקיר צידי, 1.1 מ' מקיר בהעמדה ב-90 מעלות.",
+        "מעברים: 65 ס\"מ לפחות בין דלת ארון פתוחה ב-90 מעלות לקיר או לדלת פתוחה ממול, ו-65 ס\"מ נטו בין המשקוף לדלת הארון.",
+        ...(anyCom?["ארונות מוני המסחר יהיו בארונות ריכוז נפרדים בחדר."]:[]),
+        ...(single?["בבניין אחד על מרתף – לוח חשמל ראשי צמוד לארון המדידה הציבורי, באורך 2 מ' ובעומק 50 ס\"מ."]:[]),
+        ...(cityRestrict?["בעיריית הרצליה ובעיריית ראשון לציון לא מאשרים מיגון קרינה – אין למקם חדר מונים מתחת לדירות או למועדון דיירים אלא בגובה 5 מ' לפחות, ואין לעבור עם תעלות הזנה מתחת לייעודים אלה."]:[]),
+        "הערות לתוכניות: \"בחדר זה אין לבצע קירות בין ארונות, אין לבצע דלתות פח ואין להעביר תשתיות מים, ביוב, ניקוז או ספרינקלרים. גובה מינימלי בכל נקודה 250 ס\"מ.\" וכן: \"על הקבלן לבצע כיסוי פח מרוג על פתח כניסת האדם לרצפה הכפולה ועל הרווח שבין הארונות לאחר ביצוע חח\"י.\" בכל חדר יירשמו מספר ההזמנה, מספר יח\"ד וגודל החיבור של כל ארון מדידה."]});
+    }
+    n++;
+  }
+  // generators
+  const genB=order.map(i=>[S.buildings[i],i]).filter(([b])=>hasGen(b));
+  if(genB.length){
+    push("h2",{text:`${n}. הנחיות לחדרי גנרטור`});let s=1;
+    genB.forEach(([b,i])=>{push("h3",{text:`${n}.${s}. גנרטור ל${bldLabel(bn(b,i))}`});s++;
+      const g=pickGen(b.kva);
+      if(!g||!g.g){push("p",{text:"נדרש גנרטור. גודל הגנרטור יועבר לאחר קבלת עומסי היועצים."});return}
+      const G=g.g;
+      if(b.genLoc==="roof"){const c=G.canopy65;const d=dims(c?.dimensions);
+        push("key",{text:`גנרטור ${fmt(G.kva)} KVA (הערכה) בחופה אקוסטית 65dB על הגג`});
+        push("table",{head:["נתון","ערך"],rows:[["דגם",c?.model||G.room65?.model||""],["מידות החופה (אורך × רוחב × גובה)",d?`${d[0]} × ${d[1]} × ${d[2]} מ'`:"—"],["משקל כולל",c?.weight?`${fmt(num(c.weight))} ק"ג`:"—"]]});
+        push("ul",{items:["יש להעביר את משקל הגנרטור למהנדס הקונסטרוקציה.","רמת רעש 65dB במרחק 7 מ' (מגורים).","נדרש פיר לצינור דלק 30X30 ס\"מ מהקרקע לגג וארון תדלוק 60X40 ס\"מ בחדר האשפה או לידו."]});
+      }else{const r=G.room65;const d=dims(r?.roomDimensions),gd=dims(r?.generatorDimensions);
+        push("key",{text:`חדר גנרטור מושתק ${b.genLoc==="ground"?"בקומת הקרקע":"במרתף"} – גנרטור ${fmt(G.kva)} KVA (הערכה)`});
+        push("table",{head:["נתון","ערך"],rows:[["דגם",r?.model||""],["מידות חדר נטו (אורך × רוחב × גובה)",d?`${d[0]} × ${d[1]} × ${d[2]} מ'`:"—"],["כניסת אוויר",r?.silencedAirIn?`${r.silencedAirIn} מ"ר`:"—"],["יציאת אוויר",r?.silencedAirOut?`${r.silencedAirOut} מ"ר`:"—"],["קוטר אגזוז",(()=>{const e=genExhaust(b);return e?`${e.dia}" (חישוב לתוואי לגג: 4 כיפופים, ${e.horiz} מ' אופקי, ${e.vert} מ' אנכי)`:(r?.exhaust?`${r.exhaust} אינץ'`:"—")})()],["מידות הגנרטור",gd?`${gd[0]} × ${gd[1]} × ${gd[2]} מ'`:"—"],["משקל הגנרטור",r?.generatorWeight?`${fmt(num(r.generatorWeight))} ק"ג`:"—"]]});
+        push("ul",{items:["פתחי האוורור כלפי חוץ, לאוויר החופשי.",(()=>{const e=genExhaust(b);return e?`אגזוז לגג בפיר ${e.shaft}X${e.shaft} ס"מ בבניין ${bn(b,i)} – קוטר האגזוז ${e.dia}", קוטר חיצוני עם בידוד כ-${e.outside} מ"מ.`:"אגזוז לגג בפיר 60X60 ס\"מ בבניין "+bn(b,i)+" – ראה פרק הבניין."})(),"דלת החדר – דלת אש 30/90 נפתחת כלפי חוץ החדר, במידה שתאפשר הכנסת הגנרטור (או פתח הכנסת ציוד).",...(S.trafo.req?["מרחק בין קירות החוץ של חדר הגנרטור לחדר השנאים – 5 מ' לפחות."]:[])]});
+      }
+      if(!g.exact)push("p",{text:`הגודל הנדרש ${fmt(g.n)} KVA – נבחר הגודל הקרוב כלפי מעלה בקטלוג.`});
+      push("p",{text:"הנתונים לפי קטלוג שמרלינג, לאימות מול היצרן. הגודל הסופי ייקבע לאחר קבלת עומסי יועצי המיזוג, האינסטלציה והמעליות."});
+    });
+    n++;
+  }
+  // trafo
+  if(S.trafo.req){
+    const tRow=tRow0;
+    push("h2",{text:`${n}. הנחיות לחדרי שנאים של חברת החשמל – ${tRow.name}`,pb:true});n++;
+    if(P.district!=="דן")push("note",{text:`המידות וההנחיות בפרק זה לפי מחוז דן של חח"י, ונדרש לתאם אותן מול מחוז ${P.district}.`});
+    push("key",{text:`חדר שנאים תת-קרקעי, מידות נטו עם מבואה: ${tRow.under.replace("X"," × ")} מ'`});
+    push("table",{head:["נתון","ערך"],rows:[["סוג התחנה",tRow.name],["מידות חדר תת-קרקעי נטו (עם מבואה)",tRow.under.replace("X"," × ")+" מ'"],["עיקר החדר נטו (לחישוב מרחקי קרינה)",tRow.surf.replace("X"," × ")+" מ'"],["פתח אוורור",tRow.air+" מ\"ר"],["מרחק קרינה למגורים / מועדון דיירים / תעסוקה",tRow.radRes+" מ'"],["מרחק קרינה למסחר",tRow.radCom+" מ'"],["מיקום הדלת",tRow.door],["גובה החדר נטו","2.6 מ'"]]});
+    push("note",{text:"מרחקי הקרינה נמדדים ברוטו/ברוטו: מעיקר חדר הטרפו בתוספת עובי קירות 20 ס\"מ לכל כיוון, עד העובי החיצוני של שטח המגורים או המסחר. מועדון דיירים, עמדת שומר, מוסד חינוכי וחצרו ומשרדים – כמו מגורים. יש להראות מרחקי קרינה גם למגרשים שכנים."});
+    push("ul",{items:["גובה החדר 2.6 מ' נטו, ללא עמודים. רצפה כפולה 95–120 ס\"מ נטו, רצוי 100 ס\"מ.",
+      "החדר מבטון: קירות חוץ 20 ס\"מ, 20 ס\"מ בין החדר לפיר האוורור.",
+      "דלת ברוחב 150 ס\"מ במימד הצר של החדר, 2 כנפיים, דלת אש 30/30 נפתחת כלפי חוץ, עם מנעול חח\"י.",
+      "מפלס החדר לא נמוך ממרתף מינוס 1; תקרת החדר עד 6 מ' ממפלס רחבת הפריקה.",
+      "פתחי אוורור: 2 מ' לפחות מהקיר שממול, לאזור פתוח ללא גג או מרפסת מעל (אלא אם החלל מעל גבוה מ-7 מ'); תחתית הפתח 15 ס\"מ לפחות מעל פיתוח סופי. רוחב פיר האוורור 70 ס\"מ לפחות לכל אורך החדר, עולה ישירות לאוויר החופשי.",
+      "אין גינון מעל החדר (אלא בחלל כפול באישור מיוחד).",
+      "מרחקים: צובר גז – 5 מ' (חדר בלוני גז – 20 מ'); חדר גנרטור – 5 מ'; חצר גן פרטית – 3 מ'; מיכל מים באותו מפלס או מעליו – 3.5 מ'; גמל מים – 1 מ'.",
+      "רחבת פריקה 9X10 מ', שיפוע עד 2.5%, דרך גישה בשיפוע עד 5% ובגובה 4.5 מ' נטו, פנויה מעצים, חניות, עמודי תאורה וברזי כיבוי. \"משאית 12\" של חח\"י.",
+      "פתח הורדת ציוד 1.4X2.25 מ' נטו (מכסה 1.55X2.55 מ', 25 ס\"מ מקיר), עד 7 מ' מקצה הרחבה; במיסעה או במדרכה עם מכסה לעומס מתאים.",
+      ...([2,3,5].includes(tRow.id)?["בתחנה של 2 שנאים ומעלה – גישה לרכב קל מתוך החניון עד 10 מ' מדלת התחנה, או מדרגות בלעדיות עם כניסה ישירה מבחוץ."]:[]),
+      "גישת אדם דרך חדר מדרגות משותף, עם דלתות נפרדות לחח\"י ומנעול חח\"י בכניסה ובירידה למרתף. כניסה דרך רמפת החניון – מדרכה 80 ס\"מ בצד הדלת."]});
+    push("note",{text:"ההנחיות בפרק זה הן ליקוט מניסיון משרדנו לדרישות חח\"י מחוז דן ואינן מסמך רשמי של חברת החשמל."});
+  }
+  // general notes
+  push("h2",{text:`${n}. הערות כלליות`});n++;
+  push("h3",{text:"מרחקי קרינה"});
+  push("ul",{items:["אין למקם ארונות חשמל, חדרי חשמל, חדרי מונים ופירי חשמל על קיר משותף עם דירות"+(S.buildings.some(b=>b.com||num(b.offArea))?", מסחר או משרדים":"")+". רצוי לא למקם ריכוז מוני חח\"י מתחת לדירה בקומה הראשונה.",
+    "מרחק מינימלי של פירי חח\"י וארונות מוני חח\"י מדירה – 1 מ' לפחות.",
+    "חדר מונים מתחת לדירה או למסחר – גובה 3.5 מ' נטו; מיגון קרינה לפי הנחיות יועץ הקרינה.",
+    ...(S.trafo.req?["מרחקי הקרינה מחדר השנאים – לפי הטבלה בפרק חדרי השנאים."]:[])]});
+  push("h3",{text:"דלתות ומנעולים"});
+  push("ul",{items:["כל חדר חשמל, חדר מונים, חדר פילרים וחדר גנרטור – דלת אש 30/90 הנפתחת כלפי חוץ החדר.",
+    "חדרי מונים וחדרי פילרים של חח\"י – מנעול כפול חח\"י + דיירים על אותו צילינדר, עם פרפר פנימי במנעול הדיירים. גובה דלת 2.3 מ' נטו, רוחב 90 ס\"מ פתח אור.",
+    "חדר שנאים – דלת אש 30/30, 2 כנפיים ברוחב 150 ס\"מ, נפתחת החוצה, עם מנעול חח\"י.",
+    "בקומת הקרקע לוחות החשמל והפירים יכללו דלתות אש לפי הנחיות הבטיחות. כאשר ארונות או פירי חשמל נמצאים במעבר בין חדר מדרגות ללובי – כל הדלתות דלתות אש.",
+    "לכל הפירים יש לתת דלתות."]});
+  push("h3",{text:"פירים וכללי"});
+  push("ul",{items:["הפירים יהיו ורטיקליים מקומת המרתף עד קומת הגג. יש להשאיר קיר של 10 ס\"מ בין הפירים והארונות.",
+    "אין למקם פיר חשמל בצמוד לפיר גז.",
+    "כל חדר מונים יכלול אוורור, בדרך כלל דמפר כלפי החניון.",
+    "מיקום וגודל לוחות טעינת הרכבים וחדרי הכבלים של חח\"י יינתנו בשלב מאוחר יותר.",
+    "מומלץ להפעיל חברה לאיתור התשתיות התת-קרקעיות הקיימות במגרש."]});
+  if(anyRoom||S.trafo.req){
+    push("h2",{text:"נספחים",pb:true});
+    if(anyRoom){push("p",{text:"נספח א – הנחיות מתוך נוהלי חברת החשמל לחדר חשמל / חדר מונים."});["assets/iec-4.png","assets/iec-5.png","assets/iec-6.png","assets/iec-7.png"].forEach((src,k)=>push("img",{src,cap:`נספח א – נוהל חח"י, עמוד ${k+1}`}))}
+    if(S.trafo.req)push("img",{src:"assets/grid-access.jpg",cap:"נספח ב – הנחיות הרשת הארצית של חח\"י בנושא גובה, גישה, פריקה וטעינה"});
+  }
+  push("foot",{text:"בכבוד רב, טיקטין תכנון חשמל בע\"מ. הנחיות ראשוניות בלבד – יעודכנו עם התקדמות התכנון והתיאום מול חברת החשמל והיועצים."});
+  return B;
+}
+
+/* ================= HTML renderer ================= */
+const svgUrl=svg=>"data:image/svg+xml;charset=utf-8,"+encodeURIComponent(svg);
+async function svgPng(svg,maxW){const im=new Image();im.src=svgUrl(svg);await im.decode();const w0=im.naturalWidth||1000,h0=im.naturalHeight||500;const k=Math.min(2.4,maxW/w0);
+  const c=document.createElement("canvas");c.width=Math.round(w0*k);c.height=Math.round(h0*k);const x=c.getContext("2d");x.fillStyle="#fff";x.fillRect(0,0,c.width,c.height);x.drawImage(im,0,0,c.width,c.height);
+  const bl=await new Promise(r=>c.toBlob(r,"image/png"));return {data:new Uint8Array(await bl.arrayBuffer()),w:c.width,h:c.height}}
+function renderDoc(){
+  const B=buildDoc();const P=S.project;
+  $("#sheet").innerHTML=B.map(b=>{
+    switch(b.t){
+      case "head":return `<div class="doc-head"><img src="assets/tiktin-logo.png" alt="טיקטין"><div class="date">תאריך: ${esc(b.date)}</div></div>`;
+      case "h1":return `<h1>${esc(b.text)}${P.name?` – ${esc(P.name)}`:""}</h1>`;
+      case "meta":return `<table class="meta">${b.rows.map(r=>`<tr><td>${esc(r[0])}</td><td>${r[1]?esc(r[1]):`<span class="ph">—</span>`}</td></tr>`).join("")}</table>`;
+      case "h2":return `<h2 class="${b.pb?"pb-soft":""}">${esc(b.text)}</h2>`;
+      case "h3":return `<h3>${esc(b.text)}</h3>`;
+      case "h4":return `<h4>${esc(b.text)}</h4>`;
+      case "p":return `<p>${esc(b.text)}</p>`;
+      case "key":return `<div class="key">${esc(b.text)}</div>`;
+      case "note":return `<div class="note">${esc(b.text)}</div>`;
+      case "ul":return `<ul>${b.items.map(x=>`<li>${esc(x)}</li>`).join("")}</ul>`;
+      case "items":return `<ol class="items">${b.items.map((it,k)=>`<li><span class="no">${b.prefix}.${k+1}</span><span><b>${esc(it.name)}</b> – ${esc(spec(it))}${it.note?`. <span class="nt">${esc(it.note)}</span>`:""}</span></li>`).join("")}</ol>`;
+      case "table":return `<table><thead><tr>${b.head.map(h=>`<th>${esc(h)}</th>`).join("")}</tr></thead><tbody>${b.rows.map(r=>`<tr>${r.map((c,j)=>`<td class="${b.num&&j>0?"num":""}">${esc(c)}</td>`).join("")}</tr>`).join("")}</tbody></table>`;
+      case "img":return `<figure><img src="${b.src}" alt="${esc(b.cap)}" loading="lazy"><figcaption>${esc(b.cap)}</figcaption></figure>`;
+      case "svg":return `<figure><img src="${svgUrl(b.svg)}" alt="${esc(b.cap)}"><figcaption>${esc(b.cap)}</figcaption></figure>`;
+      case "foot":return `<div class="foot">${esc(b.text)}</div>`;
+    }return ""}).join("");
+}
+
+/* ================= exports ================= */
+function fileBase(){const P=S.project;return `הנחיות חשמל ראשוניות${P.name?" - "+P.name:""}${P.iso?" - "+P.iso:""}`.replace(/[\\/:*?"<>|]/g,"-")}
+async function offer(filename,data){
+  let dl=null;try{dl=await window.claude?.use?.("downloads")}catch(e){}
+  if(!dl){status("הורדת קבצים אינה זמינה בתצוגה זו.");return}
+  try{await dl.save({filename,data});status("");toast("הקובץ נשמר")}
+  catch(e){const c=e&&e.code;status(c==="declined"?"ההורדה בוטלה.":c==="rate_limited"?"חלון הורדה כבר פתוח – יש לאשר או לסגור אותו.":"לא ניתן לשמור את הקובץ כאן.")}
+}
+function status(t){$("#x-status").textContent=t}
+function busy(btn,on,label){btn.disabled=on;if(on){btn.dataset.l=btn.textContent;btn.textContent=label}else if(btn.dataset.l)btn.textContent=btn.dataset.l}
+async function fetchBuf(src){const r=await fetch(src);return new Uint8Array(await r.arrayBuffer())}
+
+async function exportDocx(){
+  const D=window.docx;if(!D){status("ספריית Word לא נטענה. נסו לרענן את הדף.");return}
+  const {Document,Packer,Paragraph,TextRun,Table,TableRow,TableCell,WidthType,ImageRun,BorderStyle,ShadingType,AlignmentType,PageBreak,Footer,PageNumber}=D;
+  const B=buildDoc();const P=S.project;const W=9638;
+  const run=(t,o={})=>new TextRun(Object.assign({text:t,rightToLeft:true,font:"Arial",size:21},o));
+  const para=(children,o={})=>new Paragraph(Object.assign({bidirectional:true,children:Array.isArray(children)?children:[children],spacing:{after:80,line:300}},o));
+  const border={style:BorderStyle.SINGLE,size:4,color:"BFBFBF"};const borders={top:border,bottom:border,left:border,right:border};
+  const table=(head,rows,widths)=>{const cols=head.length;const cw=widths||Array(cols).fill(Math.floor(W/cols));
+    const cell=(t,i,h)=>new TableCell({borders,width:{size:cw[i],type:WidthType.DXA},shading:h?{type:ShadingType.CLEAR,fill:"F1EEEE",color:"auto"}:undefined,margins:{top:60,bottom:60,left:90,right:90},children:[para(run(String(t??""),{bold:!!h,size:19}),{spacing:{after:0}})]});
+    return new Table({visuallyRightToLeft:true,width:{size:cw.reduce((a,b)=>a+b,0),type:WidthType.DXA},columnWidths:cw,rows:[new TableRow({tableHeader:true,children:head.map((h,i)=>cell(h,i,true))}),...rows.map(r=>new TableRow({children:r.map((c,i)=>cell(c,i,false))}))]})};
+  const img=async(src,maxW,maxH)=>{const [w,h]=IMG[src]||[800,600];const s=Math.min(maxW/w,maxH/h,1);const data=await fetchBuf(src);return new ImageRun({type:src.endsWith(".jpg")?"jpg":"png",data,transformation:{width:Math.round(w*s),height:Math.round(h*s)}})};
+  const kids=[];
+  for(const b of B){
+    switch(b.t){
+      case "head":kids.push(para([await img("assets/tiktin-logo.png",170,74)],{spacing:{after:120}}));kids.push(para(run(`תאריך: ${b.date}`,{size:18,color:"555555"})));break;
+      case "h1":kids.push(para(run(b.text+(P.name?` – ${P.name}`:""),{bold:true,size:32}),{spacing:{before:120,after:160}}));break;
+      case "meta":kids.push(table(["פרט","ערך"],b.rows.map(r=>[r[0],r[1]||"—"]),[2900,W-2900]));kids.push(para(run("")));break;
+      case "h2":kids.push(para(run(b.text,{bold:true,size:27,color:"B8232F"}),{spacing:{before:280,after:100},keepNext:true,pageBreakBefore:!!b.pb,border:{bottom:{style:BorderStyle.SINGLE,size:6,color:"E3D6D6",space:2}}}));break;
+      case "h3":kids.push(para(run(b.text,{bold:true,size:23}),{spacing:{before:180,after:60},keepNext:true}));break;
+      case "h4":kids.push(para(run(b.text,{bold:true,size:21,color:"444444"}),{spacing:{before:120,after:40},keepNext:true}));break;
+      case "p":kids.push(para(run(b.text)));break;
+      case "key":kids.push(para(run(b.text,{bold:true}),{shading:{type:ShadingType.CLEAR,fill:"FBECEB",color:"auto"},border:{right:{style:BorderStyle.SINGLE,size:18,color:"B8232F",space:6}},spacing:{before:80,after:100}}));break;
+      case "note":kids.push(para(run(b.text,{size:19}),{shading:{type:ShadingType.CLEAR,fill:"F6F2EE",color:"auto"},border:{right:{style:BorderStyle.SINGLE,size:18,color:"E8742A",space:6}},spacing:{before:80,after:100}}));break;
+      case "ul":b.items.forEach(x=>kids.push(para(run(x),{numbering:{reference:"bul",level:0}})));break;
+      case "items":b.items.forEach((it,k)=>kids.push(para([run(`${b.prefix}.${k+1}  `,{color:"777777"}),run(it.name,{bold:true}),run(` – ${spec(it)}${it.note?". "+it.note:""}`)],{indent:{start:200},spacing:{after:60,line:290}})));break;
+      case "table":{const n=b.head.length;let w=null;if(n===2)w=[4300,W-4300];kids.push(table(b.head,b.rows,w));kids.push(para(run(""),{spacing:{after:60}}));break}
+      case "svg":try{const pr=await svgPng(b.svg,1800);const s2=Math.min(620/pr.w,700/pr.h,1);kids.push(para([new ImageRun({type:"png",data:pr.data,transformation:{width:Math.round(pr.w*s2),height:Math.round(pr.h*s2)}})],{alignment:AlignmentType.CENTER,keepNext:true}));kids.push(para(run(b.cap,{bold:true,size:18}),{alignment:AlignmentType.CENTER}))}catch(e){console.error(e)}break;
+      case "img":try{kids.push(para([await img(b.src,620,820)],{alignment:AlignmentType.CENTER,keepNext:true}));kids.push(para(run(b.cap,{bold:true,size:18}),{alignment:AlignmentType.CENTER}))}catch(e){}break;
+      case "foot":kids.push(para(run(b.text,{size:17,color:"666666"}),{spacing:{before:300},border:{top:{style:BorderStyle.SINGLE,size:4,color:"DDDDDD",space:4}}}));break;
+    }
+  }
+  const doc=new Document({creator:"משרד טיקטין",title:fileBase(),
+    styles:{default:{document:{run:{font:"Arial",size:21,rightToLeft:true}}}},
+    numbering:{config:[{reference:"bul",levels:[{level:0,format:D.LevelFormat.BULLET,text:"•",alignment:AlignmentType.START,style:{paragraph:{indent:{start:420,hanging:260}}}}]}]},
+    sections:[{properties:{page:{size:{width:11906,height:16838},margin:{top:1134,bottom:1134,left:1134,right:1134}}},
+      footers:{default:new Footer({children:[para([run("משרד טיקטין תכנון חשמל · עמוד ",{size:16,color:"888888"}),new TextRun({children:[PageNumber.CURRENT],size:16,color:"888888"})],{alignment:AlignmentType.CENTER})]})},
+      children:kids}]});
+  return await Packer.toBlob(doc);
+}
+function exportXlsx(){
+  const X=window.XLSX;if(!X){status("ספריית Excel לא נטענה. נסו לרענן את הדף.");return null}
+  const B=buildDoc();const P=S.project;
+  const rows=[[`הנחיות חשמל ראשוניות – ${P.name||""}${P.iso?` (ISO ${P.iso})`:""} – תאריך ${new Intl.DateTimeFormat("he-IL").format(new Date())}`],[`יזם: ${P.dev||"—"}   אדריכל: ${P.arch||"—"}   עיר: ${P.city||"—"}`],[],["נושא","הנחיות","הערות"]];
+  let topic="",sub="";
+  B.forEach(b=>{switch(b.t){
+    case "h2":topic=b.text.replace(/^\d+\.\s*/,"");sub="";rows.push([topic]);break;
+    case "h3":case "h4":sub=b.text.replace(/^[\d.]+\s*/,"");break;
+    case "items":b.items.forEach(it=>rows.push([`${b.bld} · ${b.level} · ${it.name}`,spec(it),it.note||""]));break;
+    case "ul":b.items.forEach(t=>rows.push([sub||topic,t,""]));break;
+    case "p":case "key":rows.push([sub||topic,b.text,""]);break;
+    case "note":rows.push([sub||topic,"",b.text]);break;
+    case "table":if(b.head.length===2)b.rows.forEach(r=>rows.push([`${sub||topic} · ${r[0]}`,r[1],""]));else{rows.push([sub||topic,b.head.join(" | "),""]);b.rows.forEach(r=>rows.push(["",r.join(" | "),""]))}break;
+    case "img":case "svg":rows.push([sub||topic,"",`תרשים: ${b.cap} – במסמך Word / PDF`]);break;
+    case "foot":rows.push([],[b.text]);break;}});
+  const ws=X.utils.aoa_to_sheet(rows);ws["!cols"]=[{wch:48},{wch:70},{wch:60}];
+  const wb=X.utils.book_new();X.utils.book_append_sheet(wb,ws,"הנחיות");
+  wb.Workbook={Views:[{RTL:true}]};
+  const out=X.write(wb,{bookType:"xlsx",type:"array"});return new Blob([out]);
+}
+async function exportPdf(){
+  if(!window.html2pdf){status("ספריית PDF לא נטענה. נסו לרענן את הדף.");return null}
+  // the document is rendered in chunks (one per chapter that starts on a new page) so a long document never exceeds the browser canvas limit
+  const src=$("#sheet");const nodes=[...src.cloneNode(true).childNodes];
+  const host=document.createElement("div");host.style.cssText="position:absolute;left:0;top:0;width:730px;z-index:-1;pointer-events:none";document.body.appendChild(host);
+  const mk=()=>{const d=document.createElement("div");d.className="sheet for-pdf";d.style.cssText="width:100%;box-shadow:none;border-radius:0;padding:6px 4px";host.appendChild(d);return d};
+  const chunks=[];let cur=mk();chunks.push(cur);
+  for(const nd of nodes){if(nd.nodeType===1&&nd.tagName==="H2"&&nd.classList.contains("pb-soft")&&cur.childNodes.length){cur=mk();chunks.push(cur)}
+    if(nd.nodeType===1){nd.classList.remove("pb-soft");nd.querySelectorAll?.("img").forEach(i=>i.removeAttribute("loading"))}cur.appendChild(nd)}
+  // split chunks that are still too tall for one canvas
+  const MAXH=9000;for(let k=0;k<chunks.length;k++){const c=chunks[k];if(c.scrollHeight<=MAXH)continue;const kids=[...c.childNodes];const n2=mk();host.insertBefore(n2,c.nextSibling);
+    let acc=0;let cut=kids.length;for(let j=0;j<kids.length;j++){acc+=(kids[j].offsetHeight||0);if(acc>MAXH*0.8&&j>0){cut=j;break}}kids.slice(cut).forEach(x=>n2.appendChild(x));if(n2.childNodes.length)chunks.splice(k+1,0,n2);else n2.remove()}
+  await Promise.all([...host.querySelectorAll("img")].map(i=>i.decode?i.decode().catch(()=>{}):null));
+  const opt={margin:[10,8,12,8],image:{type:"jpeg",quality:.9},html2canvas:{scale:1.7,useCORS:true,backgroundColor:"#ffffff"},jsPDF:{unit:"mm",format:"a4",orientation:"portrait"},pagebreak:{mode:["css","legacy"],avoid:["table","figure",".key",".note","li"]}};
+  try{let w=html2pdf().set(opt).from(chunks[0]).toPdf();
+    for(const c of chunks.slice(1))w=w.get("pdf").then(pdf=>{pdf.addPage()}).from(c).toContainer().toCanvas().toPdf();
+    return await w.outputPdf("blob")}
+  finally{host.remove()}
+}
+function wire(id,fn,ext,label){const btn=$(id);btn.addEventListener("click",async()=>{busy(btn,true,label);status("");try{const blob=await fn();if(blob)await offer(`${fileBase()}.${ext}`,blob)}catch(e){console.error(e);status("שגיאה בהפקת הקובץ. נסו שוב.")}finally{busy(btn,false)}})}
+wire("#x-docx",exportDocx,"docx","מכין Word…");wire("#x-pdf",exportPdf,"pdf","מכין PDF…");wire("#x-xlsx",async()=>exportXlsx(),"xlsx","מכין Excel…");
+
+/* ================= events ================= */
+function coerce(el){if(el.type==="radio"&&(el.value==="true"||el.value==="false"))return el.value==="true";return el.value}
+const STRUCT=/\.(cat|meters|sides|msides|mtype|com|genReq|genLoc|lux|mplan)$|^parking\.(has|dev|floors)$|^trafo\.|^project\.district$/;
+document.addEventListener("input",e=>{const el=e.target;
+  if(el.dataset?.ov){const [id,key,f]=el.dataset.ov.split("|");const tgt=id==="P"?S.parking:S.buildings[+id];tgt.ov=tgt.ov||{};const o=tgt.ov[key]||(tgt.ov[key]={});if(el.value==="")delete o[f];else o[f]=el.value;if(!Object.keys(o).length)delete tgt.ov[key];save();renderDoc();return}
+  const k=el.dataset?.k;if(!k)return;
+  if(el.type==="radio"||el.tagName==="SELECT")return; // handled on change
+  setPath(k,coerce(el));
+  if(k==="project.city"){const d=DISTRICT_OF[(el.value||"").trim()];if(d){S.project.district=d;$("#p-district").value=d;renderTrafo();renderProcess()}}
+  if(/^buildings\.\d+\.name$/.test(k))renderParkingChips();
+  if(/^buildings\.\d+\.kva$/.test(k)){const i=+k.split(".")[1];const box=document.querySelector(`[data-genmsg="${i}"]`);if(box){const tmp=document.createElement("div");renderBuildingsMsg(i,box)}}
+  if(/^buildings\.\d+\.units$/.test(k)){/* soft */}
+  if(k.startsWith("parking."))updateParkingChecks();
+  save();if(/^buildings\.\d+\.(units|perFloor|floors|offArea|pubArea|pubType)$/.test(k))refreshOv();renderDoc();});
+document.addEventListener("click",e=>{const r=e.target.closest?.("[data-ovreset]");if(!r)return;const id=r.dataset.ovreset;if(id==="P")S.parking.ov={};else S.buildings[+id].ov={};save();refreshOv();renderDoc();toast("המידות הוחזרו לברירת המחדל")});
+function askConfirm(text){return new Promise(res=>{const M=$("#ask-modal");$("#ask-text").textContent=text;M.hidden=false;$("#ask-yes").focus();
+  const done=v=>{M.hidden=true;$("#ask-yes").onclick=$("#ask-no").onclick=null;M.onclick=null;res(v)};$("#ask-yes").onclick=()=>done(true);$("#ask-no").onclick=()=>done(false);M.onclick=e=>{if(e.target===M)done(false)}})}
+document.addEventListener("change",async e=>{const el=e.target;
+  if(el.id==="b-count"){const n=+el.value;while(S.buildings.length<n){S.buildings.push(newBuilding(S.buildings.length));S.parking.over.push(S.buildings.length-1)}S.buildings.length=n;S.parking.over=S.parking.over.filter(i=>i<n);if(S.parking.baseBld>=n)S.parking.baseBld=-1;save();renderAll();return}
+  if(el.dataset?.over!=null){const i=+el.dataset.over;S.parking.over=el.checked?[...new Set([...S.parking.over,i])].sort():S.parking.over.filter(x=>x!==i);save();refreshOv();renderDoc();return}
+  const k=el.dataset?.k;if(!k)return;
+  if(/^base\.\d+$/.test(k)){const i=+k.split(".")[1];const P=S.parking;
+    if(el.value==="false"){if(P.baseBld===i)P.baseBld=-1;save();reRenderBuildings();updateParkingChecks();renderDoc();return}
+    if(P.baseBld>=0&&P.baseBld!==i&&S.buildings[P.baseBld]){const from=bldLabel(S.buildings[P.baseBld].name||("בניין "+(P.baseBld+1))),to=bldLabel(S.buildings[i].name||("בניין "+(i+1)));
+      const ok=await askConfirm(`החיבור הציבורי המשותף של המרתף (מונה החניון) נמצא כרגע ב${from}. להעביר את המונה הציבורי של החניון מ${from} ל${to}?`);
+      if(!ok){reRenderBuildings();return}toast(`החיבור הציבורי של המרתף הועבר ל${to}`)}
+    P.baseBld=i;save();reRenderBuildings();updateParkingChecks();renderDoc();return}
+  if(el.type==="radio"||el.tagName==="SELECT"){setPath(k,coerce(el));save();
+    if(/^buildings\./.test(k)||k==="parking.baseSize"){reRenderBuildings();renderParking()}else if(k.startsWith("parking.")){renderParking();refreshOv()}else if(k.startsWith("trafo."))renderTrafo();else if(k==="project.district"){renderTrafo();renderProcess()}
+    renderDoc();return}
+  if(/^buildings\.\d+\.(units|floors|roomLen|roomWid|kva|struct)$/.test(k))reRenderBuildings();
+});
+function reRenderBuildings(){const sel="#buildings details";const open=[...document.querySelectorAll(sel)].map(d=>d.open);renderBuildings();document.querySelectorAll(sel).forEach((d,j)=>{if(open[j])d.open=true})}
+function genMsgHtml(b){const g=pickGen(b.kva);if(!num(b.kva))return "";
+  if(!(g&&g.g))return GEN.length?`<div class="msg warn">מעל ${fmt(GEN.at(-1).kva)} KVA נדרש תכנון מיוחד</div>`:`<div class="msg info">טוען נתוני שמרלינג…</div>`;
+  const e=genExhaust(b);
+  return `<div class="msg ok">נבחר: ${fmt(g.g.kva)} KVA · דגם ${esc(g.g.room65?.model||g.g.canopy65?.model||"")}${g.exact?"":` (הגודל הקרוב כלפי מעלה ל-${fmt(g.n)})`}</div>`+
+   (e?`<div class="msg info">אגזוז לגג (לפי אפליקציית בחירת הגנרטור): קוטר ${e.dia}" · קוטר חיצוני עם בידוד כ-${e.outside} מ"מ · פיר ${e.shaft}X${e.shaft} ס"מ. התוואי: 4 כיפופים, ${e.horiz} מ' אופקי, ${e.vert} מ' אנכי (מרתף + גובה הבניין עד היציאה בגג).</div>`:"")}
+function renderBuildingsMsg(i,box){box.innerHTML=genMsgHtml(S.buildings[i])}
+function renderParkingChips(){const box=document.querySelector("#parking .chips");if(!box)return;box.innerHTML=S.buildings.map((b,i)=>`<label class="chk"><input type="checkbox" data-over="${i}" ${S.parking.over.includes(i)?"checked":""}>${esc(b.name||("בניין "+(i+1)))}</label>`).join("")}
+/* reset handled by dialog below */
+function fillProject(){setTimeout(()=>{try{decorateInputs()}catch(e){}},0);["name","iso","dev","arch","city"].forEach(k=>{const el=document.querySelector(`[data-k="project.${k}"]`);if(el)el.value=S.project[k]||""});$("#p-district").value=S.project.district||"דן"}
+$("#cities").innerHTML=Object.keys(DISTRICT_OF).map(c=>`<option value="${c}">`).join("");
+
+/* ================= save / open ================= */
+const APP_ID="tiktin-arch-guidelines";
+function loadState(o){if(!o||!o.project||!Array.isArray(o.buildings))throw new Error("bad");const d=defaults();S=Object.assign(d,o);S.parking=Object.assign(d.parking,o.parking||{});S.trafo=Object.assign(d.trafo,o.trafo||{});
+  S.buildings=o.buildings.map((b,i)=>Object.assign(newBuilding(i),b,{ov:b.ov||{}}));S.parking.ov=S.parking.ov||{};save();fillProject();renderAll();$("#imp-result").innerHTML=""}
+function snapshot(){return JSON.parse(JSON.stringify(S))}
+async function fSave(){const data=JSON.stringify({app:APP_ID,v:1,savedAt:new Date().toISOString(),state:snapshot()},null,1);
+  let dl=null;try{dl=await window.claude?.use?.("downloads")}catch(e){}
+  if(!dl){toast("שמירה למחשב אינה זמינה בתצוגה זו");return false}
+  try{await dl.save({filename:`${fileBase()}.json`,data});toast("הטופס נשמר למחשב");return true}catch(e){if(e?.code!=="declined")toast("לא ניתן לשמור את הקובץ כאן");return false}}
+$("#f-save").addEventListener("click",()=>fSave());
+$("#f-open").addEventListener("change",async e=>{const f=e.target.files[0];e.target.value="";if(!f)return;
+  try{const o=JSON.parse(await f.text());loadState(o.state||o);S._cloudId="";save();$("#savebox").open=false;toast("הטופס נפתח מהקובץ")}catch(err){toast("הקובץ אינו טופס שמור תקין")}});
+let DB=null;
+function cMsg(t){$("#c-msg").textContent=t}
+async function cRefresh(sel){try{const q=await DB.collection("projects").orderBy("updatedAt","desc").limit(100).get();
+  const list=$("#c-list");list.innerHTML=q.empty?`<option value="">אין פרויקטים שמורים</option>`:q.docs.map(d=>{const v=d.data()||{};const dt=v.updatedAt?new Intl.DateTimeFormat("he-IL",{day:"2-digit",month:"2-digit",year:"2-digit",hour:"2-digit",minute:"2-digit"}).format(new Date(v.updatedAt)):"";return `<option value="${esc(d.id)}">${esc(v.name||"ללא שם")}${v.iso?` · ISO ${esc(v.iso)}`:""}${dt?` · ${dt}`:""}</option>`}).join("");
+  if(sel)list.value=sel;else if(S._cloudId)list.value=S._cloudId}catch(e){cMsg("לא ניתן לטעון את רשימת הפרויקטים.")}}
+async function cSave(asNew){if(!DB)return false;const P=S.project;if(!P.name&&!P.iso){cMsg("יש למלא שם פרויקט או מספר ISO לפני שמירה.");return false}
+  const id=(!asNew&&S._cloudId)||("p-"+Date.now().toString(36)+"-"+Math.random().toString(36).slice(2,6));S._cloudId=id;
+  const btn=asNew?$("#c-savenew"):$("#c-save");btn.disabled=true;cMsg("שומר…");
+  try{await DB.doc("projects/"+id).set({name:P.name||"",iso:P.iso||"",dev:P.dev||"",arch:P.arch||"",updatedAt:new Date().toISOString(),state:snapshot()});save();cMsg("נשמר בענן.");toast("הטופס נשמר בענן");await cRefresh(id);return true}
+  catch(e){cMsg(e?.code==="quota_exceeded"?"אין מקום לפרויקטים נוספים – יש למחוק פרויקטים ישנים.":"השמירה נכשלה. נסו שוב.");return false}finally{btn.disabled=false}}
+(async()=>{try{DB=await window.claude?.use?.("db")}catch(e){DB=null}if(!DB)return;$("#sp-cloud").hidden=false;
+  $("#savebox").addEventListener("toggle",()=>{if($("#savebox").open)cRefresh()});
+  $("#c-save").onclick=()=>cSave(false);$("#c-savenew").onclick=()=>cSave(true);
+  $("#c-open").onclick=async()=>{const id=$("#c-list").value;if(!id)return;cMsg("פותח…");try{const d=await DB.doc("projects/"+id).get();if(!d.exists){cMsg("הפרויקט לא נמצא.");return}loadState(d.data().state);S._cloudId=id;save();cMsg("");$("#savebox").open=false;toast("הפרויקט נפתח")}catch(e){cMsg("הפתיחה נכשלה.")}};
+  const del=$("#c-del");del.onclick=async()=>{const id=$("#c-list").value;if(!id)return;if(del.dataset.confirm!=="1"){del.dataset.confirm="1";del.textContent="ללחוץ שוב למחיקה";setTimeout(()=>{del.dataset.confirm="";del.textContent="מחיקה"},3000);return}
+    del.dataset.confirm="";del.textContent="מחיקה";try{await DB.doc("projects/"+id).delete();if(S._cloudId===id){S._cloudId="";save()}cMsg("הפרויקט נמחק.");await cRefresh()}catch(e){cMsg("המחיקה נכשלה.")}};
+})();
+document.addEventListener("click",e=>{const sb=$("#savebox");if(sb.open&&!sb.contains(e.target))sb.open=false});
+
+/* ================= reset (new form) ================= */
+function fullReset(){S=defaults();try{localStorage.removeItem(LS)}catch(e){}
+  ["#imp-result","#c-msg"].forEach(s=>{const el=$(s);if(el)el.innerHTML=""});impStatus("");status("");
+  ["#imp-file","#f-open"].forEach(s=>{const el=$(s);if(el)el.value=""});
+  const sb=$("#savebox");if(sb)sb.open=false;save();fillProject();renderAll();if(DB&&$("#c-list"))$("#c-list").value="";
+  scrollTo({top:0,behavior:"smooth"});toast("נפתח טופס חדש")}
+const RM=$("#reset-modal");
+function rmClose(){RM.hidden=true;$("#rm-msg").textContent="";$("#btn-reset").focus()}
+$("#btn-reset").addEventListener("click",()=>{$("#rm-cloud").hidden=!DB;$("#rm-msg").textContent="";RM.hidden=false;$("#rm-cancel").focus()});
+$("#rm-cancel").onclick=rmClose;RM.addEventListener("click",e=>{if(e.target===RM)rmClose()});
+document.addEventListener("keydown",e=>{if(e.key==="Escape"&&!RM.hidden)rmClose()});
+$("#rm-wipe").onclick=()=>{RM.hidden=true;fullReset()};
+$("#rm-file").onclick=async()=>{if(await fSave()){RM.hidden=true;fullReset()}else $("#rm-msg").textContent="הקובץ לא נשמר, הטופס לא נמחק."};
+$("#rm-cloud").onclick=async()=>{const b=$("#rm-cloud");b.disabled=true;$("#rm-msg").textContent="שומר בענן…";const ok=await cSave(false);b.disabled=false;
+  if(ok){RM.hidden=true;fullReset()}else $("#rm-msg").textContent=(S.project.name||S.project.iso)?"השמירה נכשלה, הטופס לא נמחק.":"כדי לשמור בענן יש למלא שם פרויקט או מספר ISO."};
+
+/* ================= import from project presentation (PDF) ================= */
+let SAMPLE=null,impCtl=null,IMP_LEVELS={};
+(async()=>{try{SAMPLE=await window.claude?.use?.("sample")}catch(e){SAMPLE=null}if(SAMPLE)$("#imp-card").hidden=false})();
+function impStatus(t){$("#imp-status").textContent=t;$("#imp-hg").hidden=!t;if(!t)timerStop()}
+let TMR=null;const mmss=s=>`${Math.floor(s/60)}:${String(s%60).padStart(2,"0")}`;
+function timerStart(sec){timerStop();const el=$("#imp-timer");const end=Date.now()+sec*1000;el.hidden=false;
+  const tick=()=>{const left=Math.round((end-Date.now())/1000);el.textContent=left>0?`זמן משוער: ${mmss(left)}`:"עוד רגע…";el.title="הערכה בלבד – תלויה בגודל המצגת ובעומס"};tick();TMR=setInterval(tick,1000)}
+function timerStop(){if(TMR){clearInterval(TMR);TMR=null}const el=$("#imp-timer");if(el){el.hidden=true;el.textContent=""}}
+// tables laid out on a page (e.g. a "תמהיל" page with one table per building): each table starts at a heading item
+// (מבנן / בניין / מגדל / מרקמי …); items are assigned to the nearest heading above them in the same column
+function pdfTables(its){
+  if(its.length<20)return null;const hs=its.map(o=>o.h).filter(Boolean).sort((a,b)=>a-b);const H=hs[Math.floor(hs.length/2)]||8;const cx=o=>o.x+(o.w||0)/2;
+  let A=its.filter(o=>/^(מבנן|מבנה|בניין|בנין|מגדל|מרקמי|אגף)$/.test(o.s)||/^(מבנן|מבנה|בניין|בנין|מגדל|מרקמי|אגף)\s+\S{1,6}$/.test(o.s));
+  A=A.filter(a=>!A.some(b=>b!==a&&b.y>a.y&&b.y-a.y<H*4&&Math.abs(cx(b)-cx(a))<H*6));
+  if(A.length<2)return null;
+  const xs=[...new Set(A.map(a=>Math.round(cx(a))))].sort((a,b)=>a-b);const cols=[];xs.forEach(x=>{const c=cols.find(c=>Math.abs(c.x-x)<H*10);if(c)c.x=(c.x+x)/2;else cols.push({x})});
+  const half=cols.length>1?Math.min(...cols.slice(1).map((c,i)=>c.x-cols[i].x))/2:1e9;
+  const groups=A.map(a=>({a,items:[]}));
+  for(const o of its){let best=null;for(const g of groups){const a=g.a;if(o.y>a.y+H*0.6)continue;if(Math.abs(cx(o)-cx(a))>half)continue;const dy=a.y-o.y;if(!best||dy<best.dy)best={g,dy}}if(best)best.g.items.push(o)}
+  return groups.filter(g=>g.items.length>5).sort((p,q)=>q.a.y-p.a.y||cx(q.a)-cx(p.a)).map(g=>{
+    const lines=[];g.items.sort((a,b)=>b.y-a.y).forEach(o=>{let L=lines.find(l=>Math.abs(l.y-o.y)<=H*0.5);if(!L){L={y:o.y,it:[]};lines.push(L)}L.it.push(o)});
+    return lines.map(l=>l.it.sort((a,b)=>b.x-a.x).map(o=>o.s).join(" ").replace(/\s+/g," ").trim()).join("\n")})}
+// a per-building table → {structure,name,floors,units,perFloor}
+function parseBldTable(t){const L=t.split("\n");let st=null,nm=null,kind="";let tot=null,maxF=null,pf=0,sum=0,rows=0;
+  for(const l of L){let m;
+    if(!st&&(m=l.match(/^(מבנן|מבנה|אגף)\s+(\S.{0,12})$/)))st=m[2].trim();
+    else if(!nm&&(m=l.match(/^(בניין|בנין|מגדל|מרקמי)\s+(\S.{0,12})$/))){nm=m[2].trim();kind=m[1]}
+    else if((m=l.match(/^סך\s*ה?כל\s+(\d{1,4})\b/)))tot=+m[1];
+    else if((m=l.match(/^(\d{1,2})\s+(\d{1,3})(\s|$)/))){const f=+m[1],u=+m[2];if(f<=80&&u<=60){rows++;sum+=u;if(u>pf)pf=u;if(maxF==null||f>maxF)maxF=f}}
+    else if((m=l.match(/^קרקע\s+(\d{1,3})(\s|$)/))){const u=+m[1];if(u<=60){rows++;sum+=u;if(u>pf)pf=u}}}
+  if(!nm&&st&&rows){nm=st;st=null}
+  if(!nm||!rows)return null;return {structure:st,name:nm,kind,floors:maxF,units:tot!=null?tot:sum,perFloor:pf||null}}
+async function pdfRead(file){
+  const lib=window.pdfjsLib;if(!lib)throw {code:"nolib"};
+  try{lib.GlobalWorkerOptions.workerSrc="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js"}catch(e){}
+  const doc=await lib.getDocument({data:new Uint8Array(await file.arrayBuffer())}).promise;
+  const n=Math.min(doc.numPages,60);const pages=[];const levels={};
+  for(let i=1;i<=n;i++){impStatus(`קורא עמוד ${i} מתוך ${n}…`);const pg=await doc.getPage(i);const tc=await pg.getTextContent();
+    const t=tc.items.map(it=>it.str).join(" ").replace(/\s+/g," ").trim();
+    // level tags: "+45.25" next to a floor number ("14") on the same line
+    const its=tc.items.map(it=>({s:String(it.str).trim(),x:it.transform[4],y:it.transform[5],h:Math.abs(it.transform[3])||8})).filter(o=>o.s);
+    let nLev=0;const loc={};const put=(fl,v)=>{const k=String(fl);if(loc[k]==null||v>loc[k])loc[k]=v;nLev++};
+    const VAL=/^([+±-]?)\s*(\d{1,3}[.,]\d{2,3})\s*([+±-]?)$/, FL=/^(?:קומה\s*)?(\d{1,3})$|^(roof|גג|Roof|ROOF)$/;
+    const valOf=m=>parseFloat(m[2].replace(",","."))*((m[1]||m[3])==="-"?-1:1);
+    const flOf=s=>{const f=s.trim().match(FL);if(!f)return null;if(f[1]==null)return "roof";const n=parseInt(f[1]);return n<=80?n:null};
+    for(const a of its){
+      // merged in one text item: "+45.25 14" / "14 +45.25" / "45.25+ 14" / "קומה 14 +45.25"
+      const parts=a.s.split(/\s+/);if(parts.length>=2&&parts.length<=3){let v=null,f=null;
+        for(let k=0;k<parts.length;k++){const m=parts[k].match(VAL);if(m){v=valOf(m);const rest=parts.filter((_,q)=>q!==k).join(" ");f=flOf(rest);break}}
+        if(v!=null&&f!=null){put(f,v);continue}}
+      const m=a.s.match(VAL);if(!m)continue;const v=valOf(m);
+      const near=its.filter(o=>o!==a&&Math.abs(o.y-a.y)<=Math.max(8,a.h*2)&&Math.abs(o.x-a.x)<a.h*30&&flOf(o.s)!=null)
+        .sort((p1,p2)=>Math.abs(p1.x-a.x)+Math.abs(p1.y-a.y)*3-(Math.abs(p2.x-a.x)+Math.abs(p2.y-a.y)*3));
+      if(near[0])put(flOf(near[0].s),v)}
+    // accept the page's level tags only if they look like a real section: 3+ floors whose levels rise with the floor number
+    {const fe=Object.entries(loc).filter(([k])=>k!=="roof").map(([k,v])=>[+k,v]).sort((a,b)=>a[0]-b[0]);
+     const ok=fe.length>=3&&fe.every((e,j)=>j===0||e[1]>fe[j-1][1]);
+     if(ok)Object.entries(loc).forEach(([k,v])=>{if(levels[k]==null||v>levels[k].v)levels[k]={v,page:i}});else nLev=0}
+    pages.push({i,t,pg,nLev,its:tc.items.map(it=>({s:String(it.str).trim(),f:it.fontName||"",h:Math.abs(it.transform[3])||0,x:it.transform[4],y:it.transform[5],w:it.width||0})).filter(o=>o.s)})}
+  // repeated page furniture (side menu, header, footer): items with letters on >=40% of the pages
+  const cnt={},fonts={};pages.forEach(p=>{new Set(p.its.map(o=>o.s)).forEach(s=>cnt[s]=(cnt[s]||0)+1);p.its.forEach(o=>{const k=o.s;fonts[k]=fonts[k]||{};fonts[k][o.f]=(fonts[k][o.f]||0)+1})});
+  const rep=new Set(n>=5?Object.keys(cnt).filter(s=>cnt[s]>=Math.max(3,n*0.4)&&s.length>=3):[]);
+  const mainFont=s=>{const f=fonts[s]||{};return Object.keys(f).sort((a,b)=>f[b]-f[a])[0]};
+  pages.forEach(p=>{const own=p.its.filter(o=>!rep.has(o.s));
+    // the highlighted menu entry (different font) = the section this page belongs to
+    const act=[...new Set(p.its.filter(o=>rep.has(o.s)&&o.f!==mainFont(o.s)).map(o=>o.s))].slice(0,2);
+    const big=[...own].filter(o=>o.s.length>1||/[A-Z0-9]/.test(o.s)).sort((a,b)=>b.h-a.h);const hmax=big[0]?big[0].h:0;
+    const title=big.filter(o=>o.h>=hmax*0.9).slice(0,4).map(o=>o.s).join(" ");
+    p.own=own.map(o=>o.s).join(" ").replace(/\s+/g," ").trim();p.label=[...act,title].filter(Boolean).join(" | ");
+    const L=p.label+" "+p.own;
+    p.section=p.nLev>=3||/חתך|section/i.test(L);p.elev=/חזית|elevation/i.test(L);
+    p.site=/העמדה|פיתוח|site plan|תכנית מגרש|תוכנית מגרש/i.test(L);p.ground=/קומת קרקע|קרקע|ground/i.test(L);
+    p.data=/נתוני|תמהיל|טבלת שטחים|שטח מגרש|מספר קומות|פרוגרמה/.test(L);
+    p.raster=!p.its.length;
+    p.tables=pdfTables(p.its.filter(o=>!rep.has(o.s)))||[]});
+  return {doc,pages,total:doc.numPages,levels};
+}
+async function pageImage(pg,part){const v=pg.getViewport({scale:1});const W=part?3200:1600;const s=Math.min(W/v.width,part?4:2);const vp=pg.getViewport({scale:s});
+  const c=document.createElement("canvas");c.width=Math.round(vp.width);c.height=Math.round(vp.height);await pg.render({canvasContext:c.getContext("2d"),viewport:vp}).promise;
+  let out=c;if(part){const hw=Math.ceil(c.width/2)+Math.round(c.width*0.03);out=document.createElement("canvas");out.width=hw;out.height=c.height;out.getContext("2d").drawImage(c,part==="L"?0:c.width-hw,0,hw,c.height,0,0,hw,c.height);c.width=c.height=0}
+  return await new Promise(r=>out.toBlob(r,"image/jpeg",.85))}
+const IMP_PROMPT=`את/ה מנתח/ת מצגת פרויקט בנייה (מגורים / עירוב שימושים) בישראל עבור משרד תכנון חשמל. חלץ/י רק נתונים שמופיעים במפורש בחומר. אין לנחש.
+החזר/י JSON בלבד במבנה הבא (null לכל נתון שלא נמצא, מספרים ללא יחידות):
+{"project":{"name":null,"dev":null,"arch":null,"city":null},
+ "buildings":[{"name":"A","structure":null,"floors":null,"units":null,"perFloor":null,"heightM":null,"hasCommercial":null,"commercialArea":null,"officeArea":null,"hasPublic":null,"publicType":null,"publicArea":null}],
+ "parking":{"area":null,"floors":null,"total":null,"perFloor":[{"area":null,"spaces":null}],"devCount":null},
+ "notes":["הערה קצרה בעברית על כל נתון לא ודאי או סותר, כולל מספר העמוד"]}
+מסחר ומבני ציבור – יש לבדוק במיוחד: hasCommercial = true אם בבניין יש מסחר (חנויות / "מסחר" / סימון מסחר בתוכניות), גם אם השטח לא מצוין; hasPublic = true אם בבניין או צמוד אליו יש מבנה ציבור – גן ילדים, מעון, בית ספר, מתנ"ס, בית כנסת, "מבנה ציבור", "שב"צ", "שטח ציבורי בנוי" – המסומן בד"כ בצבע חום בתוכניות ובטבלאות (גם כשכתוב רק "גן", "גן 1", "גן 2", "חצר גן" או "שטח ציבורי" על שטח חום בתוכנית הקרקע – זה מבנה ציבור מסוג גן ילדים); publicType = סוג מבנה הציבור כפי שמופיע (למשל "גן ילדים"); publicArea = סה"כ השטח הציבורי בבניין במ"ר אם מצוין (סכום כל הגנים / השטחים הציבוריים, ופרט את החלוקה ב-notes). מבנה ציבור נפרד על המגרש – שייך/י לבניין הקרוב או שהוא יושב על המרתף שלו, וציין/י זאת ב-notes.
+הגדרות: project.dev = היזם / המזמין / החברה היזמית (מופיע לרוב בעמוד השער, בלוגו או בכותרת: "יזם", "מזמין", "בעלים", "Developer", שם חברה); project.arch = משרד האדריכלים / האדריכל (מופיע לרוב בעמוד השער, בכותרת הגיליון או בלוגו: "אדריכל", "תכנון", "עורך הבקשה", "Architects"). שמות אלה עשויים להופיע באנגלית או רק כלוגו בתמונה – יש לחפש גם בתמונות. כשיש שורת לוגואים (בעמוד השער או בפס התחתון של כל עמוד): לוגו עם "Architects" / "אדריכלים" = arch; חברת "יזמות" / "ייזום ובנייה" / "נדל"ן" / חברה יזמית = dev; לוגו עירייה / מועצה / רשות אינו היזם (הוא מעיד על העיר – city); חברות הנדסה / ניהול פרויקט / קבלן – אינן יזם, ציין/י אותן ב-notes. floors = מספר קומות מעל קומת הקרקע; units = יח"ד בבניין; perFloor = מקסימום דירות בקומה; heightM = הגובה הקובע במטרים: ההפרש בין מפלס רצפת קומת הקרקע (±0.00 / כניסה קובעת) לבין מפלס רצפת קומת המגורים העליונה – לא הגג ולא מעקה. חפש/י בחתכים ובחזיתות את סימוני המפלסים (למשל "+45.25 14" = רצפת קומה 14 במפלס 45.25). בחתך מסומן בד"כ מפלס לכל קומה (למשל "+42.10" ליד קומה 13 ו-"+45.25" ליד קומה 14, ו"גג" / "+48.75" מעליהם) – קח/י את מפלס רצפת קומת המגורים העליונה, והפחת/י את מפלס קומת הקרקע / ±0.00 / הכניסה הקובעת אם הוא אינו 0 (אם המפלסים בחתך יחסיים ל-±0.00 בקרקע – הערך עצמו הוא הגובה). כשיש כמה חתכים (חתך מבנן A / B / C) – כל חתך שייך לבניינים של אותו מבנן; מגדל ומבנה מרקמי באותו חתך מקבלים כל אחד את הגובה שלו. לעיתים מופיעות בחתך שתי מערכות מפלסים – יחסית (±0.00 בקרקע, למשל "01 +4.30" … "14 +45.25") ומוחלטת (למשל "A_00 +40.25", "roof top +60.50") – חשב/י בתוך אותה מערכת בלבד (מפלס הקומה העליונה פחות מפלס קומת הקרקע), והעדף/י את המערכת היחסית. אם אין מפלסים – null (אל תחשב/י מגובה משוער); הכתיב "ק+14" / "ק + 14 קומות" = קרקע ועוד 14 קומות, כלומר floors = 14; "ק+5-6" = 5 עד 6 קומות מעל הקרקע (floors לפי הבניין הספציפי בטבלת התמהיל / בחתך). units ו-perFloor לכל בניין – מטבלת התמהיל (יח"ד לפי קומה ולפי בניין) אם קיימת; commercialArea/officeArea/publicArea = שטח (עיקרי+שירות אם מופיע) במ"ר של מסחר / תעסוקה-משרדים / מבנה ציבור בבניין; parking.area = שטח החניון התת-קרקעי הכולל במ"ר; parking.floors = מספר קומות מרתף; parking.total = סה"כ מקומות חניה במרתף; perFloor לפי קומת מרתף מהעליונה (1-) למטה; devCount = חניות בפיתוח/על קרקעיות. שם הבניין כפי שמופיע במצגת (A, B, 1, מזרחי...). structure = שם המבנן / המבנה / האגף שאליו הבניין שייך, בדיוק כפי שמופיע במצגת (למשל "A", "מבנן B", "מבנה צפוני") – כאשר כמה בניינים/גרעינים/כניסות שייכים לאותה קבוצה; null אם אין חלוקה כזו. שמות הבניינים והמבננים יילקחו בדיוק כפי שהם כתובים במצגת – ייתכן שהמבננים מסומנים באותיות והבניינים במספרים (בניין 1, 2 ...), וייתכן שאותו מספר בניין חוזר במבננים שונים; name יכיל את שם הבניין בלבד (למשל "1"), ללא שם המבנן. יש לכלול את כל הבניינים (עד 12), מסודרים לפי מבנה ובתוך כל מבנה לפי שם הבניין. אם יש כמה מגרשים – התייחס/י למגרש העיקרי וציין/י זאת ב-notes.`;
+const SEC_PROMPT=`בתמונות חתכים (או חזיתות) של בניינים מתוך מצגת פרויקט. כל עמוד חתך מחולק לשני חצאים מוגדלים כדי שאפשר יהיה לקרוא את סימוני המפלסים הקטנים.
+לכל עמוד חתך: page = מספר העמוד, title = כותרת החתך (למשל "חתך מבנן A"), structure = שם המבנן / המבנה מהכותרת אם יש (למשל "A"), ולכל בניין שמופיע בחתך: floors = מספר הקומה העליונה של המגורים (מעל הקרקע, ללא גג טכני), topLevel = מפלס רצפת הקומה העליונה, groundLevel = מפלס רצפת קומת הקרקע באותה מערכת מפלסים.
+בדרך כלל ליד כל קומה רשום מספר הקומה ומפלס הרצפה (למשל "14 +45.25", "13 +42.10", "01 +4.30", "roof +48.75"). אם יש שתי מערכות מפלסים (יחסית ל-±0.00 ומוחלטת, למשל "A_00 +40.25") – השתמש/י במערכת היחסית; אם קומת הקרקע לא מסומנת אך המערכת יחסית ל-±0.00 – groundLevel = 0. אין לנחש – null לנתון שלא נקרא בבירור.
+החזר/י JSON בלבד: {"sections":[{"page":21,"title":"חתך מבנן A","structure":"A","buildings":[{"floors":14,"topLevel":45.25,"groundLevel":0},{"floors":5,"topLevel":16.9,"groundLevel":0}]}],"notes":["הערה קצרה בעברית"]}`;
+const normSt=v=>String(v??"").replace(/^(מבנן|מבנה|אגף|מתחם)\s*/,"").replace(/\s+/g,"").trim();
+const normNm=v=>String(v??"").replace(/^(בניין|בנין|מגדל|מרקמי)\s*/,"").replace(/\s+/g,"").trim();
+function mergeImport(d,TBL,sec){d=d||{};const notes=Array.isArray(d.notes)?d.notes.filter(Boolean):[];let bs=Array.isArray(d.buildings)?d.buildings.filter(Boolean):[];
+  if(TBL.length){const used=new Set();
+    const out=TBL.map(t=>{let j=bs.findIndex((b,k)=>!used.has(k)&&normNm(b.name)===normNm(t.name)&&(!t.structure||!b.structure||normSt(b.structure)===normSt(t.structure)));
+      if(j<0)j=bs.findIndex((b,k)=>!used.has(k)&&normNm(b.name)===normNm(t.name));const b=j>=0?bs[j]:{};if(j>=0)used.add(j);
+      return {...b,name:t.name,structure:t.structure??b.structure??null,floors:t.floors??b.floors,units:t.units??b.units,perFloor:t.perFloor??b.perFloor}});
+    const extra=bs.filter((_,k)=>!used.has(k));
+    notes.unshift(`רשימת הבניינים, הקומות ויח"ד נלקחו מ-${TBL.length} טבלאות במצגת (עמוד ${[...new Set(TBL.map(t=>t.page))].join(", ")}).`+(extra.length?` לא נכללו בניינים נוספים ש-Claude הציע ואינם בטבלאות: ${extra.map(b=>b.name).join(", ")}.`:""));
+    bs=out}
+  const S2=Array.isArray(sec?.sections)?sec.sections:[];
+  S2.forEach(se=>(se.buildings||[]).forEach(sb=>{const f=num(sb.floors),top=num(sb.topLevel);if(f==null||top==null)return;const g=num(sb.groundLevel)||0;const h=Math.round((top-g)*100)/100;if(h<=0||h>200)return;
+    let tg=bs.filter(b=>num(b.floors)===f&&(!se.structure||!b.structure||normSt(b.structure)===normSt(se.structure)));
+    tg.forEach(b=>{b.heightM=h;b._hSrc=`גובה קובע ${h} מ' לפי החתך בעמוד ${se.page||"?"}`})}));
+  if(S2.length)notes.push(`גובה הבניינים נקרא מ-${S2.length} חתכים: ${S2.map(se=>`${se.title||("עמוד "+se.page)}: ${(se.buildings||[]).filter(x=>num(x.topLevel)!=null).map(x=>`קומה ${x.floors} ב-${x.topLevel}`).join(", ")}`).join("; ")}.`);
+  if(Array.isArray(sec?.notes))notes.push(...sec.notes.filter(Boolean));
+  applyImport({...d,buildings:bs,notes})}
+function catFromH(h){const n=num(h);if(n==null)return null;return n<=29?"low":n<=42?"mid":"high"}
+function catFromFloors(f,com){const n=num(f);if(n==null||n<=0)return null;return n<=9?"low":n===10?(com?"mid":"low"):n<14?"mid":n===14?(com?"high":"mid"):"high"}
+function importFields(d){
+  const F=[];const add=(label,cur,val,apply,pre)=>{if(val==null||val==="")return;F.push({label,cur:cur==null?"":String(cur),val:String(val),apply,pre:!!pre})};
+  const src=d.project||{};const P=S.project;
+  [["name","שם הפרויקט"],["dev","יזם"],["arch","אדריכל"],["city","עיר"]].forEach(([k,l])=>add(l,P[k],src[k]?String(src[k]).trim():null,()=>{P[k]=String(src[k]).trim();if(k==="city"){const dd=DISTRICT_OF[P.city];if(dd)P.district=dd}}));
+  const bs0=Array.isArray(d.buildings)?d.buildings.filter(Boolean):[];const so=[];bs0.forEach(b=>{const k=String(b.structure||"").trim();if(!so.includes(k))so.push(k)});
+  const cN=(a,c)=>String(a||"").localeCompare(String(c||""),"he",{numeric:true});
+  const bs=bs0.map((b,i)=>({b,i})).sort((a,c)=>{const sa=String(a.b.structure||"").trim(),sc=String(c.b.structure||"").trim();return (sa?0:1)-(sc?0:1)||cN(sa,sc)||cN(a.b.name,c.b.name)||a.i-c.i}).map(o=>o.b).slice(0,12);
+  if(bs.length&&bs.length!==S.buildings.length)add("מספר בניינים",S.buildings.length,bs.length,()=>{while(S.buildings.length<bs.length){S.buildings.push(newBuilding(S.buildings.length));S.parking.over.push(S.buildings.length-1)}S.buildings.length=bs.length;S.parking.over=S.parking.over.filter(i=>i<bs.length)});
+  const used=new Set();
+  bs.forEach((xb,i)=>{
+    // match by name, else by position
+    const sameG=b=>!xb.structure||!String(b.struct||"").trim()||String(b.struct).trim()===String(xb.structure).trim();
+    let j=S.buildings.findIndex((b,k)=>!used.has(k)&&xb.name&&String(b.name).trim()===String(xb.name).trim()&&sameG(b));if(j<0){j=i;while(used.has(j))j++}used.add(j);
+    const B=()=>{while(S.buildings.length<=j)S.buildings.push(newBuilding(S.buildings.length));return S.buildings[j]};
+    const cur=S.buildings[j]||{};const tag=(xb.structure?grpLabel(xb.structure)+" · ":"")+bldLabel(xb.name||cur.name||j+1);
+    if(xb.name&&(!S.buildings[j]||String(S.buildings[j].name).trim()!==String(xb.name).trim()))add(`${tag} – שם`,S.buildings[j]?S.buildings[j].name:"",xb.name,()=>{B().name=String(xb.name)});
+    if(xb.structure)add(`${tag} – מבנן`,cur.struct||"",String(xb.structure).trim(),()=>{B().struct=String(xb.structure).trim()});
+    const nf=(k,label,v)=>{const n=num(v);if(n!=null)add(`${tag} – ${label}`,cur[k],n,()=>{B()[k]=String(n)})};
+    nf("floors","קומות",xb.floors);nf("units",'יח"ד',xb.units);nf("perFloor","דירות בקומה",xb.perFloor);
+    let fromDwg=false;if(num(xb.floors)!=null){const L=IMP_LEVELS[String(num(xb.floors))];if(L){const g=IMP_LEVELS["0"]?IMP_LEVELS["0"].v:0;const hh=Math.round((L.v-g)*100)/100;if(num(xb.heightM)==null||Math.abs(hh-num(xb.heightM))>0.5){xb.heightM=hh}fromDwg=true}}
+    {const ch=catFromH(xb.heightM),xcom=num(xb.commercialArea)>0||xb.hasCommercial===true,cf=catFromFloors(xb.floors,xcom);const c=ch||cf;
+     if(c)add(`${tag} – קטגוריית גובה`,S.buildings[j]?catText(cur.cat):"",`${catText(c)} (${ch?(xb._hSrc&&!fromDwg?xb._hSrc:`גובה קובע ${xb.heightM} מ' ${fromDwg?"לפי סימוני המפלס בחתך":"לפי המצגת"}`):`לפי ${num(xb.floors)} קומות${xcom?" עם מסחר בקרקע":""}`})`,()=>{B().cat=c},!!ch)}
+    const ca=num(xb.commercialArea);if(ca)add(`${tag} – מסחר (מ"ר)`,cur.com?cur.comArea:"",ca,()=>{const b=B();b.com=true;b.comArea=String(ca)});
+    else if(xb.hasCommercial===true&&!cur.com)add(`${tag} – יש מסחר`,"",`יש (שטח לא צוין)`,()=>{B().com=true});
+    if(xb.publicType)add(`${tag} – מבנה ציבור`,cur.pubType||"",String(xb.publicType).trim(),()=>{B().pubType=String(xb.publicType).trim()});
+    else if(xb.hasPublic===true&&!num(xb.publicArea))add(`${tag} – מבנה ציבור`,cur.pubType||"","מבנה ציבור",()=>{B().pubType="מבנה ציבור"});
+    nf("offArea",'תעסוקה (מ"ר)',num(xb.officeArea)||null);nf("pubArea",'ציבור (מ"ר)',num(xb.publicArea)||null);
+  });
+  const pk=d.parking||{};const K=S.parking;
+  const pn=(k,label,v,fx)=>{const n=num(v);if(n!=null)add(`חניון – ${label}`,K.has?K[k]:"",n,()=>{K.has=true;K[k]=String(fx?fx(n):n)})};
+  pn("area",'שטח (מ"ר)',pk.area);pn("floors","קומות",pk.floors,n=>Math.max(1,Math.min(8,n)));pn("total","סה\"כ חניות",pk.total);
+  if(Array.isArray(pk.perFloor))pk.perFloor.slice(0,8).forEach((f,k)=>{
+    const a=num(f?.area),sp=num(f?.spaces);const row=()=>{K.has=true;while(K.perFloor.length<=k)K.perFloor.push({area:"",spaces:""});if(K.perFloor.length>(parseInt(K.floors)||1))K.floors=String(K.perFloor.length);return K.perFloor[k]};
+    if(a!=null)add(`חניון – קומה מינוס ${k+1} שטח`,K.perFloor[k]?.area,a,()=>{row().area=String(a)});
+    if(sp!=null)add(`חניון – קומה מינוס ${k+1} חניות`,K.perFloor[k]?.spaces,sp,()=>{row().spaces=String(sp)})});
+  const dv=num(pk.devCount);if(dv)add("חניות בפיתוח",K.dev?K.devCount:"",dv,()=>{K.dev=true;K.devCount=String(dv)});
+  return F;
+}
+function formHasData(){const P=S.project;return !!(P.name||P.iso||P.dev||P.arch||S.buildings.some(b=>b.units||b.floors)||S.parking.area||S.parking.total)}
+const same=(a,b)=>{const na=num(a),nb=num(b);if(na!=null&&nb!=null)return na===nb;return String(a).trim()===String(b).trim()};
+function finishImport(applied,notes){save();fillProject();renderAll();
+  const nt=notes&&notes.length?`<details class="help"><summary>הערות מהקריאה (${notes.length})</summary><div class="body"><ul style="margin:0;padding-inline-start:18px">${notes.map(t=>`<li>${esc(t)}</li>`).join("")}</ul></div></details>`:"";
+  $("#imp-result").innerHTML=levHtml()+(applied.length?`<div class="msg ok">עודכן בטופס – יש לבדוק:</div><ul style="margin:6px 0;padding-inline-start:20px">${applied.map(f=>`<li>${esc(f.label)}: ${esc(f.val)}</li>`).join("")}</ul>`:`<div class="msg info">לא עודכנו נתונים.</div>`)+nt}
+let IMP_PENDING=null;
+function levHtml(){const e=Object.entries(IMP_LEVELS||{}).filter(([k])=>k!=="roof").sort((a,b)=>a[1].v-b[1].v);
+  if(!e.length)return `<div class="muted" style="margin-top:6px">לא זוהו במצגת סימוני מפלס עם מספר קומה (ייתכן שהחתכים הם תמונה). הגובה נקבע לפי מה ש-Claude קרא או לפי מספר הקומות.</div>`;
+  const top=e.slice(-3).map(([k,o])=>`קומה ${k}: ${o.v>=0?"+":""}${o.v.toFixed(2)}`).join(" · ");return `<div class="muted" style="margin-top:6px">מפלסים שזוהו בחתכים (${e.length}): … ${esc(top)}</div>`}
+function applyImport(d){
+  const F=importFields(d||{});const notes=Array.isArray(d?.notes)?d.notes.filter(Boolean):[];
+  if(!F.length){$("#imp-result").innerHTML=`<div class="msg warn">לא נמצאו במצגת נתונים למילוי הטופס.</div>`;return}
+  if(!formHasData()){F.forEach(f=>f.apply());finishImport(F,notes);return}
+  // compare mode
+  const rows=F.map((f,k)=>({...f,k,status:!f.cur?"new":same(f.cur,f.val)?"same":"diff"}));
+  const diff=rows.filter(r=>r.status==="diff"),nw=rows.filter(r=>r.status==="new"),sm=rows.filter(r=>r.status==="same");
+  IMP_PENDING={rows,notes};
+  const line=r=>`<tr class="${r.status}"><td>${r.status==="same"?"":`<input type="checkbox" data-impk="${r.k}" ${r.status==="new"||r.pre?"checked":""} aria-label="לקחת מהמצגת">`}</td><td>${esc(r.label)}</td><td>${r.cur?esc(r.cur):'<span class="muted">ריק</span>'}</td><td>${esc(r.val)}</td><td>${r.status==="diff"?'<span class="pill warn">שונה</span>':r.status==="new"?'<span class="pill info">חסר בטופס</span>':'<span class="pill ok">תואם</span>'}</td></tr>`;
+  $("#imp-result").innerHTML=levHtml()+`<div class="msg ${diff.length?"warn":"ok"}">השוואה מול המצגת: ${diff.length} שונים, ${nw.length} חסרים בטופס, ${sm.length} תואמים.</div>
+    <div class="tbl-wrap" style="margin-top:8px"><table class="floors cmp"><thead><tr><th></th><th>נתון</th><th>הוקלד</th><th>במצגת</th><th>מצב</th></tr></thead><tbody>${[...diff,...nw,...sm].map(line).join("")}</tbody></table></div>
+    <div class="muted" style="margin:6px 0">מסמנים את מה שרוצים לקחת מהמצגת. מה שלא מסומן נשאר כפי שהוקלד.</div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap"><button type="button" class="btn primary" id="imp-apply">עדכון הנתונים המסומנים</button><button type="button" class="btn" id="imp-cancel">השארת הטופס כמו שהוא</button></div>
+    ${notes.length?`<details class="help" style="margin-top:6px"><summary>הערות מהקריאה (${notes.length})</summary><div class="body"><ul style="margin:0;padding-inline-start:18px">${notes.map(t=>`<li>${esc(t)}</li>`).join("")}</ul></div></details>`:""}`;
+  $("#imp-apply").onclick=()=>{const pick=[...document.querySelectorAll("[data-impk]:checked")].map(c=>IMP_PENDING.rows[+c.dataset.impk]);
+    // apply building-count first so per-building setters find their building
+    pick.sort((a,b)=>(a.label==="מספר בניינים"?-1:0)-(b.label==="מספר בניינים"?-1:0)).forEach(f=>f.apply());finishImport(pick,IMP_PENDING.notes);IMP_PENDING=null;if(pick.length)toast("הנתונים המסומנים עודכנו")};
+  $("#imp-cancel").onclick=()=>{IMP_PENDING=null;$("#imp-result").innerHTML=`<div class="msg info">הטופס נשאר כפי שהוקלד.</div>`};
+}
+const IMP_ERR={nokey:"יש להזין מפתח API של Anthropic ב'הגדרות קריאה' שבכרטיס זה.",badkey:"מפתח ה-API שגוי. בדקו אותו ב'הגדרות קריאה'.",net:"אין חיבור לשרת של Anthropic. בדקו חיבור לאינטרנט.",api:"שגיאה בשרת הקריאה. נסו שוב או מלאו ידנית.",not_granted:"הקריאה בוטלה – לא ניתן אישור לשימוש ב-Claude.",rate_limited:"יש עומס כרגע. נסו שוב בעוד דקה.",cancelled:"הקריאה נעצרה.",too_large:"המצגת גדולה מדי. נסו קובץ עם פחות עמודים."};
+$("#imp-file").addEventListener("change",async e=>{const file=e.target.files[0];e.target.value="";if(!file||!SAMPLE)return;
+  const stop=$("#imp-stop");$("#imp-result").innerHTML="";impCtl=new AbortController();stop.hidden=false;stop.onclick=()=>impCtl.abort();
+  try{
+    const {pages,total,levels}=await pdfRead(file);IMP_LEVELS=levels||{};
+    // tables with one building each (floors / units per floor) are read directly – they override what the model returns
+    const TBL=[];pages.forEach(p=>p.tables.forEach(t=>{const r=parseBldTable(t);if(r)TBL.push({...r,page:p.i})}));
+    let body="",lim=52000;const per=Math.max(3000,Math.floor(lim/Math.max(1,pages.filter(p=>p.own).length))*2);
+    for(const p of pages){if(!p.own&&!p.label)continue;const txt=p.tables.length?p.tables.map((t,k)=>`[טבלה ${k+1}]\n${t}`).join("\n\n"):p.own.slice(0,per);
+      const add=`\n--- עמוד ${p.i}${p.label?` [${p.label}]`:""} ---\n${txt}`;if(body.length+add.length>lim){body+=add.slice(0,Math.max(0,lim-body.length));break}body+=add}
+    let images=[],secImgs=[];const caps=await SAMPLE.limits().catch(()=>null);
+    if(caps?.images){const max=Math.min(caps.images.maxCount||0,12);
+      // 1) section / elevation pages – two zoomed halves each, read in a separate focused request
+      let secs=pages.filter(p=>p.section);if(!secs.length)secs=pages.filter(p=>p.elev).slice(0,2);secs=secs.slice(0,Math.max(1,Math.floor(max/2)));
+      for(const p of secs)for(const part of ["R","L"]){impStatus(`מכין תמונה של חתך – עמוד ${p.i}…`);try{secImgs.push({i:p.i,part,label:p.label,b:await pageImage(p.pg,part)})}catch(_){}}
+      // 2) general pages for the main request
+      const pick=[];const add1=pp=>{if(pp&&!pick.includes(pp)&&!secs.includes(pp)&&pick.length<max)pick.push(pp)};const late=pages.filter(p=>p.i>3);
+      add1(pages[0]);late.filter(p=>p.site).slice(0,2).forEach(add1);
+      late.filter(p=>p.ground&&!p.site).sort((a,b)=>(/קרקע|ground/i.test(b.label)?1:0)-(/קרקע|ground/i.test(a.label)?1:0)||a.own.length-b.own.length).slice(0,2).forEach(add1);
+      late.filter(p=>p.raster).slice(0,2).forEach(add1);
+      pages.filter(p=>p.data&&!p.tables.length&&p.own.length<300).slice(0,2).forEach(add1);
+      late.filter(p=>p.own.length<80).forEach(add1);add1(pages[pages.length-1]);
+      pick.sort((a,b)=>a.i-b.i);
+      for(const p of pick){impStatus(`מכין תמונה של עמוד ${p.i}…`);try{images.push({i:p.i,label:p.label,b:await pageImage(p.pg)})}catch(_){}}}
+    if(!body.trim()&&!images.length){impStatus("");$("#imp-result").innerHTML=`<div class="msg warn">לא נמצא טקסט במצגת (ייתכן שהיא סרוקה כתמונות).</div>`;return}
+    impStatus("Claude קורא את המצגת…");
+    const est=Math.max(30,Math.min(180,Math.round(25+pages.length*0.8+body.length/2500+images.length*8)));timerStart(est);
+    const levTxt=Object.entries(IMP_LEVELS).sort((a,b)=>a[1].v-b[1].v).map(([f,o])=>`${f==="roof"?"גג":"קומה "+f}: +${o.v.toFixed(2)} (עמוד ${o.page})`).join("; ");
+    const tblTxt=TBL.length?`\n\nטבלאות בניינים שזוהו בקובץ (נתונים ודאיים – השתמש/י בהם לשמות הבניינים, המבננים, הקומות ויח"ד): ${TBL.map(t=>`${t.structure?`מבנן ${t.structure} – `:""}${t.kind||"בניין"} ${t.name}: ${t.floors??"?"} קומות, ${t.units} יח"ד${t.perFloor?`, עד ${t.perFloor} דירות בקומה`:""} (עמוד ${t.page})`).join("; ")}.`:"";
+    const prompt=IMP_PROMPT+tblTxt+(levTxt?`\n\nמפלסים שזוהו אוטומטית מסימוני המפלס בחתכים/חזיתות (מספר קומה ← מפלס רצפה): ${levTxt}. השתמש/י בהם לחישוב heightM לכל בניין לפי מספר הקומות שלו.`:"")+`\n\nהמצגת: ${total} עמודים${total>pages.length?` (נקראו ${pages.length} הראשונים)`:""}.`+(images.length?` מצורפות תמונות של העמודים (לפי הסדר): ${images.map(x=>`עמוד ${x.i}${x.label?` (${x.label})`:""}`).join("; ")}. בתמונות: לוגואים ושמות המשרדים (בד"כ בעמוד השער / בפס התחתון), תוכניות קרקע/העמדה עם שטחים ציבוריים (חום) – יש לקרוא אותם מהתמונה. גובה הבניינים נקרא בנפרד מהחתכים.`:"")+`\n\nטקסט המצגת:${body||" (אין טקסט – ראה/י תמונות)"}`;
+    const secPrompt=secImgs.length?SEC_PROMPT+`\n\nהתמונות (לפי הסדר): ${secImgs.map(x=>`עמוד ${x.i} – ${x.part==="R"?"חצי ימני":"חצי שמאלי"} מוגדל${x.label?` (${x.label})`:""}`).join("; ")}.`+(TBL.length?` הבניינים במגרש (מהטבלאות): ${TBL.map(t=>`${t.structure?`מבנן ${t.structure} `:""}${t.kind||"בניין"} ${t.name} – ${t.floors??"?"} קומות`).join("; ")}.`:""):null;
+    const [d,sec]=await Promise.all([SAMPLE.json(prompt,{signal:impCtl.signal,modelTier:"default",images:images.length?images.map(x=>x.b):undefined}),
+      secPrompt?SAMPLE.json(secPrompt,{signal:impCtl.signal,modelTier:"default",images:secImgs.map(x=>x.b)}).catch(err=>{if(err?.code==="cancelled")throw err;console.warn(err);return null}):Promise.resolve(null)]);
+    impStatus("");mergeImport(d||{},TBL,sec);
+  }catch(err){impStatus("");const c=err&&err.code;$("#imp-result").innerHTML=`<div class="msg warn">${esc(IMP_ERR[c]||(c==="nolib"?"ספריית קריאת PDF לא נטענה. נסו לרענן את הדף.":"לא הצלחתי לקרוא את המצגת. נסו שוב או מלאו ידנית."))}</div>`;console.error(err)}
+  finally{stop.hidden=true}
+});
+
+/* ===== field behaviour: X to clear (left side), first keystroke replaces the old value ===== */
+const FLD='input[type=text],input[type=number],input[type=password],input:not([type])';
+function decorateInputs(){document.querySelectorAll("#form "+FLD.split(",").join(",#form ")+",.savepanel input[type=text]").forEach(el=>{
+  if(el.type==="hidden"||el.hidden)return;let w=el.parentElement;
+  if(!w.classList.contains("clr-wrap")){w=document.createElement("span");w.className="clr-wrap";el.parentNode.insertBefore(w,el);w.appendChild(el);
+    const x=document.createElement("button");x.type="button";x.className="clr-x";x.tabIndex=-1;x.title="ניקוי השדה";x.setAttribute("aria-label","ניקוי השדה");x.textContent="×";w.appendChild(x);
+    el.addEventListener("input",()=>w.classList.toggle("has",el.value!==""))}
+  w.classList.toggle("has",el.value!=="")})}
+let decQ=false;new MutationObserver(()=>{if(decQ)return;decQ=true;queueMicrotask(()=>{decQ=false;decorateInputs()})}).observe(document.getElementById("form"),{childList:true,subtree:true});
+document.addEventListener("click",e=>{const x=e.target.closest?.(".clr-x");if(!x)return;e.preventDefault();const el=x.parentElement.querySelector("input");if(!el)return;
+  el.value="";el.dispatchEvent(new Event("input",{bubbles:true}));el.dispatchEvent(new Event("change",{bubbles:true}));x.parentElement.classList.remove("has");const nel=document.getElementById(el.id);(nel||el).focus()});
+document.addEventListener("focusin",e=>{const el=e.target;if(!el.matches||!el.matches(FLD)||el.readOnly)return;if(el.value==="")return;
+  let moved=false;const mu=ev=>{if(!moved)ev.preventDefault()};el.addEventListener("mouseup",mu,{once:true});setTimeout(()=>{try{el.select()}catch(_){}},0)});
+fillProject();renderAll();decorateInputs();
+fetch("gen-data.json").then(r=>r.json()).then(d=>{GEN=d.sort((a,b)=>a.kva-b.kva);renderBuildings();renderDoc()}).catch(()=>{status("נתוני הגנרטורים לא נטענו.")});
+</script>
+
+</body>
+</html>
