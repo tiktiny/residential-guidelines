@@ -198,7 +198,7 @@ table.cmp td:first-child{width:28px}
       <img class="logo" src="assets/tiktin-logo.png" alt="טיקטין תכנון חשמל">
       <div>
         <h1>הכנה אוטומטית של הנחיות חשמל לפרויקט מגורים ועירוב שימושים</h1>
-        <p>הנחיות ראשוניות לאדריכל · טופס לכל מגרש · <span class="ver">גרסה V8 · 08.10.2026</span></p>
+        <p>הנחיות ראשוניות לאדריכל · טופס לכל מגרש · <span class="ver">גרסה V9 · 08.10.2026</span></p>
       </div>
     </div>
     <div class="head-actions">
@@ -548,6 +548,7 @@ function renderBuildings(){
       <div class="sub"><h4>מוני חח"י</h4>
         ${seg(`met${i}`,`${p}.meters`,[{v:"down",t:"למטה (קרקע / מרתף עליון)"},{v:"floors",t:"בקומות"}],b.meters)}
         ${b.meters==="down"?`
+          ${b.cat==="low"?`<div class="grid"><label class="f">חיבור ציבורי בניין<select id="b${i}-pubsz" data-k="${p}.pubSize"><option value="">אוטומטי – ${pubAuto(b)}</option>${PUB_LOW.map(z=>`<option ${b.pubSize===z?"selected":""}>${z}</option>`).join("")}</select></label></div>`:""}
           ${canChooseMType(b)?`<div class="fieldset"><span class="lbl">ריכוז מונים (עד 36 יח"ד)</span>${seg(`mt${i}`,`${p}.mtype`,[{v:"niche",t:"נישה במרתף עליון (ברירת מחדל)"},{v:"room",t:"חדר מונים"}],b.mtype==="room"?"room":"niche")}</div>`:""}
           ${isRoom(b)?(()=>{const c=mrCalc(b);return `<div class="fieldset"><span class="lbl">העמדת ארונות בחדר המונים</span>${seg(`sd${i}`,`${p}.msides`,[{v:"one",t:`צד אחד (${high(b)?200:180})`},{v:"two",t:"שני צדדים (320)"}],mSides(b))}</div>
           <div class="fieldset"><span class="lbl">חיבור ציבורי מרתף משותף (חניון) בחדר זה</span>${seg(`bs${i}`,`base.${i}`,[{v:"false",t:"לא"},{v:"true",t:"כן"}],S.parking.baseBld===i)}
@@ -558,7 +559,7 @@ function renderBuildings(){
           <div class="fieldset"><span class="lbl">תוכנית העמדה בחדר במסמך</span>${seg(`mp${i}`,`${p}.mplan`,[{v:"false",t:"לא לצרף"},{v:"true",t:"לצרף"}],!!b.mplan)}</div>
           ${c?`<details class="help"><summary>תוכנית העמדה בחדר</summary><div class="body mplan">${mrPlanSVG(c,num(b.roomLen),num(b.roomWid))}</div></details>`:""}`})():`<div class="msg info">נישת מונים בגרעין הבניין, במרתף העליון.</div>`}
           ${meterMsg}
-          ${help(`גודל החדר מחושב כמו באפליקציית "תיכנון חדר מונים של חברת חשמל בבניני מגורים": פילר ראשי לפי גובה הבניין ומספר הדירות, ארונות 12 ו-6 מונים, חיבור ציבורי לפי גובה הבניין (עד 29 מ' – 3X63, 29–42 מ' – 3X200, מעל 42 מ' – 3X400), מרווחים 15 ס"מ, רזרבה 10 ס"מ, 65 ס"מ מול דלת ארון פתוחה ומילוט 65 ס"מ ליד דלת 90.<br>ברירת המחדל: עד 29 מ' – ארונות בצד אחד; מעל 29 מ' – שני צדדים (320 ס"מ). מסחר – גודל החיבור מוצע לפי 0.6 אמפר למ"ר משטח המסחר (אפשר לשנות ולהוסיף חיבורים): חיבורים עד 3X100 בארונות מונים, חיבורים גדולים יותר – ארון מדידה ומפסק ראשי לכל חיבור.<br>אפשר להזין אורך ורוחב אחרים לחדר; הם יופיעו במסמך במקום החישוב.`)}`
+          ${help(`גודל החדר מחושב כמו באפליקציית "תיכנון חדר מונים של חברת חשמל בבניני מגורים": פילר ראשי לפי גובה הבניין ומספר הדירות, ארונות 12 ו-6 מונים, חיבור ציבורי לפי גובה הבניין (עד 29 מ' – 3X40 עד 3X100 לפי המעליות: עד 3 דירות בקומה 3X40, 4 ומעלה 3X63, ניתן לשנות; 29–42 מ' – 3X200, מעל 42 מ' – 3X400), מרווחים 15 ס"מ, רזרבה 10 ס"מ, 65 ס"מ מול דלת ארון פתוחה ומילוט 65 ס"מ ליד דלת 90.<br>ברירת המחדל: עד 29 מ' – ארונות בצד אחד; מעל 29 מ' – שני צדדים (320 ס"מ). המונה הציבורי נכנס למקום פנוי בארון הדירות האחרון; אם אין מקום – ארון 6 מונים, ומוני המסחר עד 3X100 נכנסים לאותו ארון. אחרת – ארון נפרד למסחר.<br>מסחר – גודל החיבור מוצע לפי 0.6 אמפר למ"ר משטח המסחר (אפשר לשנות ולהוסיף חיבורים): חיבורים עד 3X100 בארונות מונים, חיבורים גדולים יותר – ארון מדידה ומפסק ראשי לכל חיבור.<br>אפשר להזין אורך ורוחב אחרים לחדר; הם יופיעו במסמך במקום החישוב.`)}`
         :`<div class="fieldset"><span class="lbl">רמת גמר</span>${seg(`lux${i}`,`${p}.lux`,[{v:"false",t:"בניין רגיל (עומק ארון 45)"},{v:"true",t:"בניין יוקרה (עומק 60)"}],!!b.lux)}</div>
           <div class="msg info">נישת כבלי חח"י, ארון מונים קומתי וחדר פילרים – לפי יח"ד, קומות ודירות בקומה (ניתן לשנות ב"מידות הפריטים").</div>`}
       </div>
@@ -628,6 +629,9 @@ const MR_EQ={f1000:{n:"פילר 1000",s:"1000",w:144,d:48,dr:[80,64],c:"#7c4dff"
   c12:{n:"ארון 12 מונים",s:"12",w:115,d:34,dr:[60,60],c:"#4f8ef7"},c6:{n:"ארון 6 מונים",s:"6",w:62,d:34,dr:[62],c:"#8fb7fb"},me:{n:"ארון מדידה",s:"מד",w:68,d:42,dr:[68],c:"#f0a53c"},mb:{n:"מפסק ראשי",s:"מפ",w:60,d:30,dr:[60],c:"#e5484d"}};
 const MR={DOOR:90,ESC:65,CLR:65,GAP:15,RES:10,SG:10,WALL:20};
 const MR_PUB={low:"3X63",mid:"3X200",high:"3X400"};
+const PUB_LOW=["3X40","3X63","3X80","3X100"];
+function pubAuto(b){if(b.cat!=="low")return MR_PUB[b.cat]||"3X63";const pf=num(b.perFloor);return pf&&pf<=3?"3X40":"3X63"}
+function pubSize(b){return b.cat==="low"&&PUB_LOW.includes(b.pubSize)?b.pubSize:pubAuto(b)}
 const MR_SIZES=["3X25","3X40","3X63","3X80","3X100","3X125","3X160","3X200","3X250","3X315","3X400","3X500","3X630","3X800","3X910"];
 const mrAmps=sz=>parseInt(String(sz).split("X")[1])||0;
 const COM_A_M2=0.6;
@@ -635,7 +639,7 @@ function comSuggest(b){const a=num(b.comArea);if(!a)return null;const A=a*COM_A_
 function comRows(b){const sg=!b.ccTouched&&comSuggest(b);if(sg)b.comConns=[{sz:sg.sz,n:String(sg.n)}];if(!Array.isArray(b.comConns)||!b.comConns.length)b.comConns=[{sz:"3X25",n:"1"}];return b.comConns}
 function comConns(b){if(!b.com)return[];return comRows(b).map(c=>({sz:MR_SIZES.includes(c.sz)?c.sz:"3X25",n:Math.max(1,parseInt(c.n)||1)})).map(c=>Object.assign(c,{amps:mrAmps(c.sz)}))}
 function comSmall(b){return comConns(b).filter(c=>c.amps<=100).reduce((a,c)=>a+c.n,0)}
-function comExtras(b){const ex=[];let sm=comSmall(b);
+function comExtras(b,skip){const ex=[];let sm=comSmall(b)-(skip||0);
   while(sm>0){if(sm>6){const m=Math.min(12,sm);ex.push({k:"c12",meters:m,label:"מסחר"});sm-=m}else{ex.push({k:"c6",meters:sm,label:"מסחר"});sm=0}}
   comConns(b).filter(c=>c.amps>100).forEach(c=>{for(let k=0;k<c.n;k++)ex.push({pair:true,gt:c.amps>315,amps:c.amps,label:"מסחר "+c.sz})});return ex}
 function comText(b){const cs=comConns(b);return cs.map(c=>`${c.n>1?c.n+" × ":""}${c.sz}`).join(", ")}
@@ -670,21 +674,23 @@ function mrBuild(p,oneSide){
   best.n12=n12;best.n6=n6;best.raw=best.L;best.L=Math.ceil(best.raw/10)*10+p.reserve;
   best.B.items.forEach(it=>{const s0=it.start;it.start=best.L-it.end;it.end=best.L-s0});
   let no=0;[...best.A.items,...best.B.items].filter(it=>!it.comm&&(it.k==="c12"||it.k==="c6")).forEach(it=>{no++;const from=(no-1)*12+1,to=Math.min(no*12,meters);const aTo=Math.min(to,p.units),hasPub=to>p.units&&from<=meters;
-    const apt=from<=aTo?(from===aTo?`${from}`:`${from}–${aTo}`):"";it.no=no;it.apts=apt+(hasPub?(apt?" + ציבורי":"ציבורי"):"")});
-  let cn=0;[...best.A.items,...best.B.items].filter(it=>it.comm).forEach(it=>{no++;it.no=no;const n=it.k==="c12"?Math.min(12,it.meters):it.meters;it.apts=`מסחר ${cn+1}–${cn+n}`;cn+=n});
+    const apt=from<=aTo?(from===aTo?`${from}`:`${from}–${aTo}`):"";it.no=no;it.apts=apt+(hasPub?(apt?" + ציבורי":"ציבורי"):"")+(hasPub&&!apt&&p.comShare?" + מסחר":"")});
+  let cn=0;[...best.A.items,...best.B.items].filter(it=>it.comm).forEach(it=>{no++;it.no=no;const n=it.k==="c12"?Math.min(12,it.meters):it.meters;it.apts=n>1?`מסחר ${cn+1}–${cn+n}`:`מסחר ${cn+1}`;cn+=n});
   return best}
 // room for one building: length / width / layout, as the meter-room app calculates it
 function mrCalc(b){
   const u=Math.max(0,Math.floor(num(b.units)||0));if(!u)return null;
-  const one=mSides(b)==="one";const sg=mrSuggest(u,b.cat);const pubSz=MR_PUB[b.cat]||"3X63",pa=mrAmps(pubSz);
+  const one=mSides(b)==="one";const sg=mrSuggest(u,b.cat);const pubSz=pubSize(b),pa=mrAmps(pubSz);
   const extras=[];let pubSlot=0;if(pa<=100)pubSlot=1;else extras.push({pair:true,gt:pa>315,amps:pa,label:"ציבורי בניין"});
   const bi=S.buildings.indexOf(b);if(bi>=0&&S.parking.baseBld===bi){const ba=mrAmps(S.parking.baseSize||"3X400");if(ba<=100)pubSlot++;else extras.push({pair:true,gt:ba>315,amps:ba,label:"מרתף"})}
-  extras.push(...comExtras(b));
+  // מונה ציבורי בארון 6 שנפתח רק בשבילו (למשל 12 / 24 דירות) – מוני המסחר עד 3X100 נכנסים לאותו ארון
+  const mt=u+pubSlot,rem=mt%12;let comShare=0;if(pubSlot&&rem>=1&&rem<=6&&rem<=pubSlot)comShare=Math.min(comSmall(b),6-rem);
+  extras.push(...comExtras(b,comShare));
   let width=one?(high(b)?200:180):320;
-  const p={units:u,width,extras,pubSlot,f1000:sg.f1000,f2:sg.f2,f0:sg.f0,gap:MR.GAP,reserve:MR.RES};
+  const p={units:u,width,extras,pubSlot,comShare,f1000:sg.f1000,f2:sg.f2,f0:sg.f0,gap:MR.GAP,reserve:MR.RES};
   let r=mrBuild(p,one);
   if(one){const reach=Math.max(...r.A.items.map(mrReach),0);const need=Math.ceil((reach+MR.CLR)/10)*10;if(need>width){width=need;p.width=width;r=mrBuild(p,true)}}
-  return{L:r.L,W:width,r,one,sg,pub:pubSz}}
+  return{L:r.L,W:width,r,one,sg,pub:pubSz,comShare}}
 function mrPlanSVG(c,roomL,roomW){
   const r=c.r,width=roomW||c.W,L=Math.max(roomL||0,r.L,100);const sc=1000/L,T=MR.WALL*sc,pad=46+T,Wpx=L*sc,Hpx=width*sc,vw=Wpx+pad*2,vh=Hpx+pad*2+10;
   const dw=MR.DOOR*sc;const ink="#222",mut="#666";
@@ -825,7 +831,7 @@ function buildingItems(b,i,raw){
   // upper basement (or ground if no basement)
   if(down){
     if(isRoom(b)){const c=mrCalc(b);const man=num(b.roomLen)||num(b.roomWid);const w=num(b.roomWid)||(c?c.W:roomWidth(b)),l=num(b.roomLen)||(c?c.L:mrLen(u,com));
-      const eq=c?[c.sg.f1000?`${c.sg.f1000} פילר 1000`:"",c.sg.f2?"פילר 2":"",c.sg.f0?"פילר 0":"",c.r.n12?`${c.r.n12} ארונות 12 מונים`:"",c.r.n6?"ארון 6 מונים":"",mrAmps(c.pub)>100?`ארון מדידה ומפסק ראשי לחיבור הציבורי ${c.pub}`:"",S.parking.baseBld===i?`ארון מדידה ומפסק ראשי לחיבור הציבורי המשותף של המרתף ${S.parking.baseSize||"3X400"}`:"",...(()=>{const ce=comExtras(b);const sm=comSmall(b);const big=ce.filter(e=>e.pair);return [sm?`ארונות מונים למסחר (${sm} ${sm>1?"מונים":"מונה"})`:"",...big.map(e=>`ארון מדידה ומפסק ראשי למסחר ${e.label.replace("מסחר ","")}`)]})()].filter(Boolean).join(", "):"";
+      const eq=c?[c.sg.f1000?`${c.sg.f1000} פילר 1000`:"",c.sg.f2?"פילר 2":"",c.sg.f0?"פילר 0":"",c.r.n12?(c.r.n12>1?`${c.r.n12} ארונות 12 מונים`:"ארון 12 מונים"):"",c.r.n6?"ארון 6 מונים":"",mrAmps(c.pub)<=100?`מונה לחיבור הציבורי של הבניין ${c.pub}`:"",mrAmps(c.pub)>100?`ארון מדידה ומפסק ראשי לחיבור הציבורי ${c.pub}`:"",S.parking.baseBld===i?`ארון מדידה ומפסק ראשי לחיבור הציבורי המשותף של המרתף ${S.parking.baseSize||"3X400"}`:"",...(()=>{const sh=c.comShare||0;const ce=comExtras(b,sh);const sm=comSmall(b)-sh;const big=ce.filter(e=>e.pair);const sc=ce.filter(e=>!e.pair);return [sh?(sh>1?`${sh} מוני המסחר בארון 6 המונים יחד עם המונה הציבורי`:"מונה המסחר בארון 6 המונים יחד עם המונה הציבורי"):"",sm?`${sc.length>1?sc.length+" ארונות":"ארון"} ${sc.every(e=>e.k==="c6")?"6":"12"} מונים למסחר (${sm} ${sm>1?"מונים":"מונה"})`:"",...big.map(e=>`ארון מדידה ומפסק ראשי למסחר ${e.label.replace("מסחר ","")}`)]})()].filter(Boolean).join(", "):"";
       push(U,{key:"mroom",name:`חדר מוני חח"י ל-${fmt(u)} יח"ד`,room:true,w,l,
       note:(c&&eq?`החדר כולל: ${eq} (${c.one?"ארונות בצד אחד":"ארונות בשני הצדדים"}). `:"")+`גובה החדר 2.5 מ' נטו לפחות. רצפה כפולה בגובה 80 ס"מ נטו. דלת אש 30/90 נפתחת החוצה לכיוון לובי הבניין עם מנעול כפול חח"י + דיירים. מתחת לפיר הכבלים לדירות.`})}
     else{push(U,{key:"mniche",name:`נישת מוני חח"י ל-${fmt(u)} מונים`,w:Math.ceil(Math.max(u,1)/12)*150+5,d:50,h:240,note:"באזור לובי הבניין, 1.4 מ' פנוי מול הנישה, קרוב לפיר הכבלים מהדירות."});
@@ -1136,7 +1142,7 @@ wire("#x-docx",exportDocx,"docx","מכין Word…");wire("#x-pdf",exportPdf,"pd
 
 /* ================= events ================= */
 function coerce(el){if(el.type==="radio"&&(el.value==="true"||el.value==="false"))return el.value==="true";return el.value}
-const STRUCT=/\.(cat|meters|sides|msides|mtype|com|genReq|genLoc|lux|mplan)$|^parking\.(has|dev|floors)$|^trafo\.|^project\.district$/;
+const STRUCT=/\.(cat|perFloor|pubSize|meters|sides|msides|mtype|com|genReq|genLoc|lux|mplan)$|^parking\.(has|dev|floors)$|^trafo\.|^project\.district$/;
 document.addEventListener("input",e=>{const el=e.target;
   if(el.dataset?.ov){const [id,key,f]=el.dataset.ov.split("|");const tgt=id==="P"?S.parking:S.buildings[+id];tgt.ov=tgt.ov||{};const o=tgt.ov[key]||(tgt.ov[key]={});if(el.value==="")delete o[f];else o[f]=el.value;if(!Object.keys(o).length)delete tgt.ov[key];save();renderDoc();return}
   const k=el.dataset?.k;if(!k)return;
