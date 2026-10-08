@@ -36,6 +36,13 @@ header.top p{margin:2px 0 0;color:var(--ink-3);font-size:13px}
 .layout{display:grid;grid-template-columns:minmax(0,1fr);gap:22px;align-items:start}
 .preview-col{border-top:3px solid var(--brand);padding-top:16px;margin-top:6px}
 .preview-col .sheet{max-width:1100px;margin-inline:auto}
+/* large screens: the whole input UI twice as big (the document preview keeps its A4 look) */
+@media (min-width:1500px){header.top,.form,.export,.modal-box,.toast div{zoom:2}.preview-col .sheet{max-width:1500px;font-size:17px}}
+@media (min-width:1100px) and (max-width:1499px){header.top,.form,.export,.modal-box,.toast div{zoom:1.5}.preview-col .sheet{font-size:15.5px}}
+.help .body input[type=password],.help .body input[type=text]{width:100%}
+html.uz header.top,html.uz .form,html.uz .export,html.uz .modal-box,html.uz .toast div{zoom:var(--uz)!important}
+.zoombox{display:inline-flex;align-items:center;gap:4px}.zoombox .btn{min-width:42px;padding:9px 10px;font-weight:700}
+.zoombox .zv{font-size:13px;color:var(--ink-3);min-width:40px;text-align:center;font-variant-numeric:tabular-nums}
 @media (max-width:1000px){.layout{grid-template-columns:1fr}}
 .form{display:flex;flex-direction:column;gap:14px}
 .card{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:16px}
@@ -188,7 +195,7 @@ table.cmp td:first-child{width:28px}
       <img class="logo" src="assets/tiktin-logo.png" alt="טיקטין תכנון חשמל">
       <div>
         <h1>הכנה אוטומטית של הנחיות חשמל לפרויקט מגורים ועירוב שימושים</h1>
-        <p>הנחיות ראשוניות לאדריכל · טופס לכל מגרש · <span class="ver">גרסה V5 · 08.10.2026</span></p>
+        <p>הנחיות ראשוניות לאדריכל · טופס לכל מגרש · <span class="ver">גרסה V6 · 08.10.2026</span></p>
       </div>
     </div>
     <div class="head-actions">
@@ -210,6 +217,7 @@ table.cmp td:first-child{width:28px}
         </div>
       </details>
       <button type="button" class="btn" id="btn-reset" title="מחיקת כל הנתונים שהוזנו">טופס חדש</button>
+      <span class="zoombox" role="group" aria-label="גודל התצוגה"><button type="button" class="btn" id="z-out" title="הקטנת הטופס">−</button><span class="zv" id="z-val" title="לחיצה – חזרה לגודל ברירת המחדל">אוטו'</span><button type="button" class="btn" id="z-in" title="הגדלת הטופס">+</button></span>
     </div>
   </header>
 
@@ -1407,6 +1415,14 @@ document.addEventListener("click",e=>{const x=e.target.closest?.(".clr-x");if(!x
   el.value="";el.dispatchEvent(new Event("input",{bubbles:true}));el.dispatchEvent(new Event("change",{bubbles:true}));x.parentElement.classList.remove("has");const nel=document.getElementById(el.id);(nel||el).focus()});
 document.addEventListener("focusin",e=>{const el=e.target;if(!el.matches||!el.matches(FLD)||el.readOnly)return;if(el.value==="")return;
   let moved=false;const mu=ev=>{if(!moved)ev.preventDefault()};el.addEventListener("mouseup",mu,{once:true});setTimeout(()=>{try{el.select()}catch(_){}},0)});
+/* ===== form size buttons (independent of the browser zoom) ===== */
+(function(){const K="tiktin-guidelines-zoom",STEPS=[1,1.25,1.5,1.75,2,2.25,2.5];
+  const auto=()=>innerWidth>=1500?2:innerWidth>=1100?1.5:1;
+  let z=null;try{const v=parseFloat(localStorage.getItem(K));if(v)z=v}catch(e){}
+  const apply=()=>{const h=document.documentElement;if(z){h.classList.add("uz");h.style.setProperty("--uz",z)}else{h.classList.remove("uz");h.style.removeProperty("--uz")}
+    $("#z-val").textContent=z?Math.round(z*100)+"%":"אוטו'";try{z?localStorage.setItem(K,z):localStorage.removeItem(K)}catch(e){}};
+  const step=d=>{const cur=z||auto();let i=STEPS.findIndex(v=>v>=cur-0.01);if(i<0)i=STEPS.length-1;i=Math.max(0,Math.min(STEPS.length-1,i+d));z=STEPS[i];apply()};
+  $("#z-in").onclick=()=>step(1);$("#z-out").onclick=()=>step(-1);$("#z-val").onclick=()=>{z=null;apply()};apply()})();
 fillProject();renderAll();decorateInputs();
 fetch("gen-data.json").then(r=>r.json()).then(d=>{GEN=d.sort((a,b)=>a.kva-b.kva);renderBuildings();renderDoc()}).catch(()=>{status("נתוני הגנרטורים לא נטענו.")});
 </script>
