@@ -198,7 +198,7 @@ table.cmp td:first-child{width:28px}
       <img class="logo" src="assets/tiktin-logo.png" alt="טיקטין תכנון חשמל">
       <div>
         <h1>הכנה אוטומטית של הנחיות חשמל לפרויקט מגורים ועירוב שימושים</h1>
-        <p>הנחיות ראשוניות לאדריכל · טופס לכל מגרש · <span class="ver">גרסה V7 · 08.10.2026</span></p>
+        <p>הנחיות ראשוניות לאדריכל · טופס לכל מגרש · <span class="ver">גרסה V8 · 08.10.2026</span></p>
       </div>
     </div>
     <div class="head-actions">
@@ -598,7 +598,7 @@ function ovRows(id,items,ov){
   const lvName={ground:"קרקע",typical:"טיפוסית",upper:"מרתף עליון",lower:"מרתף תחתון"};const seen={};const list=[];
   Object.entries(items).forEach(([lv,arr])=>arr.forEach(it=>{if(it.text||it.key==="mroom")return;if(seen[it.key]){seen[it.key].lv.push(lvName[lv]||lv);return}const r={it,lv:[lvName[lv]||lv]};seen[it.key]=r;list.push(r)}));
   return list.map(({it,lv})=>{const lvs=esc([...new Set(lv)].join(", "));
-    if(it.cust)return `<tr><td class="lv">${lvs}</td><td>${esc(it.name)}<span class="tag">${it.g?"נוסף · קבוע":"נוסף"}</span></td>
+    if(it.cust)return `<tr><td class="lv">${lvs}</td><td>${esc(it.name)}<span class="tag">נוסף</span></td>
       <td><input type="number" min="0" aria-label="רוחב ${esc(it.name)}" data-cu="${id}|${it.key}|w" value="${esc(it.w||"")}"></td>
       <td><input type="number" min="0" aria-label="עומק ${esc(it.name)}" data-cu="${id}|${it.key}|d" value="${esc(it.d||"")}"></td>
       <td><input type="number" min="0" aria-label="גובה ${esc(it.name)}" data-cu="${id}|${it.key}|h" value="${esc(it.h||"")}"></td>
@@ -615,7 +615,6 @@ function ovTable(id,items,ov){const lvs=id==="P"?[["upper","מרתף עליון"
   <div class="ov-add" data-ovaddbox="${id}"><label class="f">מפלס<select data-na="lv">${lvs.map(([v,t])=>`<option value="${v}">${t}</option>`).join("")}</select></label>
     <label class="f nm">ייעוד / שם הפריט<input type="text" data-na="name" placeholder="למשל: פיר מיזוג"></label>
     <label class="f">רוחב<input type="number" min="0" data-na="w"></label><label class="f">עומק<input type="number" min="0" data-na="d"></label><label class="f">גובה<input type="number" min="0" data-na="h"></label>
-    <label class="f">תוקף<select data-na="scope"><option value="p">רק בפרויקט זה</option><option value="g">גם בכל הפרויקטים הבאים</option></select></label>
     <button type="button" class="btn primary" data-ovadd="${id}">+ הוספת שורה</button></div>
   <div class="muted" style="margin-top:4px">שדה ריק = ברירת המחדל המוצגת באפור. × – השורה לא תופיע במסמך (↺ מחזיר). <button type="button" class="btn" style="padding:4px 10px;font-size:13px" data-ovreset="${id}">חזרה לברירות המחדל</button></div></details>`}
 function refreshOv(){S.buildings.forEach((b,i)=>{const tb=document.querySelector(`[data-ovbody="${i}"]`);if(tb)tb.innerHTML=ovRows(String(i),buildingItems(b,i,true),b.ov||{})});
@@ -770,7 +769,7 @@ function applyOv(it,ov){const o=ov&&ov[it.key];if(!o)return it;const c=Object.as
 const CUST_LS="tiktin-guidelines-custom-items";
 function custGlobal(){try{const a=JSON.parse(localStorage.getItem(CUST_LS)||"[]");return Array.isArray(a)?a:[]}catch(e){return[]}}
 function custSetGlobal(a){try{localStorage.setItem(CUST_LS,JSON.stringify(a))}catch(e){}}
-function custFor(scope){return custGlobal().filter(c=>c.scope===scope).map(c=>Object.assign({},c,{g:true}))}
+function custFor(scope){return []}
 function finItems(o,tgt,raw){const cu=(tgt.cust||[]);Object.keys(o).forEach(lv=>{cu.filter(c=>c.lv===lv).forEach(c=>o[lv].push({key:c.key,name:c.name,w:num(c.w)||0,d:num(c.d)||0,h:num(c.h)||undefined,cust:true,g:!!c.g}))});
   if(!raw)Object.keys(o).forEach(lv=>{o[lv]=o[lv].filter(it=>!it._del)});return o}
 function spec(it){
@@ -1162,16 +1161,16 @@ document.addEventListener("click",async e=>{const t=e.target.closest?.("[data-ov
   if(t.dataset.ovdel||t.dataset.ovundel){const [id,key]=(t.dataset.ovdel||t.dataset.ovundel).split("|");const tg=ovTgt(id);tg.ov=tg.ov||{};const o=tg.ov[key]||(tg.ov[key]={});if(t.dataset.ovdel)o.del=true;else delete o.del;if(!Object.keys(o).length)delete tg.ov[key];save();refreshOv();renderDoc();return}
   if(t.dataset.cudel){const [id,key]=t.dataset.cudel.split("|");const tg=ovTgt(id);const c=(tg.cust||[]).find(x=>x.key===key);if(!c)return;
     tg.cust=tg.cust.filter(x=>x.key!==key);
-    if(c.g&&await askConfirm(`להסיר את "${c.name}" גם מכל הפרויקטים הבאים?`)){custSetGlobal(custGlobal().filter(x=>x.key!==key));toast("השורה הוסרה גם מהפרויקטים הבאים")}
+    if(false&&await askConfirm(`להסיר את "${c.name}" גם מכל הפרויקטים הבאים?`)){custSetGlobal(custGlobal().filter(x=>x.key!==key));toast("השורה הוסרה גם מהפרויקטים הבאים")}
     save();refreshOv();renderDoc();return}
   if(t.dataset.ovadd){const id=t.dataset.ovadd;const box=t.closest("[data-ovaddbox]");const v=k=>box.querySelector(`[data-na="${k}"]`).value.trim();
     const name=v("name");if(!name){toast("יש למלא ייעוד / שם לפריט");box.querySelector('[data-na="name"]').focus();return}
     if(!num(v("w"))&&!num(v("d"))){toast("יש למלא רוחב או עומק");return}
-    const g=v("scope")==="g";const c={key:"cu"+Date.now().toString(36),lv:v("lv"),name,w:v("w"),d:v("d"),h:v("h"),g};
+    const g=false;const c={key:"cu"+Date.now().toString(36),lv:v("lv"),name,w:v("w"),d:v("d"),h:v("h"),g};
     const tg=ovTgt(id);tg.cust=tg.cust||[];tg.cust.push(c);
     if(g){custSetGlobal([...custGlobal(),{key:c.key,scope:id==="P"?"P":"b",lv:c.lv,name,w:c.w,d:c.d,h:c.h}])}
     ["name","w","d","h"].forEach(k=>{const el=box.querySelector(`[data-na="${k}"]`);el.value="";el.dispatchEvent(new Event("input",{bubbles:true}))});
-    save();refreshOv();renderDoc();toast(g?"השורה נוספה – תופיע גם בכל הפרויקטים הבאים":"השורה נוספה לפרויקט זה");return}
+    save();refreshOv();renderDoc();toast("השורה נוספה לפרויקט זה");return}
 });
 document.addEventListener("click",e=>{const r=e.target.closest?.("[data-ovreset]");if(!r)return;const id=r.dataset.ovreset;if(id==="P")S.parking.ov={};else S.buildings[+id].ov={};save();refreshOv();renderDoc();toast("המידות הוחזרו לברירת המחדל")});
 function askConfirm(text){return new Promise(res=>{const M=$("#ask-modal");$("#ask-text").textContent=text;M.hidden=false;$("#ask-yes").focus();
