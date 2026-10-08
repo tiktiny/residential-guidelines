@@ -33,7 +33,9 @@ header.top .logo{height:54px;width:auto;background:#fff;border-radius:6px;paddin
 header.top h1{font-size:22px;margin:0;font-weight:700;text-wrap:balance}
 header.top p{margin:2px 0 0;color:var(--ink-3);font-size:13px}
 .head-actions{display:flex;gap:8px;flex-wrap:wrap}
-.layout{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.05fr);gap:22px;align-items:start}
+.layout{display:grid;grid-template-columns:minmax(0,1fr);gap:22px;align-items:start}
+.preview-col{border-top:3px solid var(--brand);padding-top:16px;margin-top:6px}
+.preview-col .sheet{max-width:1100px;margin-inline:auto}
 @media (max-width:1000px){.layout{grid-template-columns:1fr}}
 .form{display:flex;flex-direction:column;gap:14px}
 .card{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:16px}
@@ -186,7 +188,7 @@ table.cmp td:first-child{width:28px}
       <img class="logo" src="assets/tiktin-logo.png" alt="טיקטין תכנון חשמל">
       <div>
         <h1>הכנה אוטומטית של הנחיות חשמל לפרויקט מגורים ועירוב שימושים</h1>
-        <p>הנחיות ראשוניות לאדריכל · טופס לכל מגרש · <span class="ver">גרסה V3 · 07.10.2026</span></p>
+        <p>הנחיות ראשוניות לאדריכל · טופס לכל מגרש · <span class="ver">גרסה V4 · 08.10.2026</span></p>
       </div>
     </div>
     <div class="head-actions">
@@ -343,7 +345,7 @@ const CATS=[{v:"low",t:"עד 29 מ'"},{v:"mid",t:"29–42 מ'"},{v:"high",t:"42�
 const catText=v=>(CATS.find(c=>c.v===v)||CATS[0]).t;
 const DISTRICT_OF={"תל אביב":"דן","תל אביב-יפו":"דן","תל אביב יפו":"דן","רמת גן":"דן","גבעתיים":"דן","חולון":"דן","בת ים":"דן","בני ברק":"דן",
  "רחובות":"שפלה","נס ציונה":"שפלה","אשדוד":"שפלה","ראשון לציון":"שפלה","אשקלון":"שפלה",
- "נתניה":"שרון","הרצליה":"שרון","רעננה":"שרון"};
+ "נתניה":"שרון","הרצליה":"שרון","רעננה":"שרון","רמת השרון":"דן"};
 const IMG={ // natural sizes
  "assets/tiktin-logo.png":[435,189],"assets/grid-access.jpg":[1026,1824],
  "assets/iec-4.png":[968,1328],"assets/iec-5.png":[947,1144],"assets/iec-6.png":[870,1084],"assets/iec-7.png":[911,1107],
@@ -373,9 +375,9 @@ const LS="tiktin-arch-guidelines-v1";
 const PUBTYPES=[{v:"",t:"לא ידוע"},{v:"אין",t:"אין"},{v:"גן ילדים",t:"גן ילדים"},{v:"מעון יום",t:"מעון יום"},{v:"בית ספר",t:"בית ספר"},{v:"מתנ״ס",t:"מתנ״ס"},{v:"בית כנסת",t:"בית כנסת"},{v:"מבנה ציבור",t:"מבנה ציבור אחר"}];
 const hasPub=b=>(num(b.pubArea)||0)>0||(!!String(b.pubType||"").trim()&&b.pubType!=="אין");
 const pubName=b=>(b.pubType&&b.pubType!=="אין")?b.pubType:"שטח ציבורי";
-const GRP_RE=/^(מבנן|מבנה|אגף|מתחם|מגרש|בלוק|שלב)/;
+const GRP_RE=/^(מבנן|מבנה|אגף|מתחם|מגרש|בלוק|שלב|בניין|בנין|מגדל)/;
 const grpLabel=k=>{k=String(k||"").trim();return !k?"":GRP_RE.test(k)?k:`מבנן ${k}`};
-const bldLabel=nm=>{nm=String(nm||"").trim();return /^(בניין|בנין|מגדל)/.test(nm)?nm:`בניין ${nm}`};
+const bldLabel=nm=>{nm=String(nm||"").trim();return /^(בניין|בנין|מגדל|כניסה|גרעין|אגף)/.test(nm)?nm:`בניין ${nm}`};
 function newBuilding(i){return {name:"ABCDEFGHIJKL"[i]||String(i+1),struct:"",cat:"low",units:"",floors:"",perFloor:"",meters:"down",sides:"two",msides:"",mtype:"",roomLen:"",shaftW:"",com:false,comArea:"",offArea:"",pubArea:"",pubType:"",genReq:false,kva:"",genLoc:"basement",lux:false,ov:{}}}
 function defaults(){return {project:{name:"",iso:"",dev:"",arch:"",city:"",district:"דן"},
  buildings:[newBuilding(0)],
@@ -795,6 +797,7 @@ function buildDoc(){
   const B=[];const P=S.project;const push=(t,o={})=>B.push(Object.assign({t},o));
   const today=new Intl.DateTimeFormat("he-IL",{day:"2-digit",month:"2-digit",year:"numeric"}).format(new Date());
   const bn=(b,i)=>b.name||("בניין "+(i+1));
+  const fl=(b,i)=>(String(b.struct||"").trim()?grpLabel(b.struct)+" – ":"")+bldLabel(bn(b,i));
   const catLong=c=>c==="low"?"בניין גבוה (עד 29 מ')":c==="mid"?"בניין רב קומות (29–42 מ')":"בניין רב קומות מעל 42 מ' ועד 128 מ'";
   push("head",{date:today});
   push("h1",{text:"הנחיות חשמל ראשוניות"});
@@ -815,18 +818,18 @@ function buildDoc(){
   n++;
   // assumptions
   push("h2",{text:`${n}. הנחות יסוד`});n++;
-  const downB=S.buildings.filter(b=>b.meters==="down").map((b,i)=>bn(b,S.buildings.indexOf(b))),floorB=S.buildings.filter(b=>b.meters!=="down").map(b=>bn(b,S.buildings.indexOf(b)));
+  const downB=S.buildings.filter(b=>b.meters==="down").map(b=>fl(b,S.buildings.indexOf(b))),floorB=S.buildings.filter(b=>b.meters!=="down").map(b=>fl(b,S.buildings.indexOf(b)));
   const tRow0=S.trafo.req?(TRAFO.find(t=>t.id===Number(S.trafo.type))||TRAFO[0]):null;
   push("ul",{items:[
     ...(downB.length?[`מוני חח"י בחדר או בנישה במרתף העליון, בגרעין הבניין: ${downB.join(", ")}.`]:[]),
     ...(floorB.length?[`מוני חח"י בקומות: ${floorB.join(", ")}.`]:[]),
     "לכל בניין מונה לכל דירה ומונה ציבורי לשירותי בית."+(S.buildings.some(b=>b.com)?" מונה נפרד למסחר.":"")+(S.buildings.some(b=>num(b.offArea))?" מונה נפרד לתעסוקה.":"")+(S.buildings.some(hasPub)?" מונה נפרד למבנה הציבור.":"")+(Pk.has?" מונה לחניון כולל טעינת רכבים.":""),
     tRow0?`תחנת שנאים של חח"י: ${tRow0.name} – ראה פרק חדרי שנאים.`:"תחנת שנאים: יש לקבל תיק מידע מהעירייה / מחח\"י כדי לדעת אם יידרש חדר שנאים או פילר רשת בחזית המגרש.",
-    ...S.buildings.map((b,i)=>{if(!hasGen(b))return null;const g=pickGen(b.kva);const loc=b.genLoc==="roof"?"על הגג בחופה":b.genLoc==="ground"?"בחדר בקומת הקרקע":"בחדר במרתף";return `גנרטור ל${bldLabel(bn(b,i))} ${loc}${g&&g.g?` – ${fmt(g.g.kva)} KVA (הערכה)`:""}. הגודל הסופי ייקבע לאחר קבלת עומסי היועצים.`}).filter(Boolean)]});
+    ...S.buildings.map((b,i)=>{if(!hasGen(b))return null;const g=pickGen(b.kva);const loc=b.genLoc==="roof"?"על הגג בחופה":b.genLoc==="ground"?"בחדר בקומת הקרקע":"בחדר במרתף";return `גנרטור ל${fl(b,i)} ${loc}${g&&g.g?` – ${fmt(g.g.kva)} KVA (הערכה)`:""}. הגודל הסופי ייקבע לאחר קבלת עומסי היועצים.`}).filter(Boolean)]});
   // buildings (grouped by structure when defined)
-  const bTitle=(b,i)=>`הנחיות ל${bldLabel(bn(b,i))}${b.units?` – ${fmt(num(b.units))} יח"ד`:""}, ${b.meters==="down"?"מונים במרתף":"מונים בקומות"}`;
+  const bTitle=(b,i)=>`הנחיות ל${fl(b,i)}${b.units?` – ${fmt(num(b.units))} יח"ד`:""}, ${b.meters==="down"?"מונים במרתף":"מונים בקומות"}`;
   const bBody=(b,i,sec,hL)=>{const it=buildingItems(b,i);push("p",{text:catLong(b.cat)+"."});
-    const plan=isRoom(b)&&b.mplan?(()=>{const c=mrCalc(b);return c?{svg:mrPlanSVG(c,num(b.roomLen),num(b.roomWid)),cap:`הצעה לחדר ריכוז מונים – מידות והעמדה (${bldLabel(bn(b,i))})`}:null})():null;
+    const plan=isRoom(b)&&b.mplan?(()=>{const c=mrCalc(b);return c?{svg:mrPlanSVG(c,num(b.roomLen),num(b.roomWid)),cap:`הצעה לחדר ריכוז מונים – מידות והעמדה (${fl(b,i)})`}:null})():null;
     let s=1;const lvl=(title,arr)=>{if(!arr.length)return;push(hL,{text:`${sec}.${s}. ${title}`});const base={prefix:`${sec}.${s}`,bld:(useGroups&&b.struct?grpLabel(b.struct)+" · ":"")+bldLabel(bn(b,i)),level:title};
       const k=plan?arr.findIndex(it=>it.key==="mroom"):-1;
       if(k<0)push("items",{...base,items:arr});else{push("items",{...base,items:arr.slice(0,k+1)});push("svg",plan);if(arr.length>k+1)push("items",{...base,items:arr.slice(k+1),start:k+1})}
@@ -836,7 +839,7 @@ function buildDoc(){
     lvl("קומות מרתף תחתונות – בגרעין הבניין",it.lower)};
   if(useGroups){groups.forEach((g,gi)=>{
       const names=g.idx.map(i=>bn(S.buildings[i],i));const u=g.idx.reduce((s,i)=>s+(num(S.buildings[i].units)||0),0);
-      push("h2",{text:`${n}. ${gTitle(g)} – ${names.map(bldLabel).join(", ")}${u?` (${fmt(u)} יח"ד)`:""}`,pb:gi>0});
+      push("h2",{text:`${n}. ${g.k?gTitle(g)+" – ":(g.idx.length>1?"בניינים נוספים – ":"")}${names.map(bldLabel).join(", ")}${u?` (${fmt(u)} יח"ד)`:""}`,pb:gi>0});
       g.idx.forEach((i,k)=>{const b=S.buildings[i];push("h3",{text:`${n}.${k+1}. ${bTitle(b,i)}`});bBody(b,i,`${n}.${k+1}`,"h4")});
       n++;});}
   else S.buildings.forEach((b,i)=>{push("h2",{text:`${n}. ${bTitle(b,i)}`,pb:i>0});bBody(b,i,String(n),"h3");n++;});
@@ -853,8 +856,8 @@ function buildDoc(){
     push("h2",{text:`${n}. הנחיות למרתף`,pb:true});let s=1;
     if(Pk.has){push("h3",{text:`${n}.${s}. חניון`});s++;
       push("table",{head:["קומה","שטח (מ\"ר)","חניות"],rows:[...Pk.perFloor.map((f,k)=>[`מינוס ${k+1}`,f.area?fmt(num(f.area)):"—",f.spaces?fmt(num(f.spaces)):"—"]),["סה\"כ",Pk.area?fmt(num(Pk.area)):"—",tot!=null?fmt(tot):"—"]],num:true});
-      const over=Pk.over.filter(k=>S.buildings[k]).map(k=>bn(S.buildings[k],k));if(over.length)push("p",{text:`בניינים מעל המרתף המשותף: ${over.join(", ")}.`});
-      {const bb=S.buildings[Pk.baseBld];if(bb&&isRoom(bb))push("key",{text:`החיבור הציבורי המשותף של המרתף (${Pk.baseSize||"3X400"}) – בחדר המונים של ${bldLabel(bn(bb,Pk.baseBld))}: ארון מדידה ומפסק ראשי.`})}
+      const over=Pk.over.filter(k=>S.buildings[k]).map(k=>fl(S.buildings[k],k));if(over.length)push("p",{text:`בניינים מעל המרתף המשותף: ${over.join(", ")}.`});
+      {const bb=S.buildings[Pk.baseBld];if(bb&&isRoom(bb))push("key",{text:`החיבור הציבורי המשותף של המרתף (${Pk.baseSize||"3X400"}) – בחדר המונים של ${fl(bb,Pk.baseBld)}: ארון מדידה ומפסק ראשי.`})}
 }
     if(anyRoom){
       const cityRestrict=/הרצליה|ראשון/.test(P.city||"");const anyCom=S.buildings.some(b=>b.com);
@@ -879,7 +882,7 @@ function buildDoc(){
   const genB=order.map(i=>[S.buildings[i],i]).filter(([b])=>hasGen(b));
   if(genB.length){
     push("h2",{text:`${n}. הנחיות לחדרי גנרטור`});let s=1;
-    genB.forEach(([b,i])=>{push("h3",{text:`${n}.${s}. גנרטור ל${bldLabel(bn(b,i))}`});s++;
+    genB.forEach(([b,i])=>{push("h3",{text:`${n}.${s}. גנרטור ל${fl(b,i)}`});s++;
       const g=pickGen(b.kva);
       if(!g||!g.g){push("p",{text:"נדרש גנרטור. גודל הגנרטור יועבר לאחר קבלת עומסי היועצים."});return}
       const G=g.g;
@@ -1245,7 +1248,7 @@ const IMP_PROMPT=`את/ה מנתח/ת מצגת פרויקט בנייה (מגור
  "parking":{"area":null,"floors":null,"total":null,"perFloor":[{"area":null,"spaces":null}],"devCount":null},
  "notes":["הערה קצרה בעברית על כל נתון לא ודאי או סותר, כולל מספר העמוד"]}
 מסחר ומבני ציבור – יש לבדוק במיוחד: hasCommercial = true אם בבניין יש מסחר (חנויות / "מסחר" / סימון מסחר בתוכניות), גם אם השטח לא מצוין; hasPublic = true אם בבניין או צמוד אליו יש מבנה ציבור – גן ילדים, מעון, בית ספר, מתנ"ס, בית כנסת, "מבנה ציבור", "שב"צ", "שטח ציבורי בנוי" – המסומן בד"כ בצבע חום בתוכניות ובטבלאות (גם כשכתוב רק "גן", "גן 1", "גן 2", "חצר גן" או "שטח ציבורי" על שטח חום בתוכנית הקרקע – זה מבנה ציבור מסוג גן ילדים); publicType = סוג מבנה הציבור כפי שמופיע (למשל "גן ילדים"); publicArea = סה"כ השטח הציבורי בבניין במ"ר אם מצוין (סכום כל הגנים / השטחים הציבוריים, ופרט את החלוקה ב-notes). מבנה ציבור נפרד על המגרש – שייך/י לבניין הקרוב או שהוא יושב על המרתף שלו, וציין/י זאת ב-notes.
-הגדרות: project.dev = היזם / המזמין / החברה היזמית (מופיע לרוב בעמוד השער, בלוגו או בכותרת: "יזם", "מזמין", "בעלים", "Developer", שם חברה); project.arch = משרד האדריכלים / האדריכל (מופיע לרוב בעמוד השער, בכותרת הגיליון או בלוגו: "אדריכל", "תכנון", "עורך הבקשה", "Architects"). שמות אלה עשויים להופיע באנגלית או רק כלוגו בתמונה – יש לחפש גם בתמונות. כשיש שורת לוגואים (בעמוד השער או בפס התחתון של כל עמוד): לוגו עם "Architects" / "אדריכלים" = arch; חברת "יזמות" / "ייזום ובנייה" / "נדל"ן" / חברה יזמית = dev; לוגו עירייה / מועצה / רשות אינו היזם (הוא מעיד על העיר – city); חברות הנדסה / ניהול פרויקט / קבלן – אינן יזם, ציין/י אותן ב-notes. floors = מספר קומות מעל קומת הקרקע; units = יח"ד בבניין; perFloor = מקסימום דירות בקומה; heightM = הגובה הקובע במטרים: ההפרש בין מפלס רצפת קומת הקרקע (±0.00 / כניסה קובעת) לבין מפלס רצפת קומת המגורים העליונה – לא הגג ולא מעקה. חפש/י בחתכים ובחזיתות את סימוני המפלסים (למשל "+45.25 14" = רצפת קומה 14 במפלס 45.25). בחתך מסומן בד"כ מפלס לכל קומה (למשל "+42.10" ליד קומה 13 ו-"+45.25" ליד קומה 14, ו"גג" / "+48.75" מעליהם) – קח/י את מפלס רצפת קומת המגורים העליונה, והפחת/י את מפלס קומת הקרקע / ±0.00 / הכניסה הקובעת אם הוא אינו 0 (אם המפלסים בחתך יחסיים ל-±0.00 בקרקע – הערך עצמו הוא הגובה). כשיש כמה חתכים (חתך מבנן A / B / C) – כל חתך שייך לבניינים של אותו מבנן; מגדל ומבנה מרקמי באותו חתך מקבלים כל אחד את הגובה שלו. לעיתים מופיעות בחתך שתי מערכות מפלסים – יחסית (±0.00 בקרקע, למשל "01 +4.30" … "14 +45.25") ומוחלטת (למשל "A_00 +40.25", "roof top +60.50") – חשב/י בתוך אותה מערכת בלבד (מפלס הקומה העליונה פחות מפלס קומת הקרקע), והעדף/י את המערכת היחסית. אם אין מפלסים – null (אל תחשב/י מגובה משוער); הכתיב "ק+14" / "ק + 14 קומות" = קרקע ועוד 14 קומות, כלומר floors = 14; "ק+5-6" = 5 עד 6 קומות מעל הקרקע (floors לפי הבניין הספציפי בטבלת התמהיל / בחתך). units ו-perFloor לכל בניין – מטבלת התמהיל (יח"ד לפי קומה ולפי בניין) אם קיימת; commercialArea/officeArea/publicArea = שטח (עיקרי+שירות אם מופיע) במ"ר של מסחר / תעסוקה-משרדים / מבנה ציבור בבניין; parking.area = שטח החניון התת-קרקעי הכולל במ"ר; parking.floors = מספר קומות מרתף; parking.total = סה"כ מקומות חניה במרתף; perFloor לפי קומת מרתף מהעליונה (1-) למטה; devCount = חניות בפיתוח/על קרקעיות. שם הבניין כפי שמופיע במצגת (A, B, 1, מזרחי...). structure = שם המבנן / המבנה / האגף שאליו הבניין שייך, בדיוק כפי שמופיע במצגת (למשל "A", "מבנן B", "מבנה צפוני") – כאשר כמה בניינים/גרעינים/כניסות שייכים לאותה קבוצה; null אם אין חלוקה כזו. שמות הבניינים והמבננים יילקחו בדיוק כפי שהם כתובים במצגת – ייתכן שהמבננים מסומנים באותיות והבניינים במספרים (בניין 1, 2 ...), וייתכן שאותו מספר בניין חוזר במבננים שונים; name יכיל את שם הבניין בלבד (למשל "1"), ללא שם המבנן. יש לכלול את כל הבניינים (עד 12), מסודרים לפי מבנה ובתוך כל מבנה לפי שם הבניין. טבלאות זכויות / תב"ע / טבלת שטחים (גם כשהן מופיעות כתמונה – יש לקרוא אותן מהתמונה): "מספר קומות מעל הכניסה הקובעת" = floors; "מתחת לכניסה הקובעת" = basementFloors (וגם parking.floors); "גובה מבנה" = totalHeightM (גובה המבנה הכולל, לא הגובה הקובע); "מספר יח"ד" = units; שורת "מסחר" / "מסחר ותעסוקה" של אותו מגרש = hasCommercial true ו-commercialArea = עיקרי + שירות מעל הכניסה הקובעת (אם כתוב "ותעסוקה" – ציין/י ב-notes שהשטח כולל תעסוקה). אם במצגת יש כמה מגרשים – יש לכלול את הבניינים של כל המגרשים ולציין בכל בניין plot = מספר/שם המגרש בלבד (למשל "104"); המשתמש יבחר אחר כך באיזה מגרש לטפל. אם בניין של מגרש לא מפורט אלא רק סה"כ יח"ד למגרש (למשל "מגרש 104 – 126 יח"ד + מסחר") – החזר/י בניין אחד למגרש עם units לפי המספר, ו-hasCommercial = true כשכתוב "+ מסחר". במגרש יחיד – plot = null.`;
+הגדרות: project.dev = היזם / המזמין / החברה היזמית (מופיע לרוב בעמוד השער, בלוגו או בכותרת: "יזם", "מזמין", "בעלים", "Developer", שם חברה); project.arch = משרד האדריכלים / האדריכל (מופיע לרוב בעמוד השער, בכותרת הגיליון או בלוגו: "אדריכל", "תכנון", "עורך הבקשה", "Architects"). שמות אלה עשויים להופיע באנגלית או רק כלוגו בתמונה – יש לחפש גם בתמונות. כשיש שורת לוגואים (בעמוד השער או בפס התחתון של כל עמוד): לוגו עם "Architects" / "אדריכלים" = arch; חברת "יזמות" / "ייזום ובנייה" / "נדל"ן" / חברה יזמית = dev; לוגו עירייה / מועצה / רשות אינו היזם (הוא מעיד על העיר – city); חברות הנדסה / ניהול פרויקט / קבלן – אינן יזם, ציין/י אותן ב-notes. floors = מספר קומות מעל קומת הקרקע; units = יח"ד בבניין; perFloor = מקסימום דירות בקומה; heightM = הגובה הקובע במטרים: ההפרש בין מפלס רצפת קומת הקרקע (±0.00 / כניסה קובעת) לבין מפלס רצפת קומת המגורים העליונה – לא הגג ולא מעקה. חפש/י בחתכים ובחזיתות את סימוני המפלסים (למשל "+45.25 14" = רצפת קומה 14 במפלס 45.25). בחתך מסומן בד"כ מפלס לכל קומה (למשל "+42.10" ליד קומה 13 ו-"+45.25" ליד קומה 14, ו"גג" / "+48.75" מעליהם) – קח/י את מפלס רצפת קומת המגורים העליונה, והפחת/י את מפלס קומת הקרקע / ±0.00 / הכניסה הקובעת אם הוא אינו 0 (אם המפלסים בחתך יחסיים ל-±0.00 בקרקע – הערך עצמו הוא הגובה). כשיש כמה חתכים (חתך מבנן A / B / C) – כל חתך שייך לבניינים של אותו מבנן; מגדל ומבנה מרקמי באותו חתך מקבלים כל אחד את הגובה שלו. לעיתים מופיעות בחתך שתי מערכות מפלסים – יחסית (±0.00 בקרקע, למשל "01 +4.30" … "14 +45.25") ומוחלטת (למשל "A_00 +40.25", "roof top +60.50") – חשב/י בתוך אותה מערכת בלבד (מפלס הקומה העליונה פחות מפלס קומת הקרקע), והעדף/י את המערכת היחסית. אם אין מפלסים – null (אל תחשב/י מגובה משוער); הכתיב "ק+14" / "ק + 14 קומות" = קרקע ועוד 14 קומות, כלומר floors = 14; "ק+5-6" = 5 עד 6 קומות מעל הקרקע (floors לפי הבניין הספציפי בטבלת התמהיל / בחתך). units ו-perFloor לכל בניין – מטבלת התמהיל (יח"ד לפי קומה ולפי בניין) אם קיימת; commercialArea/officeArea/publicArea = שטח (עיקרי+שירות אם מופיע) במ"ר של מסחר / תעסוקה-משרדים / מבנה ציבור בבניין; parking.area = שטח החניון התת-קרקעי הכולל במ"ר; parking.floors = מספר קומות מרתף; parking.total = סה"כ מקומות חניה במרתף; perFloor לפי קומת מרתף מהעליונה (1-) למטה; devCount = חניות בפיתוח/על קרקעיות. שם הבניין כפי שמופיע במצגת (A, B, 1, מזרחי...). structure = שם המבנן / המבנה / האגף שאליו הבניין שייך, בדיוק כפי שמופיע במצגת (למשל "A", "מבנן B", "מבנה צפוני") – כאשר כמה בניינים/גרעינים/כניסות שייכים לאותה קבוצה; null אם אין חלוקה כזו. שמות הבניינים והמבננים יילקחו בדיוק כפי שהם כתובים במצגת – ייתכן שהמבננים מסומנים באותיות והבניינים במספרים (בניין 1, 2 ...), וייתכן שאותו מספר בניין חוזר במבננים שונים; name יכיל את שם הבניין בלבד (למשל "1"), ללא שם המבנן. יש לכלול את כל הבניינים (עד 12), מסודרים לפי מבנה ובתוך כל מבנה לפי שם הבניין. טבלאות זכויות / תב"ע / טבלת שטחים (גם כשהן מופיעות כתמונה – יש לקרוא אותן מהתמונה): "מספר קומות מעל הכניסה הקובעת" = floors; "מתחת לכניסה הקובעת" = basementFloors (וגם parking.floors); "גובה מבנה" = totalHeightM (גובה המבנה הכולל, לא הגובה הקובע); "מספר יח"ד" = units; שורת "מסחר" / "מסחר ותעסוקה" של אותו מגרש = hasCommercial true ו-commercialArea = עיקרי + שירות מעל הכניסה הקובעת (אם כתוב "ותעסוקה" – ציין/י ב-notes שהשטח כולל תעסוקה). בניין עם כמה כניסות (כניסה א / ב / ג, גרעינים נפרדים): כל כניסה היא רשומה נפרדת ב-buildings – structure = שם הבניין (למשל "בניין A"), name = שם הכניסה (למשל "כניסה א"); units ו-perFloor לכל כניסה לפי עמודות הכניסה בטבלת התמהיל (סופרים את הדירות בעמודות שמתחת לכל כניסה, בכל קומה כולל קומת הקרקע; תאי "מסחר" / "מבואה ושירות" אינם דירות); floors = הקומה העליונה של אותו בניין; מסחר בקרקע משויך לכניסה שמתחתיה הוא רשום. כשיש בטבלה "גובה קומה (רצפה-רצפה)" – heightM = סכום גבהי הקומות מקומת הקרקע ועד רצפת הקומה העליונה (לא כולל הקומה העליונה עצמה וגג טכני). בניין עם כניסה אחת – structure = null ו-name = שם הבניין. אם במצגת יש כמה מגרשים – יש לכלול את הבניינים של כל המגרשים ולציין בכל בניין plot = מספר/שם המגרש בלבד (למשל "104"); המשתמש יבחר אחר כך באיזה מגרש לטפל. אם בניין של מגרש לא מפורט אלא רק סה"כ יח"ד למגרש (למשל "מגרש 104 – 126 יח"ד + מסחר") – החזר/י בניין אחד למגרש עם units לפי המספר, ו-hasCommercial = true כשכתוב "+ מסחר". במגרש יחיד – plot = null.`;
 const SEC_PROMPT=`בתמונות חתכים (או חזיתות) של בניינים מתוך מצגת פרויקט. כל עמוד חתך מחולק לשני חצאים מוגדלים כדי שאפשר יהיה לקרוא את סימוני המפלסים הקטנים.
 לכל עמוד חתך: page = מספר העמוד, title = כותרת החתך (למשל "חתך מבנן A"), structure = שם המבנן / המבנה מהכותרת אם יש (למשל "A"), ולכל בניין שמופיע בחתך: floors = מספר הקומה העליונה של המגורים (מעל הקרקע, ללא גג טכני), topLevel = מפלס רצפת הקומה העליונה, groundLevel = מפלס רצפת קומת הקרקע באותה מערכת מפלסים.
 בדרך כלל ליד כל קומה רשום מספר הקומה ומפלס הרצפה (למשל "14 +45.25", "13 +42.10", "01 +4.30", "roof +48.75"). אם יש שתי מערכות מפלסים (יחסית ל-±0.00 ומוחלטת, למשל "A_00 +40.25") – השתמש/י במערכת היחסית; אם קומת הקרקע לא מסומנת אך המערכת יחסית ל-±0.00 – groundLevel = 0. אין לנחש – null לנתון שלא נקרא בבירור.
