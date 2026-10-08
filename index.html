@@ -188,7 +188,7 @@ table.cmp td:first-child{width:28px}
       <img class="logo" src="assets/tiktin-logo.png" alt="טיקטין תכנון חשמל">
       <div>
         <h1>הכנה אוטומטית של הנחיות חשמל לפרויקט מגורים ועירוב שימושים</h1>
-        <p>הנחיות ראשוניות לאדריכל · טופס לכל מגרש · <span class="ver">גרסה V4 · 08.10.2026</span></p>
+        <p>הנחיות ראשוניות לאדריכל · טופס לכל מגרש · <span class="ver">גרסה V5 · 08.10.2026</span></p>
       </div>
     </div>
     <div class="head-actions">
@@ -320,6 +320,13 @@ table.cmp td:first-child{width:28px}
       const d=await r.json();const t=(d.content||[]).filter(c=>c.type==="text").map(c=>c.text).join("");
       const s=t.indexOf("{"),e=t.lastIndexOf("}");if(s<0||e<s)throw {code:"api",msg:"no json"};return JSON.parse(t.slice(s,e+1))}};
   window.claude={use:async n=>n==="downloads"?downloads:n==="sample"?sample:null};
+  // office projects stored in the repository (projects/index.json) – read-only list in "שמירה ופתיחה"
+  document.addEventListener("DOMContentLoaded",async()=>{try{const r=await fetch("projects/index.json",{cache:"no-store"});if(!r.ok)return;const list=await r.json();if(!Array.isArray(list)||!list.length)return;
+    const panel=document.querySelector(".savepanel");if(!panel)return;const sec=document.createElement("div");sec.className="sp-sec";
+    sec.innerHTML=`<b>פרויקטים שמורים במשרד</b><label class="f">פרויקט<select id="gh-proj">${list.map((p,i)=>`<option value="${i}">${String(p.name).replace(/[<&>"]/g,"")}</option>`).join("")}</select></label><div class="sp-row"><button type="button" class="btn primary" id="gh-popen">פתיחה</button></div><div class="muted" id="gh-pmsg"></div>`;
+    panel.prepend(sec);
+    sec.querySelector("#gh-popen").onclick=async()=>{const p=list[+sec.querySelector("#gh-proj").value];const m=sec.querySelector("#gh-pmsg");m.textContent="פותח…";
+      try{const o=await fetch("projects/"+p.file,{cache:"no-store"}).then(x=>x.json());loadState(o.state||o);save();m.textContent="";document.getElementById("savebox").open=false;toast("הפרויקט נפתח")}catch(e){m.textContent="הפתיחה נכשלה."}}}catch(e){}});
   document.addEventListener("DOMContentLoaded",()=>{const card=document.getElementById("imp-card");if(!card)return;
     const d=document.createElement("details");d.className="help";d.style.marginTop="6px";
     d.innerHTML=`<summary>הגדרות קריאה (מפתח API)</summary><div class="body" style="display:flex;flex-direction:column;gap:8px">
