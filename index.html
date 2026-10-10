@@ -198,7 +198,7 @@ table.cmp td:first-child{width:28px}
       <img class="logo" src="assets/tiktin-logo.png" alt="טיקטין תכנון חשמל">
       <div>
         <h1>הכנה אוטומטית של הנחיות חשמל לפרויקט מגורים ועירוב שימושים</h1>
-        <p>הנחיות ראשוניות לאדריכל · טופס לכל מגרש · <span class="ver">גרסה V12 · 10.10.2026</span></p>
+        <p>הנחיות ראשוניות לאדריכל · טופס לכל מגרש · <span class="ver">גרסה V13 · 10.10.2026</span></p>
       </div>
     </div>
     <div class="head-actions">
@@ -830,7 +830,8 @@ function buildingItems(b,i,raw){
   // typical
   if(apt)push(T,Object.assign({},apt));
   if(iecS){push(T,Object.assign({},iecS));push(T,Object.assign({},iecC))}
-  push(T,{key:"flp",name:"ארון חשמל קומתי",w:u>=110?60:50,d:u>=110?40:30,note:hi?"ליד פיר החירום.":""});
+  // עד 23 דירות – ללא לוח חשמל קומתי בברירת מחדל
+  if(!(u>0&&u<=23))push(T,{key:"flp",name:"ארון חשמל קומתי",w:u>=110?60:50,d:u>=110?40:30,note:hi?"ליד פיר החירום.":""});
   push(T,Object.assign({},pubS));if(emS)push(T,Object.assign({},emS));
   if(com)push(T,{key:"coms",name:"פיר חשמל למסחר",w:30,d:30,note:"נדרש אם יש מעבים או הזנות למסחר בגג."});
   if(off){push(T,{key:"offs",name:"פיר חשמל תעסוקה",w:30,d:30});push(T,{key:"offc",name:"פיר תקשורת תעסוקה",w:30,d:30})}
