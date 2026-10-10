@@ -198,7 +198,7 @@ table.cmp td:first-child{width:28px}
       <img class="logo" src="assets/tiktin-logo.png" alt="טיקטין תכנון חשמל">
       <div>
         <h1>הכנה אוטומטית של הנחיות חשמל לפרויקט מגורים ועירוב שימושים</h1>
-        <p>הנחיות ראשוניות לאדריכל · טופס לכל מגרש · <span class="ver">גרסה V15 · 10.10.2026</span></p>
+        <p>הנחיות ראשוניות לאדריכל · טופס לכל מגרש · <span class="ver">גרסה V16 · 10.10.2026</span></p>
       </div>
     </div>
     <div class="head-actions">
@@ -418,7 +418,7 @@ function newBuilding(i){return {name:"ABCDEFGHIJKL"[i]||String(i+1),struct:"",ca
 function defaults(){return {project:{name:"",iso:"",dev:"",arch:"",city:"",district:"דן"},
  buildings:[newBuilding(0)],
  parking:{has:true,area:"",floors:"1",total:"",perFloor:[{area:"",spaces:""}],over:[0],dev:false,devCount:"",ov:{},baseBld:-1,baseSize:"3X400",cust:custFor("P")},
- trafo:{req:false,type:1}}}
+ trafo:{req:false,type:1,rooms:null}}}
 let S=defaults();
 try{const raw=localStorage.getItem(LS);if(raw){const o=JSON.parse(raw);if(o&&o.project&&Array.isArray(o.buildings))S=Object.assign(defaults(),o)}}catch(e){}
 S.buildings.forEach(b=>{b.ov=b.ov||{};["struct","floors","perFloor","offArea","pubArea","pubType"].forEach(k=>{if(b[k]==null)b[k]=""})});S.parking.ov=S.parking.ov||{};
@@ -762,13 +762,32 @@ function updateParkingChecks(){
    else if(S.buildings.some(isRoom))out.push(`<div class="msg warn">לא נבחר חדר מונים לחיבור הציבורי המשותף של המרתף – בוחרים בכרטיס הבניין, תחת "מוני חח"י".</div>`)}
   box.innerHTML=out.join("");
 }
+// הצעת כמות שנאים: שנאי לכל 100 יח"ד; חיבורי מסחר + חניון + ציבורי בניינים מעל 630A – שנאי נוסף לכל 630A
+function trafoSuggest(){const u=totVal("units")||0;const nU=u?Math.ceil(u/100):0;
+  const pub=S.buildings.reduce((a,b)=>a+mrAmps(pubSize(b)),0);
+  const com=S.buildings.reduce((a,b)=>a+comConns(b).reduce((x,c)=>x+c.amps*c.n,0),0);
+  const pk=S.parking.has?mrAmps(S.parking.baseSize||"3X400"):0;const A=pub+com+pk;
+  const nA=A>630?Math.ceil(A/630)-1:0;const n=Math.max(1,nU+nA);
+  const rooms=[];let left=n;const nr=Math.ceil(n/3);for(let k=0;k<nr;k++){const c=Math.ceil(left/(nr-k));rooms.push(c);left-=c}
+  return{u,nU,pub,com,pk,A,nA,n,rooms}}
+function trafoRooms(){const T=S.trafo;if(!Array.isArray(T.rooms)||!T.rooms.length)return trafoSuggest().rooms.map(c=>c);return T.rooms.map(x=>Number(x)||1)}
+function trafoCount(id){return {1:1,2:2,3:3,4:1,5:2,6:0,7:0}[id]||0}
 function renderTrafo(){
-  const T=S.trafo;
+  const T=S.trafo;const sg=trafoSuggest();const rooms=trafoRooms();const auto=!Array.isArray(T.rooms)||!T.rooms.length;
+  const tot=rooms.reduce((a,id)=>a+trafoCount(id),0);
+  const sugTxt=`הצעה: ${sg.n} ${sg.n>1?"שנאים":"שנאי"}${sg.n>3?` ב-${sg.rooms.length} חדרים (${sg.rooms.join(" + ")})`:""} – ${sg.nU} לדירות (${fmt(sg.u)} יח"ד, שנאי לכל 100)${sg.nA?` + ${sg.nA} בגין החיבורים`:""}. סך החיבורים: ${fmt(sg.A)}A (ציבורי בניינים ${fmt(sg.pub)}A${sg.com?`, מסחר ${fmt(sg.com)}A`:""}${sg.pk?`, חניון ${fmt(sg.pk)}A`:""})${sg.A>630?" – מעל 630A":""}.`;
   $("#trafo").innerHTML=seg("treq","trafo.req",[{v:"false",t:"לא נדרש"},{v:"true",t:"נדרש חדר שנאים"}],T.req)+
-   (T.req?`<div class="grid" style="margin-top:10px"><label class="f">סוג התחנה (תת-קרקעית)<select id="t-type" data-k="trafo.type">${TRAFO.map(t=>`<option value="${t.id}" ${Number(T.type)===t.id?"selected":""}>${t.id}. ${t.name}</option>`).join("")}</select></label></div>
+   `<div class="msg info" style="margin-top:8px">${esc(sugTxt)}</div>`+
+   (T.req?`<div class="grid" style="margin-top:10px"><label class="f">מספר חדרי שנאים<select id="t-nrooms">${[1,2,3,4,5].map(k=>`<option ${rooms.length===k?"selected":""}>${k}</option>`).join("")}</select></label>
+     ${rooms.map((id,k)=>`<label class="f">חדר שנאים ${k+1}<select id="t-room${k}" data-troom="${k}">${TRAFO.map(t=>`<option value="${t.id}" ${id===t.id?"selected":""}>${esc(t.name)}</option>`).join("")}</select></label>`).join("")}</div>
+     <div class="muted" style="margin-top:6px">סה"כ ${tot} ${tot===1?"שנאי":"שנאים"}${auto?" (לפי ההצעה)":` · <button type="button" class="btn" style="padding:3px 10px;font-size:13px" id="t-auto">חזרה להצעה</button>`}. בחדר שנאים אחד – עד 3 שנאים.</div>
    ${S.project.district!=="דן"?`<div class="msg warn" style="margin-top:8px">המידות לפי מחוז דן. במסמך תתווסף הערה לתיאום מול מחוז ${esc(S.project.district)}.</div>`:""}
-   ${help(`המידות, פתחי האוורור ומרחקי הקרינה לקוחים ממסמך "ריכוז הנחיות חדרי טרפו במחוז דן" של המשרד. במסמך יופיע גם תרשים הדוגמה המתאים.`)}`:"");
+   ${help(`ברירת המחדל: שנאי לכל 100 יח"ד (למשל 150 יח"ד – 2 שנאים). אם סך חיבורי המסחר, החיבור הציבורי של החניון והחיבורים הציבוריים של הבניינים עובר 630 אמפר – נוסף שנאי לכל 630 אמפר נוספים. בחדר שנאים עד 3 שנאים; מעל 3 – כמה חדרים. אפשר לשנות את מספר החדרים ואת הרכב כל חדר.<br>המידות, פתחי האוורור ומרחקי הקרינה לקוחים ממסמך "ריכוז הנחיות חדרי טרפו במחוז דן" של המשרד.`)}`:"");
 }
+document.addEventListener("change",e=>{const el=e.target;
+  if(el.id==="t-nrooms"){const n=+el.value;const r=trafoRooms().slice(0,n);while(r.length<n)r.push(1);S.trafo.rooms=r;save();renderTrafo();renderDoc();return}
+  if(el.dataset?.troom!=null){const r=trafoRooms();r[+el.dataset.troom]=+el.value;S.trafo.rooms=r;save();renderTrafo();renderDoc()}});
+document.addEventListener("click",e=>{if(e.target.id==="t-auto"){S.trafo.rooms=null;save();renderTrafo();renderDoc()}});
 function renderProcess(){
   const d=S.project.district;const steps=PROCESS[d]||[];
   $("#process").innerHTML=`<details class="help"><summary>תהליך אישור תחנת שנאים – מחוז ${esc(d)}</summary><div class="body">${steps.length?`<ol>${steps.map(s=>`<li>${esc(s)}</li>`).join("")}</ol>`:`תהליך למחוז זה טרם הוגדר.`}<div class="muted" style="margin-top:6px">מוצג בטופס בלבד ואינו נכלל במסמך לאדריכל.</div></div></details>`;
@@ -932,12 +951,12 @@ function buildDoc(){
   // assumptions
   push("h2",{text:`${n}. הנחות יסוד`});n++;
   const downB=S.buildings.filter(b=>b.meters==="down").map(b=>fl(b,S.buildings.indexOf(b))),floorB=S.buildings.filter(b=>b.meters!=="down").map(b=>fl(b,S.buildings.indexOf(b)));
-  const tRow0=S.trafo.req?(TRAFO.find(t=>t.id===Number(S.trafo.type))||TRAFO[0]):null;
+  const tRows=S.trafo.req?trafoRooms().map(id=>TRAFO.find(t=>t.id===id)||TRAFO[0]):[];const tN=tRows.reduce((a,t)=>a+trafoCount(t.id),0);
   push("ul",{items:[
     ...(downB.length?[`מוני חח"י בחדר או בנישה במרתף העליון, בגרעין הבניין: ${downB.join(", ")}.`]:[]),
     ...(floorB.length?[`מוני חח"י בקומות: ${floorB.join(", ")}.`]:[]),
     "לכל בניין מונה לכל דירה ומונה ציבורי לשירותי בית."+(S.buildings.some(b=>b.com)?" מונה נפרד למסחר.":"")+(S.buildings.some(b=>num(b.offArea))?" מונה נפרד לתעסוקה.":"")+(S.buildings.some(hasPub)?" מונה נפרד למבנה הציבור.":"")+(Pk.has?" מונה לחניון כולל טעינת רכבים.":""),
-    tRow0?`תחנת שנאים של חח"י: ${tRow0.name} – ראה פרק חדרי שנאים.`:"תחנת שנאים: יש לקבל תיק מידע מהעירייה / מחח\"י כדי לדעת אם יידרש חדר שנאים או פילר רשת בחזית המגרש.",
+    tRows.length?`תחנת שנאים של חח"י: ${tRows.length>1?`${tN} שנאים ב-${tRows.length} חדרי שנאים (${tRows.map((t,k)=>`חדר ${k+1} – ${t.name}`).join("; ")})`:tRows[0].name} – ראה פרק חדרי שנאים.`:"תחנת שנאים: יש לקבל תיק מידע מהעירייה / מחח\"י כדי לדעת אם יידרש חדר שנאים או פילר רשת בחזית המגרש.",
     ...S.buildings.map((b,i)=>{if(!hasGen(b))return null;const g=pickGen(b.kva);const loc=b.genLoc==="roof"?"על הגג בחופה":b.genLoc==="ground"?"בחדר בקומת הקרקע":"בחדר במרתף";return `גנרטור ל${fl(b,i)} ${loc}${g&&g.g?` – ${fmt(g.g.kva)} KVA (הערכה)`:""}. הגודל הסופי ייקבע לאחר קבלת עומסי היועצים.`}).filter(Boolean)]});
   // buildings (grouped by structure when defined)
   const bTitle=(b,i)=>`הנחיות ל${fl(b,i)}${b.units?` – ${fmt(num(b.units))} יח"ד`:""}, ${b.meters==="down"?"מונים במרתף":"מונים בקומות"}`;
@@ -1018,11 +1037,12 @@ function buildDoc(){
   }
   // trafo
   if(S.trafo.req){
-    const tRow=tRow0;
-    push("h2",{text:`${n}. הנחיות לחדרי שנאים של חברת החשמל – ${tRow.name}`,pb:true});n++;
+    push("h2",{text:`${n}. הנחיות לחדרי שנאים של חברת החשמל – ${tN} ${tN===1?"שנאי":"שנאים"}${tRows.length>1?` ב-${tRows.length} חדרים`:""}`,pb:true});n++;
     if(P.district!=="דן")push("note",{text:`המידות וההנחיות בפרק זה לפי מחוז דן של חח"י, ונדרש לתאם אותן מול מחוז ${P.district}.`});
-    push("key",{text:`חדר שנאים תת-קרקעי, מידות נטו עם מבואה: ${tRow.under.replace("X"," × ")} מ'`});
-    push("table",{head:["נתון","ערך"],rows:[["סוג התחנה",tRow.name],["מידות חדר תת-קרקעי נטו (עם מבואה)",tRow.under.replace("X"," × ")+" מ'"],["עיקר החדר נטו (לחישוב מרחקי קרינה)",tRow.surf.replace("X"," × ")+" מ'"],["פתח אוורור",tRow.air+" מ\"ר"],["מרחק קרינה למגורים / מועדון דיירים / תעסוקה",tRow.radRes+" מ'"],["מרחק קרינה למסחר",tRow.radCom+" מ'"],["מיקום הדלת",tRow.door],["גובה החדר נטו","2.6 מ'"]]});
+    tRows.forEach((tRow,k)=>{if(tRows.length>1)push("h3",{text:`חדר שנאים ${k+1} – ${tRow.name}`});
+      push("key",{text:`חדר שנאים תת-קרקעי, מידות נטו עם מבואה: ${tRow.under.replace("X"," × ")} מ'`});
+      push("table",{head:["נתון","ערך"],rows:[["סוג התחנה",tRow.name],["מידות חדר תת-קרקעי נטו (עם מבואה)",tRow.under.replace("X"," × ")+" מ'"],["עיקר החדר נטו (לחישוב מרחקי קרינה)",tRow.surf.replace("X"," × ")+" מ'"],["פתח אוורור",tRow.air+" מ\"ר"],["מרחק קרינה למגורים / מועדון דיירים / תעסוקה",tRow.radRes+" מ'"],["מרחק קרינה למסחר",tRow.radCom+" מ'"],["מיקום הדלת",tRow.door],["גובה החדר נטו","2.6 מ'"]]});
+    });
     push("note",{text:"מרחקי הקרינה נמדדים ברוטו/ברוטו: מעיקר חדר הטרפו בתוספת עובי קירות 20 ס\"מ לכל כיוון, עד העובי החיצוני של שטח המגורים או המסחר. מועדון דיירים, עמדת שומר, מוסד חינוכי וחצרו ומשרדים – כמו מגורים. יש להראות מרחקי קרינה גם למגרשים שכנים."});
     push("ul",{items:["גובה החדר 2.6 מ' נטו, ללא עמודים. רצפה כפולה 95–120 ס\"מ נטו, רצוי 100 ס\"מ.",
       "החדר מבטון: קירות חוץ 20 ס\"מ, 20 ס\"מ בין החדר לפיר האוורור.",
@@ -1030,10 +1050,11 @@ function buildDoc(){
       "מפלס החדר לא נמוך ממרתף מינוס 1; תקרת החדר עד 6 מ' ממפלס רחבת הפריקה.",
       "פתחי אוורור: 2 מ' לפחות מהקיר שממול, לאזור פתוח ללא גג או מרפסת מעל (אלא אם החלל מעל גבוה מ-7 מ'); תחתית הפתח 15 ס\"מ לפחות מעל פיתוח סופי. רוחב פיר האוורור 70 ס\"מ לפחות לכל אורך החדר, עולה ישירות לאוויר החופשי.",
       "אין גינון מעל החדר (אלא בחלל כפול באישור מיוחד).",
+      ...(tRows.length>1?["בין חדרי השנאים – לפי תיאום מול חח\"י; כל חדר עם פתח הורדת ציוד, אוורור ומרחקי קרינה משלו."]:[]),
       "מרחקים: צובר גז – 5 מ' (חדר בלוני גז – 20 מ'); חדר גנרטור – 5 מ'; חצר גן פרטית – 3 מ'; מיכל מים באותו מפלס או מעליו – 3.5 מ'; גמל מים – 1 מ'.",
       "רחבת פריקה 9X10 מ', שיפוע עד 2.5%, דרך גישה בשיפוע עד 5% ובגובה 4.5 מ' נטו, פנויה מעצים, חניות, עמודי תאורה וברזי כיבוי. \"משאית 12\" של חח\"י.",
       "פתח הורדת ציוד 1.4X2.25 מ' נטו (מכסה 1.55X2.55 מ', 25 ס\"מ מקיר), עד 7 מ' מקצה הרחבה; במיסעה או במדרכה עם מכסה לעומס מתאים.",
-      ...([2,3,5].includes(tRow.id)?["בתחנה של 2 שנאים ומעלה – גישה לרכב קל מתוך החניון עד 10 מ' מדלת התחנה, או מדרגות בלעדיות עם כניסה ישירה מבחוץ."]:[]),
+      ...(tRows.some(t=>[2,3,5].includes(t.id))?["בתחנה של 2 שנאים ומעלה – גישה לרכב קל מתוך החניון עד 10 מ' מדלת התחנה, או מדרגות בלעדיות עם כניסה ישירה מבחוץ."]:[]),
       "גישת אדם דרך חדר מדרגות משותף, עם דלתות נפרדות לחח\"י ומנעול חח\"י בכניסה ובירידה למרתף. כניסה דרך רמפת החניון – מדרכה 80 ס\"מ בצד הדלת."]});
     push("note",{text:"ההנחיות בפרק זה הן ליקוט מניסיון משרדנו לדרישות חח\"י מחוז דן ואינן מסמך רשמי של חברת החשמל."});
   }
@@ -1065,7 +1086,7 @@ const svgUrl=svg=>"data:image/svg+xml;charset=utf-8,"+encodeURIComponent(svg);
 async function svgPng(svg,maxW){const im=new Image();im.src=svgUrl(svg);await im.decode();const w0=im.naturalWidth||1000,h0=im.naturalHeight||500;const k=Math.min(2.4,maxW/w0);
   const c=document.createElement("canvas");c.width=Math.round(w0*k);c.height=Math.round(h0*k);const x=c.getContext("2d");x.fillStyle="#fff";x.fillRect(0,0,c.width,c.height);x.drawImage(im,0,0,c.width,c.height);
   const bl=await new Promise(r=>c.toBlob(r,"image/png"));return {data:new Uint8Array(await bl.arrayBuffer()),w:c.width,h:c.height}}
-function renderDoc(){try{renderTotals()}catch(e){}
+function renderDoc(){try{renderTotals()}catch(e){}try{if(!document.querySelector("#trafo")?.contains(document.activeElement))renderTrafo()}catch(e){}
   const B=buildDoc();const P=S.project;
   $("#sheet").innerHTML=B.map(b=>{
     switch(b.t){
