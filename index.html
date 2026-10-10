@@ -198,7 +198,7 @@ table.cmp td:first-child{width:28px}
       <img class="logo" src="assets/tiktin-logo.png" alt="טיקטין תכנון חשמל">
       <div>
         <h1>הכנה אוטומטית של הנחיות חשמל לפרויקט מגורים ועירוב שימושים</h1>
-        <p>הנחיות ראשוניות לאדריכל · טופס לכל מגרש · <span class="ver">גרסה V11 · 10.10.2026</span></p>
+        <p>הנחיות ראשוניות לאדריכל · טופס לכל מגרש · <span class="ver">גרסה V12 · 10.10.2026</span></p>
       </div>
     </div>
     <div class="head-actions">
@@ -610,7 +610,7 @@ function ovRows(id,items,ov){
       <td><input type="number" min="0" ${dis} aria-label="${it.room?"אורך":"עומק"} ${esc(it.name)}" data-ov="${id}|${it.key}|d" value="${esc(o.d??"")}" placeholder="${dv}"></td>
       <td><input type="number" min="0" ${dis} aria-label="גובה ${esc(it.name)}" data-ov="${id}|${it.key}|h" value="${esc(o.h??"")}" placeholder="${it.h??""}"></td>
       <td class="x">${del?`<button type="button" class="btn ov-x" data-ovundel="${id}|${it.key}" title="החזרת השורה למסמך" aria-label="החזרת השורה">↺</button>`:`<button type="button" class="btn ov-x" data-ovdel="${id}|${it.key}" title="מחיקת השורה – לא תופיע במסמך" aria-label="מחיקת השורה">×</button>`}</td></tr>`+(it.bk&&!del?`<tr class="bk"><td></td><td colspan="5">${esc(it.bk)}</td></tr>`:"")}).join("")}
-function ovTable(id,items,ov){const lvs=id==="P"?[["upper","מרתף עליון"],["lower","מרתף תחתון"]]:[["ground","קרקע"],["typical","טיפוסית"],["upper","מרתף עליון"],["lower","מרתף תחתון"]];
+function ovTable(id,items,ov){const lvs=id==="P"?[["upper","מרתף עליון"],["lower","מרתף תחתון"]]:[["ground","קרקע"],["typical","טיפוסית"],["ground+typical","קרקע + טיפוסית"],["upper","מרתף עליון"],["lower","מרתף תחתון"]];
   return `<details class="ov"><summary class="muted" style="cursor:pointer">מידות הפריטים – ברירת מחדל (ניתן לשנות)</summary>
   <div class="tbl-wrap"><table><thead><tr><th>מפלס</th><th>פריט</th><th>רוחב (ס"מ)</th><th>עומק / אורך (ס"מ)</th><th>גובה (ס"מ)</th><th></th></tr></thead><tbody data-ovbody="${id}">${ovRows(id,items,ov)}</tbody></table></div>
   <div class="ov-add" data-ovaddbox="${id}"><label class="f">מפלס<select data-na="lv">${lvs.map(([v,t])=>`<option value="${v}">${t}</option>`).join("")}</select></label>
@@ -785,7 +785,7 @@ const CUST_LS="tiktin-guidelines-custom-items";
 function custGlobal(){try{const a=JSON.parse(localStorage.getItem(CUST_LS)||"[]");return Array.isArray(a)?a:[]}catch(e){return[]}}
 function custSetGlobal(a){try{localStorage.setItem(CUST_LS,JSON.stringify(a))}catch(e){}}
 function custFor(scope){return []}
-function finItems(o,tgt,raw){const cu=(tgt.cust||[]);Object.keys(o).forEach(lv=>{cu.filter(c=>c.lv===lv).forEach(c=>o[lv].push({key:c.key,name:c.name,w:num(c.w)||0,d:num(c.d)||0,h:num(c.h)||undefined,cust:true,g:!!c.g}))});
+function finItems(o,tgt,raw){const cu=(tgt.cust||[]);Object.keys(o).forEach(lv=>{cu.filter(c=>String(c.lv).split("+").includes(lv)).forEach(c=>o[lv].push({key:c.key,name:c.name,w:num(c.w)||0,d:num(c.d)||0,h:num(c.h)||undefined,cust:true,g:!!c.g}))});
   if(!raw)Object.keys(o).forEach(lv=>{o[lv]=o[lv].filter(it=>!it._del)});return o}
 function spec(it){
   if(it.text)return it.text;
