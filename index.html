@@ -198,7 +198,7 @@ table.cmp td:first-child{width:28px}
       <img class="logo" src="assets/tiktin-logo.png" alt="טיקטין תכנון חשמל">
       <div>
         <h1>הכנה אוטומטית של הנחיות חשמל לפרויקט מגורים ועירוב שימושים</h1>
-        <p>הנחיות ראשוניות לאדריכל · טופס לכל מגרש · <span class="ver">גרסה V13 · 10.10.2026</span></p>
+        <p>הנחיות ראשוניות לאדריכל · טופס לכל מגרש · <span class="ver">גרסה V14 · 10.10.2026</span></p>
       </div>
     </div>
     <div class="head-actions">
@@ -257,6 +257,10 @@ table.cmp td:first-child{width:28px}
           <label class="f">מספר ISO<input type="text" id="p-iso" data-k="project.iso" inputmode="numeric"></label>
           <label class="f">היזם<input type="text" id="p-dev" data-k="project.dev"></label>
           <label class="f">שם האדריכל<input type="text" id="p-arch" data-k="project.arch"></label>
+          <label class="f">סה"כ יח"ד בפרויקט<input type="number" min="0" id="p-units" data-k="project.units" title="לא חובה – אם לא יוזן, הסה&quot;כ יחושב מהבניינים"></label>
+          <label class="f">סה"כ שטחי מסחר (מ"ר)<input type="number" min="0" id="p-com" data-k="project.comArea" title="לא חובה – אם לא יוזן, הסה&quot;כ יחושב מהבניינים"></label>
+          <label class="f" data-pkonly>סה"כ שטח חניון (מ"ר)<input type="number" min="0" id="pk-area" data-k="parking.area" title="לא חובה – אם לא יוזן, הסה&quot;כ יחושב מקומות החניון"></label>
+          <label class="f" data-pkonly>סה"כ חניות<input type="number" min="0" id="pk-total" data-k="parking.total" title="לא חובה – אם לא יוזן, הסה&quot;כ יחושב מקומות החניון"></label>
           <label class="f">עיר<input type="text" id="p-city" data-k="project.city" list="cities"></label>
           <label class="f">מחוז חח"י
             <select id="p-district" data-k="project.district">
@@ -264,6 +268,7 @@ table.cmp td:first-child{width:28px}
             </select>
           </label>
         </div>
+        <div id="p-units-msg"></div>
         <datalist id="cities"></datalist><datalist id="structs"></datalist><datalist id="pubtypes"><option value="גן ילדים"><option value="בית ספר"><option value="מתנ״ס"><option value="מעון יום"><option value="בית כנסת"><option value="מבנה ציבור"></datalist>
       </section>
 
@@ -731,9 +736,7 @@ function renderParking(){
   let html=seg("phas","parking.has",[{v:"true",t:"יש חניון תת-קרקעי"},{v:"false",t:"אין חניון"}],P.has);
   if(P.has){
     html+=`<div class="grid" style="margin-top:10px">
-      <label class="f">שטח חניון כולל (מ"ר)<input type="number" min="0" id="pk-area" data-k="parking.area" value="${esc(P.area)}"></label>
       <label class="f">מספר קומות<select id="pk-floors" data-k="parking.floors">${Array.from({length:8},(_,i)=>`<option ${floors===i+1?"selected":""}>${i+1}</option>`).join("")}</select></label>
-      <label class="f">סה"כ חניות<input type="number" min="0" id="pk-total" data-k="parking.total" value="${esc(P.total)}"></label>
     </div>
     <div class="tbl-wrap" style="margin-top:10px"><table class="floors"><thead><tr><th>קומה</th><th>שטח (מ"ר)</th><th>חניות</th><th>הצעה (1 ל-45 מ"ר)</th></tr></thead><tbody>
       ${P.perFloor.map((f,i)=>`<tr><td>מינוס ${i+1}</td><td><input type="number" min="0" id="pf${i}-a" data-k="parking.perFloor.${i}.area" value="${esc(f.area)}"></td><td><input type="number" min="0" id="pf${i}-s" data-k="parking.perFloor.${i}.spaces" value="${esc(f.spaces)}"></td><td class="hint" data-sug="${i}"></td></tr>`).join("")}
@@ -753,10 +756,8 @@ function updateParkingChecks(){
   P.perFloor.forEach((f,i)=>{const a=num(f.area);const el=document.querySelector(`[data-sug="${i}"]`);if(el)el.textContent=a?`${Math.floor(a/45)} חניות`:""});
   const box=$("#pk-checks");if(!box)return;const out=[];
   const tA=num(P.area),sA=P.perFloor.reduce((s,f)=>s+(num(f.area)||0),0),anyA=P.perFloor.some(f=>num(f.area)!=null);
-  if(tA!=null&&anyA){const d=Math.round((sA-tA)*100)/100;out.push(d===0?`<div class="msg ok">סכום שטחי הקומות תואם לשטח הכולל (${fmt(tA)} מ"ר)</div>`:`<div class="msg warn">סכום שטחי הקומות ${fmt(sA)} מ"ר, השטח הכולל ${fmt(tA)} מ"ר – פער של ${fmt(Math.abs(d))} מ"ר</div>`)}
   if(tA!=null&&!anyA)out.push(`<div class="msg info">הצעה לסה"כ חניות: ${Math.floor(tA/45)} (1 ל-45 מ"ר)</div>`);
   const tS=num(P.total),sS=P.perFloor.reduce((s,f)=>s+(num(f.spaces)||0),0),anyS=P.perFloor.some(f=>num(f.spaces)!=null);
-  if(tS!=null&&anyS){const d=sS-tS;out.push(d===0?`<div class="msg ok">סכום החניות בקומות תואם לסה"כ (${fmt(tS)})</div>`:`<div class="msg warn">סכום החניות בקומות ${fmt(sS)}, סה"כ שהוזן ${fmt(tS)} – פער של ${fmt(Math.abs(d))}</div>`)}
   {const bb=S.buildings[P.baseBld];if(bb&&isRoom(bb))out.push(`<div class="msg ok">חיבור ציבורי מרתף משותף (${esc(P.baseSize||"3X400")}) – בחדר המונים של ${esc(bldLabel(bb.name||("בניין "+(P.baseBld+1))))}</div>`);
    else if(S.buildings.some(isRoom))out.push(`<div class="msg warn">לא נבחר חדר מונים לחיבור הציבורי המשותף של המרתף – בוחרים בכרטיס הבניין, תחת "מוני חח"י".</div>`)}
   box.innerHTML=out.join("");
@@ -772,6 +773,36 @@ function renderProcess(){
   const d=S.project.district;const steps=PROCESS[d]||[];
   $("#process").innerHTML=`<details class="help"><summary>תהליך אישור תחנת שנאים – מחוז ${esc(d)}</summary><div class="body">${steps.length?`<ol>${steps.map(s=>`<li>${esc(s)}</li>`).join("")}</ol>`:`תהליך למחוז זה טרם הוגדר.`}<div class="muted" style="margin-top:6px">מוצג בטופס בלבד ואינו נכלל במסמך לאדריכל.</div></div></details>`;
 }
+// סיכומי פרויקט: אם לא הוזנו – מחושבים מהמילוי מטה; אם הוזנו – נבדקת התאמה
+function totSum(kind){const P=S.parking;let sum=0,miss=0,any=false;
+  if(kind==="units")S.buildings.forEach(b=>{const u=num(b.units);if(u){sum+=u;any=true}else miss++});
+  if(kind==="com")S.buildings.filter(b=>b.com).forEach(b=>{const a=num(b.comArea);if(a){sum+=a;any=true}else miss++});
+  if(kind==="pkA"&&P.has)P.perFloor.forEach(f=>{const a=num(f.area);if(a!=null){sum+=a;any=true}else miss++});
+  if(kind==="pkS"&&P.has)P.perFloor.forEach(f=>{const a=num(f.spaces);if(a!=null){sum+=a;any=true}else miss++});
+  return{sum:Math.round(sum*100)/100,miss,any}}
+const TOTS=[{kind:"units",get:()=>S.project.units,set:v=>S.project.units=v,inp:"#p-units",u:'יח"ד',src:"בבניינים",what:"יח\"ד",fixT:"אתקן את הבניינים",focus:()=>{const i=Math.max(0,S.buildings.findIndex(b=>!num(b.units)));return `buildings.${i}.units`}},
+  {kind:"com",get:()=>S.project.comArea,set:v=>S.project.comArea=v,inp:"#p-com",u:'מ"ר',src:"בבניינים",what:"שטח מסחר",fixT:"אתקן את הבניינים",focus:()=>{const i=S.buildings.findIndex(b=>b.com&&!num(b.comArea));const j=i>=0?i:Math.max(0,S.buildings.findIndex(b=>b.com));return `buildings.${j}.comArea`}},
+  {kind:"pkA",get:()=>S.parking.area,set:v=>S.parking.area=v,inp:"#pk-area",u:'מ"ר',src:"בקומות החניון",what:"שטח בקומה",fixT:"אתקן את הקומות",focus:()=>`parking.perFloor.${Math.max(0,S.parking.perFloor.findIndex(f=>num(f.area)==null))}.area`},
+  {kind:"pkS",get:()=>S.parking.total,set:v=>S.parking.total=v,inp:"#pk-total",u:"חניות",src:"בקומות החניון",what:"מספר חניות בקומה",fixT:"אתקן את הקומות",focus:()=>`parking.perFloor.${Math.max(0,S.parking.perFloor.findIndex(f=>num(f.spaces)==null))}.spaces`}];
+function totVal(kind){const t=TOTS.find(x=>x.kind===kind);const e=num(t.get());const c=totSum(kind);return c.any&&!c.miss?c.sum:(e!=null?e:(c.any?c.sum:null))}
+function projUnits(){return totVal("units")||0}
+function renderTotals(){const box=$("#p-units-msg");if(!box)return;const out=[];
+  document.querySelectorAll("[data-pkonly]").forEach(l=>l.hidden=!S.parking.has);
+  TOTS.forEach(t=>{const el=$(t.inp);if(!el)return;const c=totSum(t.kind);const e=num(t.get());
+    el.placeholder=c.any?`מחושב: ${fmt(c.sum)}${c.miss?" (חלקי)":""}`:"לא חובה";
+    if(t.kind.startsWith("pk")&&!S.parking.has)return;
+    if(e==null||!c.any)return;
+    if(c.miss){if(e!==c.sum)out.push(`<div class="msg info">${t.inp==="#p-units"?"סה\"כ יח\"ד":t.kind==="com"?"סה\"כ שטחי מסחר":t.kind==="pkA"?"סה\"כ שטח חניון":"סה\"כ חניות"}: הוזן ${fmt(e)} ${t.u}; ${t.src} הוזן עד כה ${fmt(c.sum)} (חסר ${t.what} ב-${c.miss} ${t.kind.startsWith("pk")?(c.miss>1?"קומות":"קומה"):(c.miss>1?"בניינים":"בניין")}).</div>`);return}
+    if(e===c.sum)return;
+    out.push(`<div class="msg warn" style="display:flex;flex-wrap:wrap;gap:8px;align-items:center"><span><b>${{units:"סה\"כ יח\"ד",com:"סה\"כ שטחי מסחר",pkA:"סה\"כ שטח חניון",pkS:"סה\"כ חניות"}[t.kind]}:</b> הוזנו ${fmt(e)} ${t.u}, אבל הסה"כ ${t.src} הוא ${fmt(c.sum)} ${t.u}. מה נכון?</span>
+      <button type="button" class="btn" data-tfix="${t.kind}|sum">${fmt(c.sum)} נכון – לעדכן את הסה"כ</button>
+      <button type="button" class="btn" data-tfix="${t.kind}|fix">${fmt(e)} נכון – ${t.fixT}</button></div>`)});
+  box.innerHTML=out.length?`<div style="display:flex;flex-direction:column;gap:6px;margin-top:8px">${out.join("")}</div>`:""}
+function renderUnitsCheck(){renderTotals()}
+document.addEventListener("click",e=>{const b=e.target.closest?.("[data-tfix]");if(!b)return;const [kind,act]=b.dataset.tfix.split("|");const t=TOTS.find(x=>x.kind===kind);
+  if(act==="sum"){t.set(String(totSum(kind).sum));$(t.inp).value=t.get();save();renderTotals();renderDoc();toast("הסה\"כ עודכן לפי המילוי מטה");return}
+  const k=t.focus();const m=k.match(/^buildings\.(\d+)\./);if(m&&S.buildings.length>1){ACT_B=+m[1];reRenderBuildings()}
+  const f=document.querySelector(`[data-k="${k}"]`);if(f){f.scrollIntoView({block:"center"});f.focus()}});
 function renderAll(){renderBuildings();renderParking();renderTrafo();renderProcess();renderDoc()}
 
 /* ================= sizing engine (defaults derived from office letters) ================= */
@@ -891,12 +922,12 @@ function buildDoc(){
   const gTitle=g=>g.k?grpLabel(g.k):"בניינים נוספים";
   // basic data
   push("h2",{text:`${n}. נתוני יסוד`});
-  const Pk=S.parking;const devN=Pk.dev?(num(Pk.devCount)||0):0;const tot=num(Pk.total);
-  push("ul",{items:[...order.map(i=>[S.buildings[i],i]).map(([b,i])=>`${useGroups&&b.struct?`${grpLabel(b.struct)} – `:""}${bldLabel(bn(b,i))}${b.floors?` – ${b.floors} קומות מעל קומת הקרקע`:""}, ${b.units?fmt(num(b.units))+" יח\"ד":"מספר יח\"ד טרם הוזן"}${b.perFloor?` (עד ${b.perFloor} דירות בקומה)`:""} – ${catLong(b.cat)}.`+
+  const Pk=S.parking;const devN=Pk.dev?(num(Pk.devCount)||0):0;const tot=totVal("pkS");const pkA=totVal("pkA");
+  push("ul",{items:[...(projUnits()?[`סה"כ בפרויקט: ${fmt(projUnits())} יח"ד.`]:[]),...order.map(i=>[S.buildings[i],i]).map(([b,i])=>`${useGroups&&b.struct?`${grpLabel(b.struct)} – `:""}${bldLabel(bn(b,i))}${b.floors?` – ${b.floors} קומות מעל קומת הקרקע`:""}, ${b.units?fmt(num(b.units))+" יח\"ד":"מספר יח\"ד טרם הוזן"}${b.perFloor?` (עד ${b.perFloor} דירות בקומה)`:""} – ${catLong(b.cat)}.`+
 (num(b.offArea)?` תעסוקה ${fmt(num(b.offArea))} מ"ר.`:"")+(hasPub(b)?` ${pubName(b)}${num(b.pubArea)?` ${fmt(num(b.pubArea))} מ"ר`:""}.`:"")),
-    ...(Pk.has?[`חניון תת-קרקעי משותף: ${Pk.floors} קומות${Pk.area?`, ${fmt(num(Pk.area))} מ"ר`:""}${tot!=null?`, ${fmt(tot)} חניות`:""}${Pk.dev?`, ועוד ${fmt(devN)} חניות בפיתוח`:""}.`]:Pk.dev?[`חניות בפיתוח: ${fmt(devN)}.`]:[]),
+    ...(Pk.has?[`חניון תת-קרקעי משותף: ${Pk.floors} קומות${pkA?`, ${fmt(pkA)} מ"ר`:""}${tot!=null?`, ${fmt(tot)} חניות`:""}${Pk.dev?`, ועוד ${fmt(devN)} חניות בפיתוח`:""}.`]:Pk.dev?[`חניות בפיתוח: ${fmt(devN)}.`]:[]),
     ...(()=>{const cb=order.map(i=>[S.buildings[i],i]).filter(([b])=>b.com);if(!cb.length)return [];const tA=cb.reduce((a,[b])=>a+(num(b.comArea)||0),0);
-      return [`מסחר: ${cb.map(([b,i])=>`${useGroups&&b.struct?`${grpLabel(b.struct)} – `:""}${bldLabel(bn(b,i))}${num(b.comArea)?` – ${fmt(num(b.comArea))} מ"ר`:""}${comText(b)?`, חיבורי חשמל: ${comText(b)}`:""}`).join("; ")}${cb.length>1&&tA?` (סה"כ ${fmt(tA)} מ"ר)`:""}.`]})()]});
+      return [`מסחר: ${cb.map(([b,i])=>`${useGroups&&b.struct?`${grpLabel(b.struct)} – `:""}${bldLabel(bn(b,i))}${num(b.comArea)?` – ${fmt(num(b.comArea))} מ"ר`:""}${comText(b)?`, חיבורי חשמל: ${comText(b)}`:""}`).join("; ")}${cb.length>1&&totVal("com")?` (סה"כ ${fmt(totVal("com"))} מ"ר)`:""}.`]})()]});
   n++;
   // assumptions
   push("h2",{text:`${n}. הנחות יסוד`});n++;
@@ -937,7 +968,7 @@ function buildDoc(){
   if(anyRoom||Pk.has){
     push("h2",{text:`${n}. הנחיות למרתף`,pb:true});let s=1;
     if(Pk.has){push("h3",{text:`${n}.${s}. חניון`});s++;
-      push("table",{head:["קומה","שטח (מ\"ר)","חניות"],rows:[...Pk.perFloor.map((f,k)=>[`מינוס ${k+1}`,f.area?fmt(num(f.area)):"—",f.spaces?fmt(num(f.spaces)):"—"]),["סה\"כ",Pk.area?fmt(num(Pk.area)):"—",tot!=null?fmt(tot):"—"]],num:true});
+      push("table",{head:["קומה","שטח (מ\"ר)","חניות"],rows:[...Pk.perFloor.map((f,k)=>[`מינוס ${k+1}`,f.area?fmt(num(f.area)):"—",f.spaces?fmt(num(f.spaces)):"—"]),["סה\"כ",pkA?fmt(pkA):"—",tot!=null?fmt(tot):"—"]],num:true});
       const over=Pk.over.filter(k=>S.buildings[k]).map(k=>fl(S.buildings[k],k));if(over.length)push("p",{text:`בניינים מעל המרתף המשותף: ${over.join(", ")}.`});
       {const bb=S.buildings[Pk.baseBld];if(bb&&isRoom(bb))push("key",{text:`החיבור הציבורי המשותף של המרתף (${Pk.baseSize||"3X400"}) – בחדר המונים של ${fl(bb,Pk.baseBld)}: ארון מדידה ומפסק ראשי.`})}
 }
@@ -970,8 +1001,11 @@ function buildDoc(){
       const G=g.g;
       if(b.genLoc==="roof"){const c=G.canopy65;const d=dims(c?.dimensions);
         push("key",{text:`גנרטור ${fmt(G.kva)} KVA (הערכה) בחופה אקוסטית 65dB על הגג`});
-        push("table",{head:["נתון","ערך"],rows:[["דגם",c?.model||G.room65?.model||""],["מידות החופה (אורך × רוחב × גובה)",d?`${d[0]} × ${d[1]} × ${d[2]} מ'`:"—"],["משקל כולל",c?.weight?`${fmt(num(c.weight))} ק"ג`:"—"]]});
-        push("ul",{items:["יש להעביר את משקל הגנרטור למהנדס הקונסטרוקציה.","רמת רעש 65dB במרחק 7 מ' (מגורים).","נדרש פיר לצינור דלק 30X30 ס\"מ מהקרקע לגג וארון תדלוק 60X40 ס\"מ בחדר האשפה או לידו."]});
+        push("table",{head:["נתון","ערך"],rows:[["דגם",c?.model||G.room65?.model||""],["מידות החופה (אורך × רוחב × גובה)",d?`${d[0]} × ${d[1]} × ${d[2]} מ'`:"—"],["משקל כולל",c?.weight?`${fmt(num(c.weight))} ק"ג`:"—"],["בסיס בטון (אורך × רוחב)",d?`${fmt(Math.round((parseFloat(d[0])+0.2)*100)/100)} × ${fmt(Math.round((parseFloat(d[1])+0.2)*100)/100)} מ'`:"—"]]});
+        push("ul",{items:[`הגנרטור מותקן על בסיס בטון – מידות הבסיס גדולות ב-10 ס"מ ממידות הגנרטור לכל צד${d?` (${fmt(Math.round((parseFloat(d[0])+0.2)*100)/100)} × ${fmt(Math.round((parseFloat(d[1])+0.2)*100)/100)} מ')`:""}.`,
+          "יש לשמור מרחק של 1 מ' פנוי מסביב לגנרטור לטיפול ותחזוקה.",
+          "אין למקם את הגנרטור ליד פירי אוורור, פתחי שחרור עשן או מערכות דחיסת אוויר לחדרי מדרגות.",
+          "יש להעביר את משקל הגנרטור למהנדס הקונסטרוקציה.","רמת רעש 65dB במרחק 7 מ' (מגורים).","נדרש פיר לצינור דלק 30X30 ס\"מ מהקרקע לגג וארון תדלוק 60X40 ס\"מ בחדר האשפה או לידו."]});
       }else{const r=G.room65;const d=dims(r?.roomDimensions),gd=dims(r?.generatorDimensions);
         push("key",{text:`חדר גנרטור מושתק ${b.genLoc==="ground"?"בקומת הקרקע":"במרתף"} – גנרטור ${fmt(G.kva)} KVA (הערכה)`});
         push("table",{head:["נתון","ערך"],rows:[["דגם",r?.model||""],["מידות חדר נטו (אורך × רוחב × גובה)",d?`${d[0]} × ${d[1]} × ${d[2]} מ'`:"—"],["כניסת אוויר",r?.silencedAirIn?`${r.silencedAirIn} מ"ר`:"—"],["יציאת אוויר",r?.silencedAirOut?`${r.silencedAirOut} מ"ר`:"—"],["קוטר אגזוז",(()=>{const e=genExhaust(b);return e?`${e.dia}" (חישוב לתוואי לגג: 4 כיפופים, ${e.horiz} מ' אופקי, ${e.vert} מ' אנכי)`:(r?.exhaust?`${r.exhaust} אינץ'`:"—")})()],["מידות הגנרטור",gd?`${gd[0]} × ${gd[1]} × ${gd[2]} מ'`:"—"],["משקל הגנרטור",r?.generatorWeight?`${fmt(num(r.generatorWeight))} ק"ג`:"—"]]});
@@ -1022,11 +1056,6 @@ function buildDoc(){
     "כל חדר מונים יכלול אוורור, בדרך כלל דמפר כלפי החניון.",
     "מיקום וגודל לוחות טעינת הרכבים וחדרי הכבלים של חח\"י יינתנו בשלב מאוחר יותר.",
     "מומלץ להפעיל חברה לאיתור התשתיות התת-קרקעיות הקיימות במגרש."]});
-  if(anyRoom||S.trafo.req){
-    push("h2",{text:"נספחים",pb:true});
-    if(anyRoom){push("p",{text:"נספח א – הנחיות מתוך נוהלי חברת החשמל לחדר חשמל / חדר מונים."});["assets/iec-4.png","assets/iec-5.png","assets/iec-6.png","assets/iec-7.png"].forEach((src,k)=>push("img",{src,cap:`נספח א – נוהל חח"י, עמוד ${k+1}`}))}
-    if(S.trafo.req)push("img",{src:"assets/grid-access.jpg",cap:"נספח ב – הנחיות הרשת הארצית של חח\"י בנושא גובה, גישה, פריקה וטעינה"});
-  }
   push("foot",{text:"בכבוד רב, טיקטין תכנון חשמל בע\"מ. הנחיות ראשוניות בלבד – יעודכנו עם התקדמות התכנון והתיאום מול חברת החשמל והיועצים."});
   return B;
 }
@@ -1036,7 +1065,7 @@ const svgUrl=svg=>"data:image/svg+xml;charset=utf-8,"+encodeURIComponent(svg);
 async function svgPng(svg,maxW){const im=new Image();im.src=svgUrl(svg);await im.decode();const w0=im.naturalWidth||1000,h0=im.naturalHeight||500;const k=Math.min(2.4,maxW/w0);
   const c=document.createElement("canvas");c.width=Math.round(w0*k);c.height=Math.round(h0*k);const x=c.getContext("2d");x.fillStyle="#fff";x.fillRect(0,0,c.width,c.height);x.drawImage(im,0,0,c.width,c.height);
   const bl=await new Promise(r=>c.toBlob(r,"image/png"));return {data:new Uint8Array(await bl.arrayBuffer()),w:c.width,h:c.height}}
-function renderDoc(){
+function renderDoc(){try{renderTotals()}catch(e){}
   const B=buildDoc();const P=S.project;
   $("#sheet").innerHTML=B.map(b=>{
     switch(b.t){
@@ -1142,7 +1171,7 @@ async function exportPdf(){
   const MAXH=9000;for(let k=0;k<chunks.length;k++){const c=chunks[k];if(c.scrollHeight<=MAXH)continue;const kids=[...c.childNodes];const n2=mk();host.insertBefore(n2,c.nextSibling);
     let acc=0;let cut=kids.length;for(let j=0;j<kids.length;j++){acc+=(kids[j].offsetHeight||0);if(acc>MAXH*0.8&&j>0){cut=j;break}}kids.slice(cut).forEach(x=>n2.appendChild(x));if(n2.childNodes.length)chunks.splice(k+1,0,n2);else n2.remove()}
   await Promise.all([...host.querySelectorAll("img")].map(i=>i.decode?i.decode().catch(()=>{}):null));
-  const opt={margin:[10,8,12,8],image:{type:"jpeg",quality:.9},html2canvas:{scale:1.7,useCORS:true,backgroundColor:"#ffffff"},jsPDF:{unit:"mm",format:"a4",orientation:"portrait"},pagebreak:{mode:["css","legacy"],avoid:["table","figure",".key",".note","li"]}};
+  const opt={margin:[10,8,12,8],image:{type:"jpeg",quality:.9},html2canvas:{scale:1.7,useCORS:true,backgroundColor:"#ffffff",scrollX:0,scrollY:0},jsPDF:{unit:"mm",format:"a4",orientation:"portrait"},pagebreak:{mode:["css","legacy"],avoid:["table","figure",".key",".note","li"]}};
   try{let w=html2pdf().set(opt).from(chunks[0]).toPdf();
     for(const c of chunks.slice(1))w=w.get("pdf").then(pdf=>{pdf.addPage()}).from(c).toContainer().toCanvas().toPdf();
     return await w.outputPdf("blob")}
@@ -1205,8 +1234,11 @@ document.addEventListener("change",async e=>{const el=e.target;
   if(el.type==="radio"||el.tagName==="SELECT"){setPath(k,coerce(el));save();
     if(/^buildings\./.test(k)||k==="parking.baseSize"){reRenderBuildings();renderParking()}else if(k.startsWith("parking.")){renderParking();refreshOv()}else if(k.startsWith("trafo."))renderTrafo();else if(k==="project.district"){renderTrafo();renderProcess()}
     renderDoc();return}
-  if(/^buildings\.\d+\.(units|floors|roomLen|roomWid|kva|struct)$/.test(k))reRenderBuildings();
+  if(/^buildings\.\d+\.(units|floors|roomLen|roomWid|kva|struct)$/.test(k)){if(PDOWN)PEND=true;else reRenderBuildings()}
 });
+// רענון שנדחה עד שחרור העכבר – כדי שלחיצה על לשונית / כפתור אחרי הקלדה לא "תיבלע"
+let PDOWN=false,PEND=false;document.addEventListener("pointerdown",()=>{PDOWN=true},true);
+document.addEventListener("pointerup",()=>{setTimeout(()=>{PDOWN=false;if(PEND){PEND=false;reRenderBuildings()}},0)},true);
 function reRenderBuildings(){const sel="#buildings details";const open=[...document.querySelectorAll(sel)].map(d=>d.open);renderBuildings();document.querySelectorAll(sel).forEach((d,j)=>{if(open[j])d.open=true})}
 function genMsgHtml(b){const g=pickGen(b.kva);if(!num(b.kva))return "";
   if(!(g&&g.g))return GEN.length?`<div class="msg warn">מעל ${fmt(GEN.at(-1).kva)} KVA נדרש תכנון מיוחד</div>`:`<div class="msg info">טוען נתוני שמרלינג…</div>`;
@@ -1216,7 +1248,7 @@ function genMsgHtml(b){const g=pickGen(b.kva);if(!num(b.kva))return "";
 function renderBuildingsMsg(i,box){box.innerHTML=genMsgHtml(S.buildings[i])}
 function renderParkingChips(){const box=document.querySelector("#parking .chips");if(!box)return;box.innerHTML=S.buildings.map((b,i)=>`<label class="chk"><input type="checkbox" data-over="${i}" ${S.parking.over.includes(i)?"checked":""}>${esc(b.name||("בניין "+(i+1)))}</label>`).join("")}
 /* reset handled by dialog below */
-function fillProject(){setTimeout(()=>{try{decorateInputs()}catch(e){}},0);["name","iso","dev","arch","city"].forEach(k=>{const el=document.querySelector(`[data-k="project.${k}"]`);if(el)el.value=S.project[k]||""});$("#p-district").value=S.project.district||"דן"}
+function fillProject(){setTimeout(()=>{try{decorateInputs()}catch(e){}},0);["name","iso","dev","arch","city","units","comArea"].forEach(k=>{const el=document.querySelector(`[data-k="project.${k}"]`);if(el)el.value=S.project[k]||""});["area","total"].forEach(k=>{const el=document.querySelector(`[data-k="parking.${k}"]`);if(el)el.value=S.parking[k]||""});$("#p-district").value=S.project.district||"דן"}
 $("#cities").innerHTML=Object.keys(DISTRICT_OF).map(c=>`<option value="${c}">`).join("");
 
 /* ================= save / open ================= */
