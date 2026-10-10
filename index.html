@@ -178,7 +178,7 @@ details.ov td.lv{color:var(--ink-3);font-size:12px;white-space:nowrap}
 .timer{font-variant-numeric:tabular-nums;font-weight:600;color:var(--brand);font-size:14px;background:var(--brand-soft);border-radius:6px;padding:2px 8px}
 .savebox{position:relative}
 .cc-row{display:flex;gap:10px;align-items:flex-end;flex-wrap:wrap;margin-bottom:6px}.cc-row .f{flex:1 1 140px}.cc-del{padding:8px 12px;font-weight:700}
-details.ov td.x{width:1%;white-space:nowrap}details.ov tr.del td{color:var(--ink-3);text-decoration:line-through}details.ov tr.del input{opacity:.4}details.ov .tag{font-size:11px;color:var(--brand);margin-inline-start:6px}
+details.ov td.x{width:1%;white-space:nowrap}details.ov tr.bk td{font-size:12px;color:var(--ink-2);padding-top:0;border-bottom:1px solid var(--line-2)}details.ov tr:has(+tr.bk) td{border-bottom:0}details.ov tr.del td{color:var(--ink-3);text-decoration:line-through}details.ov tr.del input{opacity:.4}details.ov .tag{font-size:11px;color:var(--brand);margin-inline-start:6px}
 .ov-add{display:flex;flex-wrap:wrap;gap:6px;align-items:flex-end;margin-top:8px;padding-top:8px;border-top:1px dashed var(--line)}.ov-add input,.ov-add select{padding:6px 8px;font-size:14px}.ov-add .nm{flex:1 1 280px;min-width:220px}.ov-add .nm .clr-wrap,.ov-add .nm input{width:100%}.ov-add input[type=number]{width:80px}.ov-x{padding:2px 9px;font-size:14px;font-weight:700}
 .savebox>summary{list-style:none;display:inline-block}
 .savebox>summary::-webkit-details-marker{display:none}
@@ -198,7 +198,7 @@ table.cmp td:first-child{width:28px}
       <img class="logo" src="assets/tiktin-logo.png" alt="טיקטין תכנון חשמל">
       <div>
         <h1>הכנה אוטומטית של הנחיות חשמל לפרויקט מגורים ועירוב שימושים</h1>
-        <p>הנחיות ראשוניות לאדריכל · טופס לכל מגרש · <span class="ver">גרסה V10 · 08.10.2026</span></p>
+        <p>הנחיות ראשוניות לאדריכל · טופס לכל מגרש · <span class="ver">גרסה V11 · 10.10.2026</span></p>
       </div>
     </div>
     <div class="head-actions">
@@ -609,7 +609,7 @@ function ovRows(id,items,ov){
       <td><input type="number" min="0" ${dis} aria-label="רוחב ${esc(it.name)}" data-ov="${id}|${it.key}|w" value="${esc(o.w??"")}" placeholder="${it.w}"></td>
       <td><input type="number" min="0" ${dis} aria-label="${it.room?"אורך":"עומק"} ${esc(it.name)}" data-ov="${id}|${it.key}|d" value="${esc(o.d??"")}" placeholder="${dv}"></td>
       <td><input type="number" min="0" ${dis} aria-label="גובה ${esc(it.name)}" data-ov="${id}|${it.key}|h" value="${esc(o.h??"")}" placeholder="${it.h??""}"></td>
-      <td class="x">${del?`<button type="button" class="btn ov-x" data-ovundel="${id}|${it.key}" title="החזרת השורה למסמך" aria-label="החזרת השורה">↺</button>`:`<button type="button" class="btn ov-x" data-ovdel="${id}|${it.key}" title="מחיקת השורה – לא תופיע במסמך" aria-label="מחיקת השורה">×</button>`}</td></tr>`}).join("")}
+      <td class="x">${del?`<button type="button" class="btn ov-x" data-ovundel="${id}|${it.key}" title="החזרת השורה למסמך" aria-label="החזרת השורה">↺</button>`:`<button type="button" class="btn ov-x" data-ovdel="${id}|${it.key}" title="מחיקת השורה – לא תופיע במסמך" aria-label="מחיקת השורה">×</button>`}</td></tr>`+(it.bk&&!del?`<tr class="bk"><td></td><td colspan="5">${esc(it.bk)}</td></tr>`:"")}).join("")}
 function ovTable(id,items,ov){const lvs=id==="P"?[["upper","מרתף עליון"],["lower","מרתף תחתון"]]:[["ground","קרקע"],["typical","טיפוסית"],["upper","מרתף עליון"],["lower","מרתף תחתון"]];
   return `<details class="ov"><summary class="muted" style="cursor:pointer">מידות הפריטים – ברירת מחדל (ניתן לשנות)</summary>
   <div class="tbl-wrap"><table><thead><tr><th>מפלס</th><th>פריט</th><th>רוחב (ס"מ)</th><th>עומק / אורך (ס"מ)</th><th>גובה (ס"מ)</th><th></th></tr></thead><tbody data-ovbody="${id}">${ovRows(id,items,ov)}</tbody></table></div>
@@ -647,7 +647,10 @@ function nicheCabs(b){const u=Math.max(0,Math.floor(num(b.units)||0));const pa=m
   const mt=u+pub,rem=mt%12;let n12=Math.floor(mt/12)+(rem>6?1:0),n6=(rem>=1&&rem<=6)?1:0;
   let sm=comSmall(b);if(pub&&rem>=1&&rem<=6&&rem<=pub){const sh=Math.min(sm,6-rem);sm-=sh}
   let c12=0,c6=0;while(sm>0){if(sm>6){c12++;sm-=Math.min(12,sm)}else{c6++;sm=0}}
-  return{n12:n12+c12,n6:n6+c6,w:(n12+c12)*150+(n6+c6)*90+5,meters:mt+comSmall(b)}}
+  const N12=n12+c12,N6=n6+c6,parts=[...Array(N12).fill(["ארון 12 מונים",150]),...Array(N6).fill(["ארון 6 מונים",90])];const walls=Math.max(0,parts.length-1);
+  const w=parts.reduce((a,p)=>a+p[1],0)+walls*10;
+  const bk=parts.length>1?parts.map(p=>`נישה ל${p[0]} ${p[1]}`).join(" + קיר הפרדה 10 + ")+` = ${w} ס"מ`:"";
+  return{n12:N12,n6:N6,w,bk,meters:mt+comSmall(b)}}
 function comText(b){const cs=comConns(b);return cs.map(c=>`${c.n>1?c.n+" × ":""}${c.sz}`).join(", ")}
 const mrDoorLen=k=>Math.max(0,...MR_EQ[k].dr);
 const mrOff=k=>k==="mb"?0:4;
@@ -777,7 +780,7 @@ function hasGen(b){return high(b)||b.genReq}
 function inBasement(i){return S.parking.has&&S.parking.over.includes(i)}
 function mrLen(u,com){let L=u<=42?450:u<=53?500:u<=72?600:u<=92?700:u<=120?900:u<=185?1100:r10(u*6);return L+(com?120:0)}
 // item: {key,name,w,d,h,room,l,count,note,text}
-function applyOv(it,ov){const o=ov&&ov[it.key];if(!o)return it;const c=Object.assign({},it);if(num(o.w)!=null)c.w=num(o.w);if(num(o.d)!=null){if(c.room)c.l=num(o.d);else c.d=num(o.d)}if(num(o.h)!=null)c.h=num(o.h);if(o.del)c._del=true;return c}
+function applyOv(it,ov){const o=ov&&ov[it.key];if(!o)return it;const c=Object.assign({},it);if(num(o.w)!=null){c.w=num(o.w);delete c.bk}if(num(o.d)!=null){if(c.room)c.l=num(o.d);else c.d=num(o.d)}if(num(o.h)!=null)c.h=num(o.h);if(o.del)c._del=true;return c}
 const CUST_LS="tiktin-guidelines-custom-items";
 function custGlobal(){try{const a=JSON.parse(localStorage.getItem(CUST_LS)||"[]");return Array.isArray(a)?a:[]}catch(e){return[]}}
 function custSetGlobal(a){try{localStorage.setItem(CUST_LS,JSON.stringify(a))}catch(e){}}
@@ -787,7 +790,7 @@ function finItems(o,tgt,raw){const cu=(tgt.cust||[]);Object.keys(o).forEach(lv=>
 function spec(it){
   if(it.text)return it.text;
   if(it.room)return `במידות ${fmt(it.l/100)}X${fmt(it.w/100)} מ'`+(it.h?`, גובה ${fmt(it.h/100)} מ'`:"");
-  return `${it.count>1?`${it.count} פירים, כל אחד `:""}`+[it.w?`ברוחב ${fmt(it.w)}`:"",it.d?`עומק ${fmt(it.d)}`:""].filter(Boolean).join(" ")+` ס"מ`+(it.h?`, גובה ${fmt(it.h)} ס"מ`:"");
+  return `${it.count>1?`${it.count} פירים, כל אחד `:""}`+[it.w?`ברוחב ${fmt(it.w)}${it.bk?` ס"מ (${it.bk.replace(/ = \d+ ס"מ$/," ס\"מ")})`:""}`:"",it.d?`עומק ${fmt(it.d)}`:""].filter(Boolean).join(" ")+` ס"מ`+(it.h?`, גובה ${fmt(it.h)} ס"מ`:"");
 }
 function buildingItems(b,i,raw){
   const u=num(b.units)||0, hi=high(b), tower=b.cat==="high", down=b.meters==="down";
@@ -814,7 +817,7 @@ function buildingItems(b,i,raw){
   // ground
   if(apt)push(G,Object.assign({},apt,{note:"עם דלת אש. "+apt.note}));
   if(iecS){push(G,Object.assign({},iecS,{note:"עם דלת אש. "+iecS.note}));push(G,Object.assign({},iecC0))}
-  push(G,{key:"gfp",name:"לוח חשמל קומת קרקע",w:tower?120:u<=60?80:100,d:50,note:"עם דלת אש."});
+  push(G,{key:"gfp",name:"לוח חשמל קומת קרקע",w:tower?120:u<=60?80:100,d:50,h:240,note:"עם דלת אש."});
   push(G,Object.assign({},pubS));if(emS)push(G,Object.assign({},emS));
   if(com)push(G,{key:"coms",name:"פיר חשמל למסחר",w:30,d:30,note:"נדרש אם יש מעבים או הזנות למסחר בגג."});
   if(off)push(G,{key:"offs",name:"פיר חשמל תעסוקה",w:30,d:30});
@@ -841,7 +844,7 @@ function buildingItems(b,i,raw){
       push(U,{key:"mroom",name:`חדר מוני חח"י ל-${fmt(u)} יח"ד`,room:true,w,l,
       note:(c&&eq?`החדר כולל: ${eq} (${c.one?"ארונות בצד אחד":"ארונות בשני הצדדים"}). `:"")+`גובה החדר 2.5 מ' נטו לפחות. רצפה כפולה בגובה 80 ס"מ נטו. דלת אש 30/90 נפתחת החוצה לכיוון לובי הבניין עם מנעול כפול חח"י + דיירים. מתחת לפיר הכבלים לדירות.`})}
     else{{const nc=nicheCabs(b);const cab=[nc.n12?(nc.n12>1?`${nc.n12} ארונות 12 מונים`:"ארון 12 מונים"):"",nc.n6?(nc.n6>1?`${nc.n6} ארונות 6 מונים`:"ארון 6 מונים"):""].filter(Boolean).join(" ו");
-      push(U,{key:"mniche",name:`נישת מוני חח"י ל-${fmt(nc.meters)} מונים`,w:nc.w,d:50,h:240,note:`הנישה ל${/^\d/.test(cab)?"-":""}${cab} (כולל המונה הציבורי של הבניין${comSmall(b)?" ומוני המסחר":""}). באזור לובי הבניין, 1.4 מ' פנוי מול הנישה, קרוב לפיר הכבלים מהדירות.`})}
+      push(U,{key:"mniche",name:`נישת מוני חח"י ל-${fmt(nc.meters)} מונים`,w:nc.w,bk:nc.bk,d:50,h:240,note:`${nc.bk?"נישה נפרדת לכל ארון עם קיר הפרדה 10 ס\"מ ביניהן":`הנישה ל${/^\d/.test(cab)?"-":""}${cab}`} (כולל המונה הציבורי של הבניין${comSmall(b)?" ומוני המסחר":""}). באזור לובי הבניין, 1.4 מ' פנוי מול הנישה, קרוב לפיר הכבלים מהדירות.`})}
       push(U,{key:"mainp",name:"לוח חשמל ראשי בניין",w:100,d:50})}
   }else push(U,{key:"proom",name:"חדר פילרים של חח\"י",room:true,w:320,l:u>100?550:450,note:"רצפה כפולה 80 ס\"מ, מתחת לפיר חח\"י. דלת אש 30/90 נפתחת החוצה עם מנעול כפול חח\"י + דיירים."});
   push(U,{key:"bzq",name:"נישה לארון בזק ראשי",w:u<=60?100:120,d:40});
