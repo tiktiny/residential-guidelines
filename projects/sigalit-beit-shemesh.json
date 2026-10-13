@@ -1,0 +1,152 @@
+{
+ "app": "residential-guidelines",
+ "v": 1,
+ "savedAt": "2026-10-13T14:59:23.898Z",
+ "state": {
+  "project": {
+   "name": "מתחם הסיגלית – בית שמש",
+   "iso": "",
+   "dev": "מיזם נדל\"ן הסיגלית בית שמש בע\"מ",
+   "arch": "",
+   "city": "בית שמש",
+   "district": "אחר",
+   "units": "240",
+   "comArea": "650"
+  },
+  "buildings": [
+   {
+    "name": "A",
+    "struct": "",
+    "cat": "low",
+    "units": "80",
+    "floors": "",
+    "perFloor": "",
+    "meters": "down",
+    "sides": "two",
+    "msides": "",
+    "mtype": "",
+    "roomLen": "",
+    "shaftW": "",
+    "com": true,
+    "comArea": "217",
+    "offArea": "",
+    "pubArea": "",
+    "pubType": "",
+    "genReq": false,
+    "kva": "",
+    "genLoc": "basement",
+    "lux": false,
+    "ov": {},
+    "comConns": [
+     {
+      "sz": "3X160",
+      "n": "1"
+     }
+    ],
+    "cust": []
+   },
+   {
+    "name": "B",
+    "struct": "",
+    "cat": "low",
+    "units": "80",
+    "floors": "",
+    "perFloor": "",
+    "meters": "down",
+    "sides": "two",
+    "msides": "",
+    "mtype": "",
+    "roomLen": "",
+    "shaftW": "",
+    "com": true,
+    "comArea": "217",
+    "offArea": "",
+    "pubArea": "350",
+    "pubType": "גן ילדים",
+    "genReq": false,
+    "kva": "",
+    "genLoc": "basement",
+    "lux": false,
+    "ov": {},
+    "comConns": [
+     {
+      "sz": "3X160",
+      "n": "1"
+     }
+    ],
+    "cust": []
+   },
+   {
+    "name": "C",
+    "struct": "",
+    "cat": "low",
+    "units": "80",
+    "floors": "",
+    "perFloor": "",
+    "meters": "down",
+    "sides": "two",
+    "msides": "",
+    "mtype": "",
+    "roomLen": "",
+    "shaftW": "",
+    "com": true,
+    "comArea": "216",
+    "offArea": "",
+    "pubArea": "",
+    "pubType": "",
+    "genReq": false,
+    "kva": "",
+    "genLoc": "basement",
+    "lux": false,
+    "ov": {},
+    "comConns": [
+     {
+      "sz": "3X160",
+      "n": "1"
+     }
+    ],
+    "cust": []
+   }
+  ],
+  "parking": {
+   "has": true,
+   "area": "",
+   "floors": "4",
+   "total": "270",
+   "perFloor": [
+    {
+     "area": "",
+     "spaces": "60"
+    },
+    {
+     "area": "",
+     "spaces": "68"
+    },
+    {
+     "area": "",
+     "spaces": "68"
+    },
+    {
+     "area": "",
+     "spaces": "74"
+    }
+   ],
+   "over": [
+    0,
+    1,
+    2
+   ],
+   "dev": false,
+   "devCount": "",
+   "ov": {},
+   "baseBld": 0,
+   "baseSize": "3X400",
+   "cust": []
+  },
+  "trafo": {
+   "req": false,
+   "type": 1,
+   "rooms": null
+  }
+ }
+}
