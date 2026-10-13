@@ -1,7 +1,7 @@
 {
  "app": "residential-guidelines",
  "v": 1,
- "savedAt": "2026-10-13T14:59:23.898Z",
+ "savedAt": "2026-10-13T15:10:19.022Z",
  "state": {
   "project": {
    "name": "מתחם הסיגלית – בית שמש",
@@ -9,18 +9,18 @@
    "dev": "מיזם נדל\"ן הסיגלית בית שמש בע\"מ",
    "arch": "",
    "city": "בית שמש",
-   "district": "אחר",
-   "units": "240",
-   "comArea": "650"
+   "district": "ירושלים",
+   "units": "",
+   "comArea": "450"
   },
   "buildings": [
    {
-    "name": "A",
+    "name": "מגדל",
     "struct": "",
-    "cat": "low",
-    "units": "80",
-    "floors": "",
-    "perFloor": "",
+    "cat": "high",
+    "units": "162",
+    "floors": "27",
+    "perFloor": "6",
     "meters": "down",
     "sides": "two",
     "msides": "",
@@ -28,7 +28,7 @@
     "roomLen": "",
     "shaftW": "",
     "com": true,
-    "comArea": "217",
+    "comArea": "225",
     "offArea": "",
     "pubArea": "",
     "pubType": "",
@@ -40,6 +40,37 @@
     "comConns": [
      {
       "sz": "3X160",
+      "n": "1"
+     }
+    ],
+    "cust": []
+   },
+   {
+    "name": "A",
+    "struct": "",
+    "cat": "low",
+    "units": "38",
+    "floors": "8",
+    "perFloor": "5",
+    "meters": "down",
+    "sides": "two",
+    "msides": "",
+    "mtype": "",
+    "roomLen": "",
+    "shaftW": "",
+    "com": true,
+    "comArea": "75",
+    "offArea": "",
+    "pubArea": "250",
+    "pubType": "מבנה ציבור",
+    "genReq": false,
+    "kva": "",
+    "genLoc": "basement",
+    "lux": false,
+    "ov": {},
+    "comConns": [
+     {
+      "sz": "3X63",
       "n": "1"
      }
     ],
@@ -49,9 +80,9 @@
     "name": "B",
     "struct": "",
     "cat": "low",
-    "units": "80",
-    "floors": "",
-    "perFloor": "",
+    "units": "38",
+    "floors": "8",
+    "perFloor": "5",
     "meters": "down",
     "sides": "two",
     "msides": "",
@@ -59,10 +90,10 @@
     "roomLen": "",
     "shaftW": "",
     "com": true,
-    "comArea": "217",
+    "comArea": "75",
     "offArea": "",
-    "pubArea": "350",
-    "pubType": "גן ילדים",
+    "pubArea": "250",
+    "pubType": "מבנה ציבור",
     "genReq": false,
     "kva": "",
     "genLoc": "basement",
@@ -70,7 +101,7 @@
     "ov": {},
     "comConns": [
      {
-      "sz": "3X160",
+      "sz": "3X63",
       "n": "1"
      }
     ],
@@ -80,9 +111,9 @@
     "name": "C",
     "struct": "",
     "cat": "low",
-    "units": "80",
-    "floors": "",
-    "perFloor": "",
+    "units": "40",
+    "floors": "8",
+    "perFloor": "5",
     "meters": "down",
     "sides": "two",
     "msides": "",
@@ -90,10 +121,10 @@
     "roomLen": "",
     "shaftW": "",
     "com": true,
-    "comArea": "216",
+    "comArea": "75",
     "offArea": "",
-    "pubArea": "",
-    "pubType": "",
+    "pubArea": "250",
+    "pubType": "מבנה ציבור",
     "genReq": false,
     "kva": "",
     "genLoc": "basement",
@@ -101,7 +132,7 @@
     "ov": {},
     "comConns": [
      {
-      "sz": "3X160",
+      "sz": "3X63",
       "n": "1"
      }
     ],
@@ -110,7 +141,7 @@
   ],
   "parking": {
    "has": true,
-   "area": "",
+   "area": "13000",
    "floors": "4",
    "total": "270",
    "perFloor": [
@@ -134,7 +165,8 @@
    "over": [
     0,
     1,
-    2
+    2,
+    3
    ],
    "dev": false,
    "devCount": "",
