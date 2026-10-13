@@ -49,6 +49,7 @@ html.uz header.top,html.uz .form,html.uz .export,html.uz .modal-box,html.uz .toa
 .card h2{font-size:16px;margin:0 0 12px;display:flex;align-items:center;gap:8px}
 .card h2 .step{display:inline-grid;place-items:center;width:24px;height:24px;border-radius:50%;background:var(--brand);color:#fff;font-size:13px;font-variant-numeric:tabular-nums}
 .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:10px 12px}
+.pgrid{display:flex;flex-wrap:wrap;align-items:flex-end}.pgrid>.f{flex:1 1 170px;min-width:0}.pgrid>.f-name{flex:3 1 340px}.pgrid>.f-iso{flex:0 0 130px}.pgrid>.f[hidden]{display:none}
 label.f{display:flex;flex-direction:column;gap:4px;font-size:13px;color:var(--ink-2);font-weight:500}
 input[type=text],input[type=number],select{font:inherit;font-size:15px;color:#1e2226;background:#ffffff;border:1px solid var(--line);border-radius:7px;padding:8px 10px;width:100%;min-width:0}
 input:focus-visible,select:focus-visible,button:focus-visible,summary:focus-visible{outline:2px solid var(--focus);outline-offset:2px}
@@ -198,7 +199,7 @@ table.cmp td:first-child{width:28px}
       <img class="logo" src="assets/tiktin-logo.png" alt="טיקטין תכנון חשמל">
       <div>
         <h1>הכנה אוטומטית של הנחיות חשמל לפרויקט מגורים ועירוב שימושים</h1>
-        <p>הנחיות ראשוניות לאדריכל · טופס לכל מגרש · <span class="ver">גרסה V16 · 10.10.2026</span></p>
+        <p>הנחיות ראשוניות לאדריכל · טופס לכל מגרש · <span class="ver">גרסה V17 · 13.10.2026</span></p>
       </div>
     </div>
     <div class="head-actions">
@@ -252,9 +253,9 @@ table.cmp td:first-child{width:28px}
       </section>
       <section class="card">
         <h2><span class="step">1</span>פרטי הפרויקט</h2>
-        <div class="grid">
-          <label class="f">שם הפרויקט<input type="text" id="p-name" data-k="project.name"></label>
-          <label class="f">מספר ISO<input type="text" id="p-iso" data-k="project.iso" inputmode="numeric"></label>
+        <div class="grid pgrid">
+          <label class="f f-name">שם הפרויקט<input type="text" id="p-name" data-k="project.name"></label>
+          <label class="f f-iso">מספר ISO<input type="text" id="p-iso" data-k="project.iso" inputmode="numeric" maxlength="7" pattern="[0-9]{0,7}" title="עד 7 ספרות"></label>
           <label class="f">היזם<input type="text" id="p-dev" data-k="project.dev"></label>
           <label class="f">שם האדריכל<input type="text" id="p-arch" data-k="project.arch"></label>
           <label class="f">סה"כ יח"ד בפרויקט<input type="number" min="0" id="p-units" data-k="project.units" title="לא חובה – אם לא יוזן, הסה&quot;כ יחושב מהבניינים"></label>
@@ -264,7 +265,7 @@ table.cmp td:first-child{width:28px}
           <label class="f">עיר<input type="text" id="p-city" data-k="project.city" list="cities"></label>
           <label class="f">מחוז חח"י
             <select id="p-district" data-k="project.district">
-              <option value="דן">דן</option><option value="שרון">שרון</option><option value="שפלה">שפלה</option><option value="אחר">אחר</option>
+              <option value="דן">דן</option><option value="שרון">שרון</option><option value="שפלה">שפלה</option><option value="ירושלים">ירושלים</option><option value="אחר">אחר</option>
             </select>
           </label>
         </div>
@@ -381,7 +382,7 @@ const CATS=[{v:"low",t:"עד 29 מ'"},{v:"mid",t:"29–42 מ'"},{v:"high",t:"42�
 const catText=v=>(CATS.find(c=>c.v===v)||CATS[0]).t;
 const DISTRICT_OF={"תל אביב":"דן","תל אביב-יפו":"דן","תל אביב יפו":"דן","רמת גן":"דן","גבעתיים":"דן","חולון":"דן","בת ים":"דן","בני ברק":"דן",
  "רחובות":"שפלה","נס ציונה":"שפלה","אשדוד":"שפלה","ראשון לציון":"שפלה","אשקלון":"שפלה",
- "נתניה":"שרון","הרצליה":"שרון","רעננה":"שרון","רמת השרון":"דן"};
+ "נתניה":"שרון","הרצליה":"שרון","רעננה":"שרון","רמת השרון":"דן","ירושלים":"ירושלים","בית שמש":"ירושלים","מבשרת ציון":"ירושלים","מעלה אדומים":"ירושלים","גבעת זאב":"ירושלים","ביתר עילית":"ירושלים"};
 const IMG={ // natural sizes
  "assets/tiktin-logo.png":[435,189],"assets/grid-access.jpg":[1026,1824],
  "assets/iec-4.png":[968,1328],"assets/iec-5.png":[947,1144],"assets/iec-6.png":[870,1084],"assets/iec-7.png":[911,1107],
@@ -404,7 +405,7 @@ const PROCESS={
  "שפלה":["פגישת הצגת פרויקט מול המתכנן בלבד (ללא תחנות פנימיות) או משלוח תוכניות, וקבלת טופס תיאום אדריכלי שעובר בדרך כלל אלינו ולתחנות פנימיות.",
       "פגישות זום עם תחנות פנימיות עד לאישור סיכום תחנה מהן למתכנן (ללא מתכנן רשת וחל\"ב); אז המתכנן מוציא סיכום תחנה.",
       "פגישות זום עם תחנות פנימיות לקבלת אישור להיתר.","לאחר קבלת היתר – פגישות זום עם תחנות פנימיות לקבלת אישור לביצוע."],
- "שרון":[],"אחר":[]};
+ "שרון":[],"ירושלים":[],"אחר":[]};
 
 /* ================= state ================= */
 const LS="tiktin-arch-guidelines-v1";
@@ -1247,6 +1248,7 @@ wire("#x-docx",exportDocx,"docx","מכין Word…");wire("#x-pdf",exportPdf,"pd
 function coerce(el){if(el.type==="radio"&&(el.value==="true"||el.value==="false"))return el.value==="true";return el.value}
 const STRUCT=/\.(cat|perFloor|pubSize|meters|sides|msides|mtype|com|genReq|genLoc|lux|mplan)$|^parking\.(has|dev|floors)$|^trafo\.|^project\.district$/;
 document.addEventListener("input",e=>{const el=e.target;
+  if(el.id==="p-iso"){const v=el.value.replace(/\D/g,"").slice(0,7);if(v!==el.value)el.value=v}
   if(el.dataset?.ov){const [id,key,f]=el.dataset.ov.split("|");const tgt=id==="P"?S.parking:S.buildings[+id];tgt.ov=tgt.ov||{};const o=tgt.ov[key]||(tgt.ov[key]={});if(el.value==="")delete o[f];else o[f]=el.value;if(!Object.keys(o).length)delete tgt.ov[key];save();renderDoc();return}
   const k=el.dataset?.k;if(!k)return;
   if(el.type==="radio"||el.tagName==="SELECT")return; // handled on change
