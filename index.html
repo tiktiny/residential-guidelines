@@ -199,7 +199,7 @@ table.cmp td:first-child{width:28px}
       <img class="logo" src="assets/tiktin-logo.png" alt="טיקטין תכנון חשמל">
       <div>
         <h1>הכנה אוטומטית של הנחיות חשמל לפרויקט מגורים ועירוב שימושים</h1>
-        <p>הנחיות ראשוניות לאדריכל · טופס לכל מגרש · <span class="ver">גרסה V17 · 13.10.2026</span></p>
+        <p>הנחיות ראשוניות לאדריכל · טופס לכל מגרש · <span class="ver">גרסה V18 · 13.10.2026</span></p>
       </div>
     </div>
     <div class="head-actions">
@@ -580,7 +580,9 @@ function renderBuildings(){
           ${(()=>{const sg=comSuggest(b);return sg?`<div class="msg info">הצעה לפי ${COM_A_M2} אמפר למ"ר: ${fmt(sg.a)} מ"ר × ${COM_A_M2} = ${fmt(Math.round(sg.A))} A → ${sg.n>1?sg.n+" × ":""}${sg.sz}${b.ccTouched?` <button type="button" class="btn" style="padding:3px 10px;font-size:13px" data-ccsug="${i}">החלת ההצעה</button>`:" (מוצע אוטומטית – אפשר לשנות)"}</div>`:""})()}</div>`:""}
         <div class="grid"><label class="f">שטח תעסוקה / משרדים (מ"ר)<input type="number" min="0" id="b${i}-off" data-k="${p}.offArea" value="${esc(b.offArea)}" placeholder="אין"></label>
           <label class="f">שטח ציבורי (מ"ר)<input type="number" min="0" id="b${i}-pub" data-k="${p}.pubArea" value="${esc(b.pubArea)}" placeholder="אין"></label>
-          <label class="f">מבנה ציבור<select id="b${i}-pubt" data-k="${p}.pubType">${PUBTYPES.map(o=>`<option value="${esc(o.v)}" ${String(b.pubType||"")===o.v?"selected":""}>${esc(o.t)}</option>`).join("")}${b.pubType&&!PUBTYPES.some(o=>o.v===b.pubType)?`<option value="${esc(b.pubType)}" selected>${esc(b.pubType)}</option>`:""}</select></label></div>
+          <label class="f">מבנה ציבור<select id="b${i}-pubt" data-k="${p}.pubType">${PUBTYPES.map(o=>`<option value="${esc(o.v)}" ${String(b.pubType||"")===o.v?"selected":""}>${esc(o.t)}</option>`).join("")}${b.pubType&&!PUBTYPES.some(o=>o.v===b.pubType)?`<option value="${esc(b.pubType)}" selected>${esc(b.pubType)}</option>`:""}</select></label>
+          ${hasPub(b)?(()=>{const au=pubConnAuto(b);return `<label class="f">חיבור מבנה ציבור<select id="b${i}-pubc" data-k="${p}.pubConn"><option value="">אוטומטי – ${au.sz}</option>${MR_SIZES.map(z=>`<option ${b.pubConn===z?"selected":""}>${z}</option>`).join("")}</select></label>`})():""}</div>
+        ${hasPub(b)?(()=>{const au=pubConnAuto(b);return `<div class="muted" style="margin-top:4px">הצעה לחיבור מבנה הציבור: ${au.a?`${fmt(au.a)} מ"ר × ${PUB_A_M2} = ${fmt(Math.round(au.a*PUB_A_M2))}A → `:""}${au.sz} (לפחות 3X40)</div>`})():""}
       </div>
       <div class="sub"><h4>גנרטור</h4>
         ${high(b)?`<div class="muted">בניין מעל 29 מ' – גנרטור נדרש תמיד</div>`:seg(`gr${i}`,`${p}.genReq`,[{v:"false",t:"לא נדרש"},{v:"true",t:"נדרש"}],b.genReq)}
@@ -644,10 +646,16 @@ const COM_A_M2=0.6;
 function comSuggest(b){const a=num(b.comArea);if(!a)return null;const A=a*COM_A_M2;let n=1;while(A/n>910)n++;const sz=MR_SIZES.find(z=>mrAmps(z)>=A/n)||"3X910";return{a,A,sz,n}}
 function comRows(b){const sg=!b.ccTouched&&comSuggest(b);if(sg)b.comConns=[{sz:sg.sz,n:String(sg.n)}];if(!Array.isArray(b.comConns)||!b.comConns.length)b.comConns=[{sz:"3X25",n:"1"}];return b.comConns}
 function comConns(b){if(!b.com)return[];return comRows(b).map(c=>({sz:MR_SIZES.includes(c.sz)?c.sz:"3X25",n:Math.max(1,parseInt(c.n)||1)})).map(c=>Object.assign(c,{amps:mrAmps(c.sz)}))}
-function comSmall(b){return comConns(b).filter(c=>c.amps<=100).reduce((a,c)=>a+c.n,0)}
+// חיבור מבנה ציבור: לפחות 3X40, לפי 0.35 אמפר למ"ר
+const PUB_A_M2=0.35;
+function pubConnAuto(b){const a=num(b.pubArea)||0;const A=Math.max(40,a*PUB_A_M2);return{sz:MR_SIZES.find(z=>mrAmps(z)>=A)||"3X910",A,a}}
+function pubConn(b){if(!hasPub(b))return null;const sz=MR_SIZES.includes(b.pubConn)?b.pubConn:pubConnAuto(b).sz;return{sz,amps:mrAmps(sz)}}
+function pubSmallN(b){const c=pubConn(b);return c&&c.amps<=100?1:0}
+function comSmall(b){return comConns(b).filter(c=>c.amps<=100).reduce((a,c)=>a+c.n,0)+pubSmallN(b)}
+function smLabel(b){const c=comConns(b).some(x=>x.amps<=100),p=pubSmallN(b)>0;return c&&p?"למסחר ולמבנה הציבור":p?"למבנה הציבור":"למסחר"}
 function comExtras(b,skip){const ex=[];let sm=comSmall(b)-(skip||0);
   while(sm>0){if(sm>6){const m=Math.min(12,sm);ex.push({k:"c12",meters:m,label:"מסחר"});sm-=m}else{ex.push({k:"c6",meters:sm,label:"מסחר"});sm=0}}
-  comConns(b).filter(c=>c.amps>100).forEach(c=>{for(let k=0;k<c.n;k++)ex.push({pair:true,gt:c.amps>315,amps:c.amps,label:"מסחר "+c.sz})});return ex}
+  comConns(b).filter(c=>c.amps>100).forEach(c=>{for(let k=0;k<c.n;k++)ex.push({pair:true,gt:c.amps>315,amps:c.amps,label:"מסחר "+c.sz})});{const pc=pubConn(b);if(pc&&pc.amps>100)ex.push({pair:true,gt:pc.amps>315,amps:pc.amps,label:"מבנה ציבור "+pc.sz})}return ex}
 // נישת מונים: אותה חלוקה לארונות כמו בחדר המונים – ארון 12 מונים 150 ס"מ, ארון 6 מונים 90 ס"מ
 function nicheCabs(b){const u=Math.max(0,Math.floor(num(b.units)||0));const pa=mrAmps(pubSize(b));const pub=pa<=100?1:0;
   const mt=u+pub,rem=mt%12;let n12=Math.floor(mt/12)+(rem>6?1:0),n6=(rem>=1&&rem<=6)?1:0;
@@ -767,23 +775,23 @@ function updateParkingChecks(){
 function trafoSuggest(){const u=totVal("units")||0;const nU=u?Math.ceil(u/100):0;
   const pub=S.buildings.reduce((a,b)=>a+mrAmps(pubSize(b)),0);
   const com=S.buildings.reduce((a,b)=>a+comConns(b).reduce((x,c)=>x+c.amps*c.n,0),0);
-  const pk=S.parking.has?mrAmps(S.parking.baseSize||"3X400"):0;const A=pub+com+pk;
+  const pb=S.buildings.reduce((a,b)=>a+(pubConn(b)?.amps||0),0);const pk=S.parking.has?mrAmps(S.parking.baseSize||"3X400"):0;const A=pub+com+pk+pb;
   const nA=A>630?Math.ceil(A/630)-1:0;const n=Math.max(1,nU+nA);
   const rooms=[];let left=n;const nr=Math.ceil(n/3);for(let k=0;k<nr;k++){const c=Math.ceil(left/(nr-k));rooms.push(c);left-=c}
-  return{u,nU,pub,com,pk,A,nA,n,rooms}}
+  return{u,nU,pub,com,pk,pb,A,nA,n,rooms}}
 function trafoRooms(){const T=S.trafo;if(!Array.isArray(T.rooms)||!T.rooms.length)return trafoSuggest().rooms.map(c=>c);return T.rooms.map(x=>Number(x)||1)}
 function trafoCount(id){return {1:1,2:2,3:3,4:1,5:2,6:0,7:0}[id]||0}
 function renderTrafo(){
   const T=S.trafo;const sg=trafoSuggest();const rooms=trafoRooms();const auto=!Array.isArray(T.rooms)||!T.rooms.length;
   const tot=rooms.reduce((a,id)=>a+trafoCount(id),0);
-  const sugTxt=`הצעה: ${sg.n} ${sg.n>1?"שנאים":"שנאי"}${sg.n>3?` ב-${sg.rooms.length} חדרים (${sg.rooms.join(" + ")})`:""} – ${sg.nU} לדירות (${fmt(sg.u)} יח"ד, שנאי לכל 100)${sg.nA?` + ${sg.nA} בגין החיבורים`:""}. סך החיבורים: ${fmt(sg.A)}A (ציבורי בניינים ${fmt(sg.pub)}A${sg.com?`, מסחר ${fmt(sg.com)}A`:""}${sg.pk?`, חניון ${fmt(sg.pk)}A`:""})${sg.A>630?" – מעל 630A":""}.`;
+  const sugTxt=`הצעה: ${sg.n} ${sg.n>1?"שנאים":"שנאי"}${sg.n>3?` ב-${sg.rooms.length} חדרים (${sg.rooms.join(" + ")})`:""} – ${sg.nU} לדירות (${fmt(sg.u)} יח"ד, שנאי לכל 100)${sg.nA?` + ${sg.nA} בגין החיבורים`:""}. סך החיבורים: ${fmt(sg.A)}A (ציבורי בניינים ${fmt(sg.pub)}A${sg.com?`, מסחר ${fmt(sg.com)}A`:""}${sg.pb?`, מבנה ציבור ${fmt(sg.pb)}A`:""}${sg.pk?`, חניון ${fmt(sg.pk)}A`:""})${sg.A>630?" – מעל 630A":""}.`;
   $("#trafo").innerHTML=seg("treq","trafo.req",[{v:"false",t:"לא נדרש"},{v:"true",t:"נדרש חדר שנאים"}],T.req)+
    `<div class="msg info" style="margin-top:8px">${esc(sugTxt)}</div>`+
    (T.req?`<div class="grid" style="margin-top:10px"><label class="f">מספר חדרי שנאים<select id="t-nrooms">${[1,2,3,4,5].map(k=>`<option ${rooms.length===k?"selected":""}>${k}</option>`).join("")}</select></label>
      ${rooms.map((id,k)=>`<label class="f">חדר שנאים ${k+1}<select id="t-room${k}" data-troom="${k}">${TRAFO.map(t=>`<option value="${t.id}" ${id===t.id?"selected":""}>${esc(t.name)}</option>`).join("")}</select></label>`).join("")}</div>
      <div class="muted" style="margin-top:6px">סה"כ ${tot} ${tot===1?"שנאי":"שנאים"}${auto?" (לפי ההצעה)":` · <button type="button" class="btn" style="padding:3px 10px;font-size:13px" id="t-auto">חזרה להצעה</button>`}. בחדר שנאים אחד – עד 3 שנאים.</div>
    ${S.project.district!=="דן"?`<div class="msg warn" style="margin-top:8px">המידות לפי מחוז דן. במסמך תתווסף הערה לתיאום מול מחוז ${esc(S.project.district)}.</div>`:""}
-   ${help(`ברירת המחדל: שנאי לכל 100 יח"ד (למשל 150 יח"ד – 2 שנאים). אם סך חיבורי המסחר, החיבור הציבורי של החניון והחיבורים הציבוריים של הבניינים עובר 630 אמפר – נוסף שנאי לכל 630 אמפר נוספים. בחדר שנאים עד 3 שנאים; מעל 3 – כמה חדרים. אפשר לשנות את מספר החדרים ואת הרכב כל חדר.<br>המידות, פתחי האוורור ומרחקי הקרינה לקוחים ממסמך "ריכוז הנחיות חדרי טרפו במחוז דן" של המשרד.`)}`:"");
+   ${help(`ברירת המחדל: שנאי לכל 100 יח"ד (למשל 150 יח"ד – 2 שנאים). אם סך חיבורי המסחר, חיבורי מבני הציבור, החיבור הציבורי של החניון והחיבורים הציבוריים של הבניינים עובר 630 אמפר – נוסף שנאי לכל 630 אמפר נוספים. בחדר שנאים עד 3 שנאים; מעל 3 – כמה חדרים. אפשר לשנות את מספר החדרים ואת הרכב כל חדר.<br>המידות, פתחי האוורור ומרחקי הקרינה לקוחים ממסמך "ריכוז הנחיות חדרי טרפו במחוז דן" של המשרד.`)}`:"");
 }
 document.addEventListener("change",e=>{const el=e.target;
   if(el.id==="t-nrooms"){const n=+el.value;const r=trafoRooms().slice(0,n);while(r.length<n)r.push(1);S.trafo.rooms=r;save();renderTrafo();renderDoc();return}
@@ -892,11 +900,11 @@ function buildingItems(b,i,raw){
   // upper basement (or ground if no basement)
   if(down){
     if(isRoom(b)){const c=mrCalc(b);const man=num(b.roomLen)||num(b.roomWid);const w=num(b.roomWid)||(c?c.W:roomWidth(b)),l=num(b.roomLen)||(c?c.L:mrLen(u,com));
-      const eq=c?[c.sg.f1000?`${c.sg.f1000} פילר 1000`:"",c.sg.f2?"פילר 2":"",c.sg.f0?"פילר 0":"",c.r.n12?(c.r.n12>1?`${c.r.n12} ארונות 12 מונים`:"ארון 12 מונים"):"",c.r.n6?"ארון 6 מונים":"",mrAmps(c.pub)<=100?`מונה לחיבור הציבורי של הבניין ${c.pub}`:"",mrAmps(c.pub)>100?`ארון מדידה ומפסק ראשי לחיבור הציבורי ${c.pub}`:"",S.parking.baseBld===i?`ארון מדידה ומפסק ראשי לחיבור הציבורי המשותף של המרתף ${S.parking.baseSize||"3X400"}`:"",...(()=>{const sh=c.comShare||0;const ce=comExtras(b,sh);const sm=comSmall(b)-sh;const big=ce.filter(e=>e.pair);const sc=ce.filter(e=>!e.pair);return [sh?(sh>1?`${sh} מוני המסחר בארון 6 המונים יחד עם המונה הציבורי`:"מונה המסחר בארון 6 המונים יחד עם המונה הציבורי"):"",sm?`${sc.length>1?sc.length+" ארונות":"ארון"} ${sc.every(e=>e.k==="c6")?"6":"12"} מונים למסחר (${sm} ${sm>1?"מונים":"מונה"})`:"",...big.map(e=>`ארון מדידה ומפסק ראשי למסחר ${e.label.replace("מסחר ","")}`)]})()].filter(Boolean).join(", "):"";
+      const eq=c?[c.sg.f1000?`${c.sg.f1000} פילר 1000`:"",c.sg.f2?"פילר 2":"",c.sg.f0?"פילר 0":"",c.r.n12?(c.r.n12>1?`${c.r.n12} ארונות 12 מונים`:"ארון 12 מונים"):"",c.r.n6?"ארון 6 מונים":"",mrAmps(c.pub)<=100?`מונה לחיבור הציבורי של הבניין ${c.pub}`:"",mrAmps(c.pub)>100?`ארון מדידה ומפסק ראשי לחיבור הציבורי ${c.pub}`:"",S.parking.baseBld===i?`ארון מדידה ומפסק ראשי לחיבור הציבורי המשותף של המרתף ${S.parking.baseSize||"3X400"}`:"",...(()=>{const sh=c.comShare||0;const ce=comExtras(b,sh);const sm=comSmall(b)-sh;const big=ce.filter(e=>e.pair);const sc=ce.filter(e=>!e.pair);return [sh?`${sh>1?sh+" מונים":"מונה"} ${smLabel(b)} בארון 6 המונים יחד עם המונה הציבורי`:"",sm?`${sc.length>1?sc.length+" ארונות":"ארון"} ${sc.every(e=>e.k==="c6")?"6":"12"} מונים ${smLabel(b)} (${sm} ${sm>1?"מונים":"מונה"})`:"",...big.map(e=>`ארון מדידה ומפסק ראשי ל${e.label}`)]})()].filter(Boolean).join(", "):"";
       push(U,{key:"mroom",name:`חדר מוני חח"י ל-${fmt(u)} יח"ד`,room:true,w,l,
       note:(c&&eq?`החדר כולל: ${eq} (${c.one?"ארונות בצד אחד":"ארונות בשני הצדדים"}). `:"")+`גובה החדר 2.5 מ' נטו לפחות. רצפה כפולה בגובה 80 ס"מ נטו. דלת אש 30/90 נפתחת החוצה לכיוון לובי הבניין עם מנעול כפול חח"י + דיירים. מתחת לפיר הכבלים לדירות.`})}
     else{{const nc=nicheCabs(b);const cab=[nc.n12?(nc.n12>1?`${nc.n12} ארונות 12 מונים`:"ארון 12 מונים"):"",nc.n6?(nc.n6>1?`${nc.n6} ארונות 6 מונים`:"ארון 6 מונים"):""].filter(Boolean).join(" ו");
-      push(U,{key:"mniche",name:`נישת מוני חח"י ל-${fmt(nc.meters)} מונים`,w:nc.w,bk:nc.bk,d:50,h:240,note:`${nc.bk?"נישה נפרדת לכל ארון עם קיר הפרדה 10 ס\"מ ביניהן":`הנישה ל${/^\d/.test(cab)?"-":""}${cab}`} (כולל המונה הציבורי של הבניין${comSmall(b)?" ומוני המסחר":""}). באזור לובי הבניין, 1.4 מ' פנוי מול הנישה, קרוב לפיר הכבלים מהדירות.`})}
+      push(U,{key:"mniche",name:`נישת מוני חח"י ל-${fmt(nc.meters)} מונים`,w:nc.w,bk:nc.bk,d:50,h:240,note:`${nc.bk?"נישה נפרדת לכל ארון עם קיר הפרדה 10 ס\"מ ביניהן":`הנישה ל${/^\d/.test(cab)?"-":""}${cab}`} (כולל המונה הציבורי של הבניין${comSmall(b)?` והמונים ${smLabel(b)}`:""}). באזור לובי הבניין, 1.4 מ' פנוי מול הנישה, קרוב לפיר הכבלים מהדירות.`})}
       push(U,{key:"mainp",name:"לוח חשמל ראשי בניין",w:100,d:50})}
   }else push(U,{key:"proom",name:"חדר פילרים של חח\"י",room:true,w:320,l:u>100?550:450,note:"רצפה כפולה 80 ס\"מ, מתחת לפיר חח\"י. דלת אש 30/90 נפתחת החוצה עם מנעול כפול חח\"י + דיירים."});
   push(U,{key:"bzq",name:"נישה לארון בזק ראשי",w:u<=60?100:120,d:40});
@@ -944,7 +952,7 @@ function buildDoc(){
   push("h2",{text:`${n}. נתוני יסוד`});
   const Pk=S.parking;const devN=Pk.dev?(num(Pk.devCount)||0):0;const tot=totVal("pkS");const pkA=totVal("pkA");
   push("ul",{items:[...(projUnits()?[`סה"כ בפרויקט: ${fmt(projUnits())} יח"ד.`]:[]),...order.map(i=>[S.buildings[i],i]).map(([b,i])=>`${useGroups&&b.struct?`${grpLabel(b.struct)} – `:""}${bldLabel(bn(b,i))}${b.floors?` – ${b.floors} קומות מעל קומת הקרקע`:""}, ${b.units?fmt(num(b.units))+" יח\"ד":"מספר יח\"ד טרם הוזן"}${b.perFloor?` (עד ${b.perFloor} דירות בקומה)`:""} – ${catLong(b.cat)}.`+
-(num(b.offArea)?` תעסוקה ${fmt(num(b.offArea))} מ"ר.`:"")+(hasPub(b)?` ${pubName(b)}${num(b.pubArea)?` ${fmt(num(b.pubArea))} מ"ר`:""}.`:"")),
+(num(b.offArea)?` תעסוקה ${fmt(num(b.offArea))} מ"ר.`:"")+(hasPub(b)?` ${pubName(b)}${num(b.pubArea)?` ${fmt(num(b.pubArea))} מ"ר`:""}, חיבור חשמל: ${pubConn(b).sz}.`:"")),
     ...(Pk.has?[`חניון תת-קרקעי משותף: ${Pk.floors} קומות${pkA?`, ${fmt(pkA)} מ"ר`:""}${tot!=null?`, ${fmt(tot)} חניות`:""}${Pk.dev?`, ועוד ${fmt(devN)} חניות בפיתוח`:""}.`]:Pk.dev?[`חניות בפיתוח: ${fmt(devN)}.`]:[]),
     ...(()=>{const cb=order.map(i=>[S.buildings[i],i]).filter(([b])=>b.com);if(!cb.length)return [];const tA=cb.reduce((a,[b])=>a+(num(b.comArea)||0),0);
       return [`מסחר: ${cb.map(([b,i])=>`${useGroups&&b.struct?`${grpLabel(b.struct)} – `:""}${bldLabel(bn(b,i))}${num(b.comArea)?` – ${fmt(num(b.comArea))} מ"ר`:""}${comText(b)?`, חיבורי חשמל: ${comText(b)}`:""}`).join("; ")}${cb.length>1&&totVal("com")?` (סה"כ ${fmt(totVal("com"))} מ"ר)`:""}.`]})()]});
@@ -1224,20 +1232,35 @@ async function exportXlsx(){
 }
 async function exportPdf(){
   if(!window.html2pdf){status("ספריית PDF לא נטענה. נסו לרענן את הדף.");return null}
-  // the document is rendered in chunks (one per chapter that starts on a new page) so a long document never exceeds the browser canvas limit
-  const src=$("#sheet");const nodes=[...src.cloneNode(true).childNodes];
-  const host=document.createElement("div");host.style.cssText="position:absolute;left:0;top:0;width:730px;z-index:-1;pointer-events:none";document.body.appendChild(host);
-  const mk=()=>{const d=document.createElement("div");d.className="sheet for-pdf";d.style.cssText="width:100%;box-shadow:none;border-radius:0;padding:6px 4px";host.appendChild(d);return d};
-  const chunks=[];let cur=mk();chunks.push(cur);
-  for(const nd of nodes){if(nd.nodeType===1&&nd.tagName==="H2"&&nd.classList.contains("pb-soft")&&cur.childNodes.length){cur=mk();chunks.push(cur)}
-    if(nd.nodeType===1){nd.classList.remove("pb-soft");nd.querySelectorAll?.("img").forEach(i=>i.removeAttribute("loading"))}cur.appendChild(nd)}
-  // split chunks that are still too tall for one canvas
-  const MAXH=9000;for(let k=0;k<chunks.length;k++){const c=chunks[k];if(c.scrollHeight<=MAXH)continue;const kids=[...c.childNodes];const n2=mk();host.insertBefore(n2,c.nextSibling);
-    let acc=0;let cut=kids.length;for(let j=0;j<kids.length;j++){acc+=(kids[j].offsetHeight||0);if(acc>MAXH*0.8&&j>0){cut=j;break}}kids.slice(cut).forEach(x=>n2.appendChild(x));if(n2.childNodes.length)chunks.splice(k+1,0,n2);else n2.remove()}
-  await Promise.all([...host.querySelectorAll("img")].map(i=>i.decode?i.decode().catch(()=>{}):null));
-  const opt={margin:[10,8,12,8],image:{type:"jpeg",quality:.9},html2canvas:{scale:1.7,useCORS:true,backgroundColor:"#ffffff",scrollX:0,scrollY:0},jsPDF:{unit:"mm",format:"a4",orientation:"portrait"},pagebreak:{mode:["css","legacy"],avoid:["table","figure",".key",".note","li"]}};
-  try{let w=html2pdf().set(opt).from(chunks[0]).toPdf();
-    for(const c of chunks.slice(1))w=w.get("pdf").then(pdf=>{pdf.addPage()}).from(c).toContainer().toCanvas().toPdf();
+  // page-by-page layout: the document is cut into atoms (blocks, list items, table rows) that are packed into A4 pages,
+  // so no line, row or drawing is ever split between pages
+  const W=730,PAGE=Math.floor((297-10-12)*W/(210-8-8))-24;
+  const host=document.createElement("div");host.style.cssText=`position:absolute;left:0;top:0;width:${W}px;z-index:-1;pointer-events:none`;document.body.appendChild(host);
+  const mk=()=>{const d=document.createElement("div");d.className="sheet for-pdf";d.style.cssText="width:100%;box-shadow:none;border-radius:0;padding:6px 4px;margin:0;max-width:none";host.appendChild(d);return d};
+  try{
+    const src=$("#sheet").cloneNode(true);src.querySelectorAll("img").forEach(i=>i.removeAttribute("loading"));
+    const atoms=[];
+    for(const nd of [...src.childNodes]){if(nd.nodeType!==1)continue;
+      const keep=/^H[1-4]$/.test(nd.tagName)||nd.classList.contains("key");const brk=nd.tagName==="H2"&&nd.classList.contains("pb-soft");nd.classList.remove("pb-soft");
+      if((nd.tagName==="OL"||nd.tagName==="UL")&&nd.children.length>1){const lis=[...nd.children];lis.forEach((li,k)=>{const c=nd.cloneNode(false);if(k>0)c.style.marginTop="0";if(k<lis.length-1)c.style.marginBottom="0";c.appendChild(li);atoms.push({el:c,brk:brk&&k===0})});continue}
+      if(nd.tagName==="TABLE"&&nd.tBodies[0]&&nd.tBodies[0].rows.length>6){const rows=[...nd.tBodies[0].rows];const th=nd.tHead;for(let k=0;k<rows.length;k+=6){const c=nd.cloneNode(false);if(th)c.appendChild(th.cloneNode(true));const tb=document.createElement("tbody");rows.slice(k,k+6).forEach(r=>tb.appendChild(r));c.appendChild(tb);if(k>0)c.style.marginTop="0";atoms.push({el:c,brk:brk&&k===0})}continue}
+      atoms.push({el:nd,keep,brk})}
+    // measure
+    const meas=mk();atoms.forEach(a=>meas.appendChild(a.el));
+    await Promise.all([...meas.querySelectorAll("img")].map(i=>i.decode?i.decode().catch(()=>{}):null));
+    atoms.forEach(a=>{const cs=getComputedStyle(a.el);a.h=a.el.getBoundingClientRect().height+(parseFloat(cs.marginTop)||0)+(parseFloat(cs.marginBottom)||0)});
+    // pack into pages
+    const pages=[];let cur=[],used=0;
+    for(let k=0;k<atoms.length;k++){const a=atoms[k];let need=a.h;
+      if(a.keep){let j=k+1;while(j<atoms.length&&atoms[j].keep){need+=atoms[j].h;j++}if(j<atoms.length)need+=Math.min(atoms[j].h,PAGE/3)}
+      if(cur.length&&(a.brk||used+need>PAGE)){pages.push(cur);cur=[];used=0}
+      cur.push(a);used+=a.h}
+    if(cur.length)pages.push(cur);
+    meas.remove();
+    const divs=pages.map(pg=>{const d=mk();pg.forEach(a=>d.appendChild(a.el));return d});
+    const opt={margin:[10,8,12,8],image:{type:"jpeg",quality:.92},html2canvas:{scale:2,useCORS:true,backgroundColor:"#ffffff",scrollX:0,scrollY:0},jsPDF:{unit:"mm",format:"a4",orientation:"portrait"},pagebreak:{mode:["avoid-all"]}};
+    let w=html2pdf().set(opt).from(divs[0]).toPdf();
+    for(const d of divs.slice(1))w=w.get("pdf").then(pdf=>{pdf.addPage()}).from(d).toContainer().toCanvas().toPdf();
     return await w.outputPdf("blob")}
   finally{host.remove()}
 }
@@ -1299,7 +1322,7 @@ document.addEventListener("change",async e=>{const el=e.target;
   if(el.type==="radio"||el.tagName==="SELECT"){setPath(k,coerce(el));save();
     if(/^buildings\./.test(k)||k==="parking.baseSize"){reRenderBuildings();renderParking()}else if(k.startsWith("parking.")){renderParking();refreshOv()}else if(k.startsWith("trafo."))renderTrafo();else if(k==="project.district"){renderTrafo();renderProcess()}
     renderDoc();return}
-  if(/^buildings\.\d+\.(units|floors|roomLen|roomWid|kva|struct)$/.test(k)){if(PDOWN)PEND=true;else reRenderBuildings()}
+  if(/^buildings\.\d+\.(units|floors|roomLen|roomWid|kva|struct|pubArea)$/.test(k)){if(PDOWN)PEND=true;else reRenderBuildings()}
 });
 // רענון שנדחה עד שחרור העכבר – כדי שלחיצה על לשונית / כפתור אחרי הקלדה לא "תיבלע"
 let PDOWN=false,PEND=false;document.addEventListener("pointerdown",()=>{PDOWN=true},true);
