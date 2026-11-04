@@ -199,7 +199,7 @@ table.cmp td:first-child{width:28px}
       <img class="logo" src="assets/tiktin-logo.png" alt="טיקטין תכנון חשמל">
       <div>
         <h1>הכנה אוטומטית של הנחיות חשמל לפרויקט מגורים ועירוב שימושים</h1>
-        <p>הנחיות ראשוניות לאדריכל · טופס לכל מגרש · <span class="ver">גרסה V18 · 13.10.2026</span></p>
+        <p>הנחיות ראשוניות לאדריכל · טופס לכל מגרש · <span class="ver">גרסה V19 · 04.11.2026</span></p>
       </div>
     </div>
     <div class="head-actions">
@@ -408,6 +408,15 @@ const PROCESS={
  "שרון":[],"ירושלים":[],"אחר":[]};
 
 /* ================= state ================= */
+/* ---- קבלת נתונים מאפליקציה אחרת של המשרד + כפתור חזרה ---- */
+const TK_HANDOFF=(function(KEY){ let h=null; try{ const u=new URL(location.href);
+  if(u.searchParams.has('handoff')){ const o=JSON.parse(localStorage.getItem('tiktin_handoff')||'null');
+    if(o&&o.to===KEY&&Date.now()-o.ts<1800000){ h=o; localStorage.removeItem('tiktin_handoff'); sessionStorage.setItem('tiktin_return_'+KEY,JSON.stringify({url:o.returnUrl,title:o.fromTitle})); }
+    u.searchParams.delete('handoff'); history.replaceState(null,'',u.pathname+u.search+u.hash); }
+  const r=JSON.parse(sessionStorage.getItem('tiktin_return_'+KEY)||'null');
+  if(r&&r.url){ const add=()=>{ const hd=document.querySelector('header'); if(!hd||hd.querySelector('.tk-back')) return; const a=document.createElement('a'); a.href=r.url; a.className='tk-back'; a.textContent='↩ חזרה ל'+r.title; a.title='חזרה לאפליקציה הקודמת – הנתונים שמולאו שם נשמרו'; a.style.cssText='display:inline-flex;align-items:center;height:34px;padding:0 12px;border:1.5px solid #c8202f;border-radius:8px;color:#c8202f;background:#fff;font-size:14px;font-weight:600;text-decoration:none;white-space:nowrap;flex:none'; a.addEventListener('click',()=>{ try{ sessionStorage.removeItem('tiktin_return_'+KEY); }catch(e){} }); hd.appendChild(a); };
+    if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',add); else add(); }
+}catch(e){} return h; })('guidelines');
 const LS="tiktin-arch-guidelines-v1";
 const PUBTYPES=[{v:"",t:"לא ידוע"},{v:"אין",t:"אין"},{v:"גן ילדים",t:"גן ילדים"},{v:"מעון יום",t:"מעון יום"},{v:"בית ספר",t:"בית ספר"},{v:"מתנ״ס",t:"מתנ״ס"},{v:"בית כנסת",t:"בית כנסת"},{v:"מבנה ציבור",t:"מבנה ציבור אחר"}];
 const hasPub=b=>(num(b.pubArea)||0)>0||(!!String(b.pubType||"").trim()&&b.pubType!=="אין");
@@ -423,6 +432,7 @@ function defaults(){return {project:{name:"",iso:"",dev:"",arch:"",city:"",distr
 let S=defaults();
 try{const raw=localStorage.getItem(LS);if(raw){const o=JSON.parse(raw);if(o&&o.project&&Array.isArray(o.buildings))S=Object.assign(defaults(),o)}}catch(e){}
 S.buildings.forEach(b=>{b.ov=b.ov||{};["struct","floors","perFloor","offArea","pubArea","pubType"].forEach(k=>{if(b[k]==null)b[k]=""})});S.parking.ov=S.parking.ov||{};
+if(TK_HANDOFF&&TK_HANDOFF.state){ const h=TK_HANDOFF.state; S=defaults(); Object.assign(S.project,h.project||{}); if(Array.isArray(h.buildings)&&h.buildings.length) S.buildings=h.buildings.map((b,i)=>Object.assign(newBuilding(i),b)); Object.assign(S.parking,h.parking||{}); if(S.parking.has) S.parking.over=S.buildings.map((b,i)=>i); const d=DISTRICT_OF[(S.project.city||'').trim()]; if(d) S.project.district=d; try{ localStorage.setItem(LS,JSON.stringify(S)); }catch(e){} }
 function save(){try{localStorage.setItem(LS,JSON.stringify(S))}catch(e){}}
 
 /* ================= helpers ================= */
