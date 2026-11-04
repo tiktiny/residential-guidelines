@@ -199,7 +199,7 @@ table.cmp td:first-child{width:28px}
       <img class="logo" src="assets/tiktin-logo.png" alt="טיקטין תכנון חשמל">
       <div>
         <h1>הכנה אוטומטית של הנחיות חשמל לפרויקט מגורים ועירוב שימושים</h1>
-        <p>הנחיות ראשוניות לאדריכל · טופס לכל מגרש · <span class="ver">גרסה V19 · 04.11.2026</span></p>
+        <p>הנחיות ראשוניות לאדריכל · טופס לכל מגרש · <span class="ver">גרסה V20 · 04.11.2026</span></p>
       </div>
     </div>
     <div class="head-actions">
@@ -378,7 +378,7 @@ table.cmp td:first-child{width:28px}
 <script>
 "use strict";
 /* ================= reference data ================= */
-const CATS=[{v:"low",t:"עד 29 מ'"},{v:"mid",t:"29–42 מ'"},{v:"high",t:"42–128 מ'"}];
+const CATS=[{v:"low",t:"עד 29 מ'"},{v:"mid",t:"29 עד 42 מ'"},{v:"high",t:"מעל 42 מ' – מגדל"}];
 const catText=v=>(CATS.find(c=>c.v===v)||CATS[0]).t;
 const DISTRICT_OF={"תל אביב":"דן","תל אביב-יפו":"דן","תל אביב יפו":"דן","רמת גן":"דן","גבעתיים":"דן","חולון":"דן","בת ים":"דן","בני ברק":"דן",
  "רחובות":"שפלה","נס ציונה":"שפלה","אשדוד":"שפלה","ראשון לציון":"שפלה","אשקלון":"שפלה",
@@ -949,7 +949,7 @@ function buildDoc(){
   const today=new Intl.DateTimeFormat("he-IL",{day:"2-digit",month:"2-digit",year:"numeric"}).format(new Date());
   const bn=(b,i)=>b.name||("בניין "+(i+1));
   const fl=(b,i)=>(String(b.struct||"").trim()?grpLabel(b.struct)+" – ":"")+bldLabel(bn(b,i));
-  const catLong=c=>c==="low"?"בניין גבוה (עד 29 מ')":c==="mid"?"בניין רב קומות (29–42 מ')":"בניין רב קומות מעל 42 מ' ועד 128 מ'";
+  const catLong=c=>c==="low"?"בניין גבוה (עד 29 מ')":c==="mid"?"בניין רב קומות (29–42 מ')":"מגדל (מעל 42 מ')";
   push("head",{date:today});
   push("h1",{text:"הנחיות חשמל ראשוניות"});
   push("meta",{rows:[["שם הפרויקט",P.name],["מספר ISO",P.iso],["יזם",P.dev],["אדריכל",P.arch],["עיר",P.city],["תאריך",today],["הוכן ע\"י","משרד טיקטין תכנון חשמל"]]});
