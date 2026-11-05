@@ -199,7 +199,7 @@ table.cmp td:first-child{width:28px}
       <img class="logo" src="assets/tiktin-logo.png" alt="טיקטין תכנון חשמל">
       <div>
         <h1>הכנה אוטומטית של הנחיות חשמל לפרויקט מגורים ועירוב שימושים</h1>
-        <p>הנחיות ראשוניות לאדריכל · טופס לכל מגרש · <span class="ver">גרסה V20 · 04.11.2026</span></p>
+        <p>הנחיות ראשוניות לאדריכל · טופס לכל מגרש · <span class="ver">גרסה V21 · 05.11.2026</span></p>
       </div>
     </div>
     <div class="head-actions">
@@ -749,6 +749,10 @@ function mrPlanSVG(c,roomL,roomW){
   s+=`<text x="${pad+Wpx/2}" y="${pad-T-10}" font-size="12" text-anchor="middle" fill="${mut}">${Math.max(roomL||0,r.L)}</text><text x="${pad+Wpx+T+14}" y="${pad+Hpx/2}" font-size="12" text-anchor="middle" fill="${mut}" transform="rotate(-90 ${pad+Wpx+T+14} ${pad+Hpx/2})">${width}</text>`;
   return s+"</svg>"}
 
+function baseLoc(){const P=S.parking;if(P.baseBld>=0&&S.buildings[P.baseBld])return "b:"+P.baseBld;return P.baseLoc==="trafo"||P.baseLoc==="hv"?P.baseLoc:""}
+document.addEventListener("change",e=>{const el=e.target;if(el.id!=="pk-baseloc")return;const P=S.parking;const v=el.value;
+  if(v.startsWith("b:")){P.baseBld=+v.slice(2);P.baseLoc=""}else{P.baseBld=-1;P.baseLoc=v}
+  save();renderParking();reRenderBuildings();renderDoc()});
 function renderParking(){
   const P=S.parking;const floors=Math.max(1,Math.min(8,parseInt(P.floors)||1));
   while(P.perFloor.length<floors)P.perFloor.push({area:"",spaces:""});P.perFloor.length=floors;
@@ -762,7 +766,16 @@ function renderParking(){
     </tbody></table></div>
     <div id="pk-checks" style="display:flex;flex-direction:column;gap:6px;margin-top:8px"></div>
     <div class="fieldset" style="margin-top:10px"><span class="lbl">בניינים מעל המרתף המשותף</span>
-      <div class="chips">${S.buildings.map((b,i)=>`<label class="chk"><input type="checkbox" data-over="${i}" ${P.over.includes(i)?"checked":""}>${esc(b.name||("בניין "+(i+1)))}</label>`).join("")}</div></div>`;
+      <div class="chips">${S.buildings.map((b,i)=>`<label class="chk"><input type="checkbox" data-over="${i}" ${P.over.includes(i)?"checked":""}>${esc(b.name||("בניין "+(i+1)))}</label>`).join("")}</div></div>
+    ${(()=>{const loc=baseLoc();const rooms=S.buildings.map((b,i)=>[b,i]).filter(([b])=>isRoom(b));
+      return `<div class="fieldset" style="margin-top:10px"><span class="lbl">מיקום החיבור הציבורי של המרתף המשותף</span>
+      <div class="grid"><label class="f">מיקום החיבור<select id="pk-baseloc"><option value="" ${loc===""?"selected":""}>טרם נקבע</option>
+        ${rooms.map(([b,i])=>`<option value="b:${i}" ${loc==="b:"+i?"selected":""}>בחדר המונים של ${esc(bldLabel(b.name||String(i+1)))}</option>`).join("")}
+        <option value="trafo" ${loc==="trafo"?"selected":""}>צמוד לתחנת חברת החשמל</option>
+        <option value="hv" ${loc==="hv"?"selected":""}>חיבור מתח גבוה</option></select></label>
+        ${loc&&loc!=="hv"?`<label class="f">גודל החיבור<select id="pk-bsz" data-k="parking.baseSize">${MR_SIZES.map(z=>`<option ${P.baseSize===z?"selected":""}>${z}</option>`).join("")}</select></label>`:""}</div>
+      ${loc==="hv"?`<label class="f" style="margin-top:6px">הנחיות חיבור מתח גבוה בחניון (שורה לכל הנחיה – יופיעו בסוף פרק המרתף)<textarea id="pk-hv" data-k="parking.hvText" rows="5" style="font:inherit;font-size:15px;border:1px solid var(--line);border-radius:7px;padding:8px 10px;background:#fff;color:#1e2226;resize:vertical" placeholder="למשל: חדר מתח גבוה צמוד לתחנת השנאים...">${esc(P.hvText||"")}</textarea></label>`:""}
+      ${rooms.length?"":`<div class="muted">אין כרגע בניין עם חדר מונים – אפשר לבחור צמוד לתחנה או מתח גבוה.</div>`}</div>`})()}`;
   }
   html+=`<div class="fieldset" style="margin-top:12px"><span class="lbl">חניות בפיתוח</span>${seg("pdev","parking.dev",[{v:"false",t:"אין"},{v:"true",t:"יש"}],P.dev)}
     ${P.dev?`<div class="grid"><label class="f">מספר חניות בפיתוח<input type="number" min="0" id="pk-dev" data-k="parking.devCount" value="${esc(P.devCount)}"></label></div>`:""}
@@ -778,14 +791,16 @@ function updateParkingChecks(){
   if(tA!=null&&!anyA)out.push(`<div class="msg info">הצעה לסה"כ חניות: ${Math.floor(tA/45)} (1 ל-45 מ"ר)</div>`);
   const tS=num(P.total),sS=P.perFloor.reduce((s,f)=>s+(num(f.spaces)||0),0),anyS=P.perFloor.some(f=>num(f.spaces)!=null);
   {const bb=S.buildings[P.baseBld];if(bb&&isRoom(bb))out.push(`<div class="msg ok">חיבור ציבורי מרתף משותף (${esc(P.baseSize||"3X400")}) – בחדר המונים של ${esc(bldLabel(bb.name||("בניין "+(P.baseBld+1))))}</div>`);
-   else if(S.buildings.some(isRoom))out.push(`<div class="msg warn">לא נבחר חדר מונים לחיבור הציבורי המשותף של המרתף – בוחרים בכרטיס הבניין, תחת "מוני חח"י".</div>`)}
+   else if(P.baseLoc==="trafo")out.push(`<div class="msg ok">חיבור ציבורי מרתף משותף (${esc(P.baseSize||"3X400")}) – צמוד לתחנת חברת החשמל</div>`);
+   else if(P.baseLoc==="hv")out.push(`<div class="msg ok">חיבור ציבורי מרתף משותף – חיבור מתח גבוה. ההנחיות שתזינו יופיעו בסוף פרק המרתף.</div>`);
+   else out.push(`<div class="msg warn">לא נקבע מיקום החיבור הציבורי של המרתף המשותף – בוחרים בשדה "מיקום החיבור" למטה.</div>`)}
   box.innerHTML=out.join("");
 }
 // הצעת כמות שנאים: שנאי לכל 100 יח"ד; חיבורי מסחר + חניון + ציבורי בניינים מעל 630A – שנאי נוסף לכל 630A
 function trafoSuggest(){const u=totVal("units")||0;const nU=u?Math.ceil(u/100):0;
   const pub=S.buildings.reduce((a,b)=>a+mrAmps(pubSize(b)),0);
   const com=S.buildings.reduce((a,b)=>a+comConns(b).reduce((x,c)=>x+c.amps*c.n,0),0);
-  const pb=S.buildings.reduce((a,b)=>a+(pubConn(b)?.amps||0),0);const pk=S.parking.has?mrAmps(S.parking.baseSize||"3X400"):0;const A=pub+com+pk+pb;
+  const pb=S.buildings.reduce((a,b)=>a+(pubConn(b)?.amps||0),0);const pk=S.parking.has&&S.parking.baseLoc!=="hv"?mrAmps(S.parking.baseSize||"3X400"):0;const A=pub+com+pk+pb;
   const nA=A>630?Math.ceil(A/630)-1:0;const n=Math.max(1,nU+nA);
   const rooms=[];let left=n;const nr=Math.ceil(n/3);for(let k=0;k<nr;k++){const c=Math.ceil(left/(nr-k));rooms.push(c);left-=c}
   return{u,nU,pub,com,pk,pb,A,nA,n,rooms}}
@@ -1008,7 +1023,9 @@ function buildDoc(){
     if(Pk.has){push("h3",{text:`${n}.${s}. חניון`});s++;
       push("table",{head:["קומה","שטח (מ\"ר)","חניות"],rows:[...Pk.perFloor.map((f,k)=>[`מינוס ${k+1}`,f.area?fmt(num(f.area)):"—",f.spaces?fmt(num(f.spaces)):"—"]),["סה\"כ",pkA?fmt(pkA):"—",tot!=null?fmt(tot):"—"]],num:true});
       const over=Pk.over.filter(k=>S.buildings[k]).map(k=>fl(S.buildings[k],k));if(over.length)push("p",{text:`בניינים מעל המרתף המשותף: ${over.join(", ")}.`});
-      {const bb=S.buildings[Pk.baseBld];if(bb&&isRoom(bb))push("key",{text:`החיבור הציבורי המשותף של המרתף (${Pk.baseSize||"3X400"}) – בחדר המונים של ${fl(bb,Pk.baseBld)}: ארון מדידה ומפסק ראשי.`})}
+      {const bb=S.buildings[Pk.baseBld];if(bb&&isRoom(bb))push("key",{text:`החיבור הציבורי המשותף של המרתף (${Pk.baseSize||"3X400"}) – בחדר המונים של ${fl(bb,Pk.baseBld)}: ארון מדידה ומפסק ראשי.`});
+       else if(Pk.baseLoc==="trafo")push("key",{text:`החיבור הציבורי המשותף של המרתף (${Pk.baseSize||"3X400"}) – צמוד לתחנת השנאים של חברת החשמל: ארון מדידה ומפסק ראשי.`});
+       else if(Pk.baseLoc==="hv")push("key",{text:"החיבור הציבורי המשותף של המרתף – חיבור מתח גבוה. ראו הנחיות חיבור מתח גבוה בחניון בסוף פרק זה."})}
 }
     if(anyRoom){
       const cityRestrict=/הרצליה|ראשון/.test(P.city||"");const anyCom=S.buildings.some(b=>b.com);
@@ -1027,6 +1044,8 @@ function buildDoc(){
         ...(cityRestrict?["בעיריית הרצליה ובעיריית ראשון לציון לא מאשרים מיגון קרינה – אין למקם חדר מונים מתחת לדירות או למועדון דיירים אלא בגובה 5 מ' לפחות, ואין לעבור עם תעלות הזנה מתחת לייעודים אלה."]:[]),
         "הערות לתוכניות: \"בחדר זה אין לבצע קירות בין ארונות, אין לבצע דלתות פח ואין להעביר תשתיות מים, ביוב, ניקוז או ספרינקלרים. גובה מינימלי בכל נקודה 250 ס\"מ.\" וכן: \"על הקבלן לבצע כיסוי פח מרוג על פתח כניסת האדם לרצפה הכפולה ועל הרווח שבין הארונות לאחר ביצוע חח\"י.\" בכל חדר יירשמו מספר ההזמנה, מספר יח\"ד וגודל החיבור של כל ארון מדידה."]});
     }
+    if(Pk.has&&Pk.baseLoc==="hv"){push("h3",{text:`${n}.${s}. הנחיות חיבור מתח גבוה בחניון`});s++;
+      const L=String(Pk.hvText||"").split("\n").map(x=>x.trim()).filter(Boolean);push("ul",{items:L.length?L:["[להשלמה]"]})}
     n++;
   }
   // generators
@@ -1324,11 +1343,11 @@ document.addEventListener("change",async e=>{const el=e.target;
   if(el.dataset?.over!=null){const i=+el.dataset.over;S.parking.over=el.checked?[...new Set([...S.parking.over,i])].sort():S.parking.over.filter(x=>x!==i);save();refreshOv();renderDoc();return}
   const k=el.dataset?.k;if(!k)return;
   if(/^base\.\d+$/.test(k)){const i=+k.split(".")[1];const P=S.parking;
-    if(el.value==="false"){if(P.baseBld===i)P.baseBld=-1;save();reRenderBuildings();updateParkingChecks();renderDoc();return}
+    if(el.value==="false"){if(P.baseBld===i)P.baseBld=-1;save();reRenderBuildings();renderParking();renderDoc();return}
     if(P.baseBld>=0&&P.baseBld!==i&&S.buildings[P.baseBld]){const from=bldLabel(S.buildings[P.baseBld].name||("בניין "+(P.baseBld+1))),to=bldLabel(S.buildings[i].name||("בניין "+(i+1)));
       const ok=await askConfirm(`החיבור הציבורי המשותף של המרתף (מונה החניון) נמצא כרגע ב${from}. להעביר את המונה הציבורי של החניון מ${from} ל${to}?`);
       if(!ok){reRenderBuildings();return}toast(`החיבור הציבורי של המרתף הועבר ל${to}`)}
-    P.baseBld=i;save();reRenderBuildings();updateParkingChecks();renderDoc();return}
+    P.baseBld=i;P.baseLoc="";save();reRenderBuildings();renderParking();renderDoc();return}
   if(el.type==="radio"||el.tagName==="SELECT"){setPath(k,coerce(el));save();
     if(/^buildings\./.test(k)||k==="parking.baseSize"){reRenderBuildings();renderParking()}else if(k.startsWith("parking.")){renderParking();refreshOv()}else if(k.startsWith("trafo."))renderTrafo();else if(k==="project.district"){renderTrafo();renderProcess()}
     renderDoc();return}
