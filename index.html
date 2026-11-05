@@ -199,7 +199,7 @@ table.cmp td:first-child{width:28px}
       <img class="logo" src="assets/tiktin-logo.png" alt="טיקטין תכנון חשמל">
       <div>
         <h1>הכנה אוטומטית של הנחיות חשמל לפרויקט מגורים ועירוב שימושים</h1>
-        <p>הנחיות ראשוניות לאדריכל · טופס לכל מגרש · <span class="ver">גרסה V21 · 05.11.2026</span></p>
+        <p>הנחיות ראשוניות לאדריכל · טופס לכל מגרש · <span class="ver">גרסה V22 · 05.11.2026</span></p>
       </div>
     </div>
     <div class="head-actions">
@@ -576,7 +576,8 @@ function renderBuildings(){
           ${c?`<details class="help"><summary>תוכנית העמדה בחדר</summary><div class="body mplan">${mrPlanSVG(c,num(b.roomLen),num(b.roomWid))}</div></details>`:""}`})():`<div class="msg info">נישת מונים בגרעין הבניין, במרתף העליון.</div>`}
           ${meterMsg}
           ${help(`גודל החדר מחושב כמו באפליקציית "תיכנון חדר מונים של חברת חשמל בבניני מגורים": פילר ראשי לפי גובה הבניין ומספר הדירות, ארונות 12 ו-6 מונים, חיבור ציבורי לפי גובה הבניין (עד 29 מ' – 3X40 עד 3X100 לפי המעליות: עד 3 דירות בקומה 3X40, 4 ומעלה 3X63, ניתן לשנות; 29–42 מ' – 3X200, מעל 42 מ' – 3X400), מרווחים 15 ס"מ, רזרבה 10 ס"מ, 65 ס"מ מול דלת ארון פתוחה ומילוט 65 ס"מ ליד דלת 90.<br>ברירת המחדל: עד 29 מ' – ארונות בצד אחד; מעל 29 מ' – שני צדדים (320 ס"מ). המונה הציבורי נכנס למקום פנוי בארון הדירות האחרון; אם אין מקום – ארון 6 מונים, ומוני המסחר עד 3X100 נכנסים לאותו ארון. אחרת – ארון נפרד למסחר.<br>מסחר – גודל החיבור מוצע לפי 0.6 אמפר למ"ר משטח המסחר (אפשר לשנות ולהוסיף חיבורים): חיבורים עד 3X100 בארונות מונים, חיבורים גדולים יותר – ארון מדידה ומפסק ראשי לכל חיבור.<br>אפשר להזין אורך ורוחב אחרים לחדר; הם יופיעו במסמך במקום החישוב.`)}`
-        :`<div class="fieldset"><span class="lbl">רמת גמר</span>${seg(`lux${i}`,`${p}.lux`,[{v:"false",t:"בניין רגיל (עומק ארון 45)"},{v:"true",t:"בניין יוקרה (עומק 60)"}],!!b.lux)}</div>
+        :`${(num(b.perFloor)||0)>6?`<div class="fieldset"><span class="lbl">כבלי חח"י בקומות (מעל 6 דירות בקומה)</span>${seg(`ic${i}`,`${p}.iecCable`,[{v:"95",t:"כבל 95"},{v:"240",t:"כבל 240"}],iecCableType(b))}${(()=>{const R=iecRiser(b);return `<div class="muted">${R.net} כבלי ${R.c} + ${R.spare} ספר – רוחב נישת הכבלים ${R.width} ס"מ</div>`})()}</div>`:""}
+          <div class="fieldset"><span class="lbl">רמת גמר</span>${seg(`lux${i}`,`${p}.lux`,[{v:"false",t:"בניין רגיל (עומק ארון 45)"},{v:"true",t:"בניין יוקרה (עומק 60)"}],!!b.lux)}</div>
           <div class="msg info">נישת כבלי חח"י, ארון מונים קומתי וחדר פילרים – לפי יח"ד, קומות ודירות בקומה (ניתן לשנות ב"מידות הפריטים").</div>`}
       </div>
       <div class="sub"><h4>שימושים נוספים</h4>
@@ -876,6 +877,16 @@ function spec(it){
   if(it.room)return `במידות ${fmt(it.l/100)}X${fmt(it.w/100)} מ'`+(it.h?`, גובה ${fmt(it.h/100)} מ'`:"");
   return `${it.count>1?`${it.count} פירים, כל אחד `:""}`+[it.w?`ברוחב ${fmt(it.w)}${it.bk?` ס"מ (${it.bk.replace(/ = \d+ ס"מ$/," ס\"מ")})`:""}`:"",it.d?`עומק ${fmt(it.d)}`:""].filter(Boolean).join(" ")+` ס"מ`+(it.h?`, גובה ${fmt(it.h)} ס"מ`:"");
 }
+// כבלי חח"י בקומות – אותו חישוב כמו באפליקציית "חישוב רוחב פיר חברת חשמל מונים בקומות" (דירה טיפוסית 5 חד' 3X25, גידול 1% ל-5 שנים)
+const IEC_CB={"95":{limit:160,D:3.4,sp:10,wall:10,bend:51,spare:2},"240":{limit:315,D:5.3,sp:16,wall:10,bend:79.5,spare:1}};
+const IEC_COINC=[[1,1],[2,.95],[3,.9],[4,.87],[5,.81],[6,.75],[7,.72],[8,.7],[9,.68],[10,.65],[11,.64],[12,.63],[13,.62],[14,.61],[15,.6],[18,.59],[20,.58],[25,.57],[30,.56],[35,.55],[40,.54],[45,.53],[50,.52],[60,.51],[70,.5]];
+function iecCableType(b){return (num(b.perFloor)||0)>6&&String(b.iecCable)==="240"?"240":"95"}
+function iecRiser(b){const c=iecCableType(b),K=IEC_CB[c];const pf=num(b.perFloor)||0,fl=num(b.floors)||0,u=Math.max(1,Math.floor(num(b.units)||0));
+  const byFloors=!!(pf&&fl);const floors=byFloors?Array(fl).fill(pf):Array(u).fill(1);const P=9,gf=Math.pow(1.01,5),A=1000/(Math.sqrt(3)*400);
+  const k=n=>{let v=1;for(const [m,x] of IEC_COINC)if(n>=m)v=x;return v};const cur=n=>n>0?k(n)*n*P/0.95*A*gf:0;
+  let net=0,cn=0;floors.forEach(n=>{if(!net){net=1;cn=n;return}if(cn>0&&cur(cn+n)>K.limit){net++;cn=n}else cn+=n});
+  const tot=net+K.spare;const raw=Math.max(tot===1?40:tot===2?60:0,tot*K.D+Math.max(tot-1,0)*K.sp+2*K.wall+K.bend/2);
+  return {c,...K,byFloors,net,tot,raw,width:Math.max(60,Math.ceil(raw/5-1e-9)*5)}}
 function buildingItems(b,i,raw){
   const u=num(b.units)||0, hi=high(b), tower=b.cat==="high", down=b.meters==="down";
   const com=!!b.com, off=(num(b.offArea)||0)>0, pub=hasPub(b);
@@ -887,8 +898,8 @@ function buildingItems(b,i,raw){
     else if(u>50)apt={key:"apt",name:"פיר כבלים לדירות",w:r5(Math.max(100,1.4*u)),d:u>=90?50:40,note:"לא צמוד לדירה ולא צמוד לפיר גז."};
     else apt={key:"apt",name:"פיר כבלים לדירות",w:Math.max(30,r5(2*u)),d:40,note:"לא צמוד לדירה ולא צמוד לפיר גז."};}
   else{ const pf=num(b.perFloor)||0, fl=num(b.floors)||0;
-    const byFloors=!!(pf&&fl);const cab=byFloors?Math.ceil(fl/Math.max(1,Math.floor(16/pf))):Math.ceil(Math.max(u,1)/16);const spare=byFloors?2:3;const nC=cab+spare;
-    iecS={key:"iecs",name:"נישת כבלי חח\"י",w:Math.max(60,r5(nC*11)),d:50,h:240,note:(byFloors?`${cab} כבלי 95 (עד 16 דירות בקומות שלמות לכבל: ${fl} קומות × ${pf} דירות)`:`${cab} כבלי 95 (${fmt(u)} יח"ד ÷ 16, ללא חלוקה לקומות)`)+` + ${spare} כבלי ספר = ${nC} כבלים × 11 ס"מ = ${nC*11} ס"מ, מינימום 60. יאומת במחשבון חח"י. רציפה מחדר הפילרים עד הקומה העליונה, במרחק 1 מ' לפחות מדירה.`};
+    const R=iecRiser(b);const ct=R.c;
+    iecS={key:"iecs",name:"נישת כבלי חח\"י",w:R.width,d:50,h:240,note:`${R.net} כבלי ${ct} (${R.byFloors?`${fl} קומות × ${pf} דירות`:`${fmt(u)} יח"ד, ללא חלוקה לקומות`}; עד ${R.limit}A לכבל, דירה טיפוסית 5 חד' 3X25) + ${R.spare} ${R.spare>1?"כבלי":"כבל"} ספר = ${R.tot} כבלים בקוטר ${R.D} ס"מ, מרווח ${R.sp} ס"מ, ${R.wall} ס"מ לקיר ומחצית רדיוס כיפוף ${fmt(R.bend/2)} ס"מ – ${fmt(Math.round(R.raw))} ס"מ, מעוגל ${R.width} ס"מ (מינימום 60). יאומת במחשבון חח"י. רציפה מחדר הפילרים עד הקומה העליונה, במרחק 1 מ' לפחות מדירה.`};
     const cw=pf>6?145:90;
     iecC={key:"iecc",name:`ארון מוני חח"י קומתי (${pf>6?"ארון 12":"ארון 6"})`,w:cw,d:b.lux?60:45,h:240,note:(b.lux?"בניין יוקרה – עומק 60 לדלתות כפולות לגמר, איחוד דירות וחיבורים מעל 100 אמפר (ארון מדידה). ":"")+"בהמשך לנישת כבלי חח\"י, בלובי הקומה, לא על קיר משותף עם דירה."};
     iecC0={key:"iecc0",name:`ארון מוני חח"י קומתי (${pf>6?"ארון 12":"ארון 6"})`,w:cw,d:50,h:240,note:"עומק 50 כולל דלת אש. בהמשך לנישת כבלי חח\"י, לא על קיר משותף עם דירה."};}
@@ -991,7 +1002,7 @@ function buildDoc(){
     ...(floorB.length?[`מוני חח"י בקומות: ${floorB.join(", ")}.`]:[]),
     "לכל בניין מונה לכל דירה ומונה ציבורי לשירותי בית."+(S.buildings.some(b=>b.com)?" מונה נפרד למסחר.":"")+(S.buildings.some(b=>num(b.offArea))?" מונה נפרד לתעסוקה.":"")+(S.buildings.some(hasPub)?" מונה נפרד למבנה הציבור.":"")+(Pk.has?" מונה לחניון כולל טעינת רכבים.":""),
     tRows.length?`תחנת שנאים של חח"י: ${tRows.length>1?`${tN} שנאים ב-${tRows.length} חדרי שנאים (${tRows.map((t,k)=>`חדר ${k+1} – ${t.name}`).join("; ")})`:tRows[0].name} – ראה פרק חדרי שנאים.`:"תחנת שנאים: יש לקבל תיק מידע מהעירייה / מחח\"י כדי לדעת אם יידרש חדר שנאים או פילר רשת בחזית המגרש.",
-    ...S.buildings.map((b,i)=>{if(!hasGen(b))return null;const g=pickGen(b.kva);const loc=b.genLoc==="roof"?"על הגג בחופה":b.genLoc==="ground"?"בחדר בקומת הקרקע":"בחדר במרתף";return `גנרטור ל${fl(b,i)} ${loc}${g&&g.g?` – ${fmt(g.g.kva)} KVA (הערכה)`:""}. הגודל הסופי ייקבע לאחר קבלת עומסי היועצים.`}).filter(Boolean)]});
+    ...S.buildings.map((b,i)=>{if(!hasGen(b))return null;const g=pickGen(b.kva);const loc=b.genLoc==="roof"?"על הגג בחופה":b.genLoc==="ground"?"בחדר בקומת הקרקע":"בחדר במרתף";return `גנרטור ל${fl(b,i)} ${loc}${g&&g.g?` – גנרטור מוצע ${fmt(g.g.kva)} KVA`:""}. הגודל הסופי ייקבע לאחר קבלת עומסי היועצים.`}).filter(Boolean)]});
   // buildings (grouped by structure when defined)
   const bTitle=(b,i)=>`הנחיות ל${fl(b,i)}${b.units?` – ${fmt(num(b.units))} יח"ד`:""}, ${b.meters==="down"?"מונים במרתף":"מונים בקומות"}`;
   const bBody=(b,i,sec,hL)=>{const it=buildingItems(b,i);push("p",{text:catLong(b.cat)+"."});
@@ -1057,18 +1068,17 @@ function buildDoc(){
       if(!g||!g.g){push("p",{text:"נדרש גנרטור. גודל הגנרטור יועבר לאחר קבלת עומסי היועצים."});return}
       const G=g.g;
       if(b.genLoc==="roof"){const c=G.canopy65;const d=dims(c?.dimensions);
-        push("key",{text:`גנרטור ${fmt(G.kva)} KVA (הערכה) בחופה אקוסטית 65dB על הגג`});
+        push("key",{text:`גנרטור מוצע ${fmt(G.kva)} KVA בחופה אקוסטית 65dB על הגג`});
         push("table",{head:["נתון","ערך"],rows:[["דגם",c?.model||G.room65?.model||""],["מידות החופה (אורך × רוחב × גובה)",d?`${d[0]} × ${d[1]} × ${d[2]} מ'`:"—"],["משקל כולל",c?.weight?`${fmt(num(c.weight))} ק"ג`:"—"],["בסיס בטון (אורך × רוחב)",d?`${fmt(Math.round((parseFloat(d[0])+0.2)*100)/100)} × ${fmt(Math.round((parseFloat(d[1])+0.2)*100)/100)} מ'`:"—"]]});
         push("ul",{items:[`הגנרטור מותקן על בסיס בטון – מידות הבסיס גדולות ב-10 ס"מ ממידות הגנרטור לכל צד${d?` (${fmt(Math.round((parseFloat(d[0])+0.2)*100)/100)} × ${fmt(Math.round((parseFloat(d[1])+0.2)*100)/100)} מ')`:""}.`,
           "יש לשמור מרחק של 1 מ' פנוי מסביב לגנרטור לטיפול ותחזוקה.",
           "אין למקם את הגנרטור ליד פירי אוורור, פתחי שחרור עשן או מערכות דחיסת אוויר לחדרי מדרגות.",
           "יש להעביר את משקל הגנרטור למהנדס הקונסטרוקציה.","רמת רעש 65dB במרחק 7 מ' (מגורים).","נדרש פיר לצינור דלק 30X30 ס\"מ מהקרקע לגג וארון תדלוק 60X40 ס\"מ בחדר האשפה או לידו."]});
       }else{const r=G.room65;const d=dims(r?.roomDimensions),gd=dims(r?.generatorDimensions);
-        push("key",{text:`חדר גנרטור מושתק ${b.genLoc==="ground"?"בקומת הקרקע":"במרתף"} – גנרטור ${fmt(G.kva)} KVA (הערכה)`});
+        push("key",{text:`חדר גנרטור מושתק ${b.genLoc==="ground"?"בקומת הקרקע":"במרתף"} – גנרטור מוצע ${fmt(G.kva)} KVA`});
         push("table",{head:["נתון","ערך"],rows:[["דגם",r?.model||""],["מידות חדר נטו (אורך × רוחב × גובה)",d?`${d[0]} × ${d[1]} × ${d[2]} מ'`:"—"],["כניסת אוויר",r?.silencedAirIn?`${r.silencedAirIn} מ"ר`:"—"],["יציאת אוויר",r?.silencedAirOut?`${r.silencedAirOut} מ"ר`:"—"],["קוטר אגזוז",(()=>{const e=genExhaust(b);return e?`${e.dia}" (חישוב לתוואי לגג: 4 כיפופים, ${e.horiz} מ' אופקי, ${e.vert} מ' אנכי)`:(r?.exhaust?`${r.exhaust} אינץ'`:"—")})()],["מידות הגנרטור",gd?`${gd[0]} × ${gd[1]} × ${gd[2]} מ'`:"—"],["משקל הגנרטור",r?.generatorWeight?`${fmt(num(r.generatorWeight))} ק"ג`:"—"]]});
         push("ul",{items:["פתחי האוורור כלפי חוץ, לאוויר החופשי.",(()=>{const e=genExhaust(b);return e?`אגזוז לגג בפיר ${e.shaft}X${e.shaft} ס"מ בבניין ${bn(b,i)} – קוטר האגזוז ${e.dia}", קוטר חיצוני עם בידוד כ-${e.outside} מ"מ.`:"אגזוז לגג בפיר 60X60 ס\"מ בבניין "+bn(b,i)+" – ראה פרק הבניין."})(),"דלת החדר – דלת אש 30/90 נפתחת כלפי חוץ החדר, במידה שתאפשר הכנסת הגנרטור (או פתח הכנסת ציוד).",...(S.trafo.req?["מרחק בין קירות החוץ של חדר הגנרטור לחדר השנאים – 5 מ' לפחות."]:[])]});
       }
-      if(!g.exact)push("p",{text:`הגודל הנדרש ${fmt(g.n)} KVA – נבחר הגודל הקרוב כלפי מעלה בקטלוג.`});
       push("p",{text:"הנתונים לפי קטלוג שמרלינג, לאימות מול היצרן. הגודל הסופי ייקבע לאחר קבלת עומסי יועצי המיזוג, האינסטלציה והמעליות."});
     });
     n++;
