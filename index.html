@@ -199,7 +199,7 @@ table.cmp td:first-child{width:28px}
       <img class="logo" src="assets/tiktin-logo.png" alt="טיקטין תכנון חשמל">
       <div>
         <h1>הכנה אוטומטית של הנחיות חשמל לפרויקט מגורים ועירוב שימושים</h1>
-        <p>הנחיות ראשוניות לאדריכל · טופס לכל מגרש · <span class="ver">גרסה V22 · 05.11.2026</span></p>
+        <p>הנחיות ראשוניות לאדריכל · טופס לכל מגרש · <span class="ver">גרסה V23 · 07.11.2026</span></p>
       </div>
     </div>
     <div class="head-actions">
@@ -245,11 +245,13 @@ table.cmp td:first-child{width:28px}
         <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">
           <label class="btn primary" for="imp-file" style="cursor:pointer">בחירת קובץ PDF</label>
           <input type="file" id="imp-file" accept="application/pdf,.pdf" hidden>
+          <label class="btn primary" for="imp-dwf" style="cursor:pointer">בחירת קובץ DWF</label>
+          <input type="file" id="imp-dwf" accept=".dwf,.dwfx,model/vnd.dwf" hidden>
           <button type="button" class="btn" id="imp-stop" hidden>עצירה</button>
           <span class="hg" id="imp-hg" hidden aria-hidden="true"></span><span class="muted" id="imp-status" role="status"></span><span class="timer" id="imp-timer" hidden></span>
         </div>
         <div id="imp-result" style="margin-top:10px"></div>
-        <details class="help" style="margin-top:6px"><summary>הסבר</summary><div class="body">המערכת קוראת את המצגת ומחפשת שם פרויקט, יזם, אדריכל, עיר, בניינים (קומות, יח"ד, דירות בקומה, גובה, מסחר, תעסוקה, ציבור) וחניון (שטח, קומות, חניות). אם הטופס ריק – הנתונים שנמצאו ממלאים אותו. אם כבר הוקלדו נתונים – מוצגת השוואה בין מה שהוקלד למה שבמצגת, ובוחרים מה לעדכן. הקריאה נעשית ע"י Claude דרך מפתח API (ראו "הגדרות קריאה").</div></details>
+        <details class="help" style="margin-top:6px"><summary>הסבר</summary><div class="body">המערכת קוראת את המצגת (PDF) או שרטוט DWF / DWFX ומחפשת שם פרויקט, יזם, אדריכל, עיר, בניינים (קומות, יח"ד, דירות בקומה, גובה, מסחר, תעסוקה, ציבור) וחניון (שטח, קומות, חניות). אם הטופס ריק – הנתונים שנמצאו ממלאים אותו. אם כבר הוקלדו נתונים – מוצגת השוואה בין מה שהוקלד למה שבמצגת, ובוחרים מה לעדכן. הקריאה נעשית ע"י Claude דרך מפתח API (ראו "הגדרות קריאה").</div></details>
       </section>
       <section class="card">
         <h2><span class="step">1</span>פרטי הפרויקט</h2>
@@ -1412,7 +1414,7 @@ document.addEventListener("click",e=>{["#savebox","#openbox"].forEach(q=>{const 
 /* ================= reset (new form) ================= */
 function fullReset(){S=defaults();try{localStorage.removeItem(LS)}catch(e){}
   ["#imp-result","#c-msg","#c-msg-o"].forEach(s=>{const el=$(s);if(el)el.innerHTML=""});impStatus("");status("");
-  ["#imp-file","#f-open"].forEach(s=>{const el=$(s);if(el)el.value=""});
+  ["#imp-file","#imp-dwf","#f-open"].forEach(s=>{const el=$(s);if(el)el.value=""});
   ["#savebox","#openbox"].forEach(q=>{const sb=$(q);if(sb)sb.open=false});save();fillProject();renderAll();if(DB&&$("#c-list"))$("#c-list").value="";
   scrollTo({top:0,behavior:"smooth"});toast("נפתח טופס חדש")}
 const RM=$("#reset-modal");
@@ -1614,6 +1616,54 @@ function applyImport(d){
   $("#imp-cancel").onclick=()=>{IMP_PENDING=null;$("#imp-result").innerHTML=`<div class="msg info">הטופס נשאר כפי שהוקלד.</div>`};
 }
 const IMP_ERR={nokey:"יש להזין מפתח API של Anthropic ב'הגדרות קריאה' שבכרטיס זה.",badkey:"מפתח ה-API שגוי. בדקו אותו ב'הגדרות קריאה'.",net:"אין חיבור לשרת של Anthropic. בדקו חיבור לאינטרנט.",api:"שגיאה בשרת הקריאה. נסו שוב או מלאו ידנית.",not_granted:"הקריאה בוטלה – לא ניתן אישור לשימוש ב-Claude.",rate_limited:"יש עומס כרגע. נסו שוב בעוד דקה.",cancelled:"הקריאה נעצרה.",too_large:"המצגת גדולה מדי. נסו קובץ עם פחות עמודים."};
+/* ===== קריאת קובץ DWF / DWFX (Autodesk) – טקסט מהגיליונות ותמונות מוטמעות ===== */
+async function zipEntries(buf){const u8=new Uint8Array(buf),dv=new DataView(buf);let e=-1;
+  for(let i=u8.length-22;i>=Math.max(0,u8.length-70000);i--){if(dv.getUint32(i,true)===0x06054b50){e=i;break}}
+  if(e<0)throw {code:"dwfbad"};const cnt=dv.getUint16(e+10,true),cdSize=dv.getUint32(e+12,true),cdOff=dv.getUint32(e+16,true);const shift=e-(cdOff+cdSize);
+  const out=[];let p=cdOff+shift;const td=new TextDecoder();
+  for(let k=0;k<cnt&&p+46<=u8.length;k++){if(dv.getUint32(p,true)!==0x02014b50)break;
+    const meth=dv.getUint16(p+10,true),csz=dv.getUint32(p+20,true),nl=dv.getUint16(p+28,true),xl=dv.getUint16(p+30,true),cl=dv.getUint16(p+32,true),lo=dv.getUint32(p+42,true)+shift;
+    const name=td.decode(u8.subarray(p+46,p+46+nl));p+=46+nl+xl+cl;
+    if(dv.getUint32(lo,true)!==0x04034b50)continue;const ds=lo+30+dv.getUint16(lo+26,true)+dv.getUint16(lo+28,true);
+    out.push({name,meth,data:u8.subarray(ds,ds+csz)})}
+  return out}
+async function zipData(en){if(en.meth===0)return en.data;if(en.meth!==8||!window.DecompressionStream)return null;
+  try{const s=new Blob([en.data]).stream().pipeThrough(new DecompressionStream("deflate-raw"));return new Uint8Array(await new Response(s).arrayBuffer())}catch(e){return null}}
+// מחרוזות קריאות מתוך גרפיקה בינארית (W2D): ASCII ו-UTF-16 (כולל עברית)
+function binStrings(u8){const out=[];let s="";
+  for(let i=0;i<u8.length;i++){const c=u8[i];if(c>=32&&c<127){s+=String.fromCharCode(c)}else{if(s.length>=3)out.push(s);s=""}}if(s.length>=3)out.push(s);
+  let w="";for(let i=0;i+1<u8.length;i+=1){const c=u8[i]|(u8[i+1]<<8);const ok=(c>=0x5d0&&c<=0x5ea)||(w&&((c>=32&&c<127)||c===0x22||c===0x27));
+    if(ok&&(c>=0x5d0&&c<=0x5ea||w)){w+=String.fromCharCode(c);i++}else{if(/[א-ת]{2}/.test(w))out.push(w.trim());w=""}}
+  if(/[\u05d0-\u05ea]{2}/.test(w))out.push(w.trim());
+  return out.filter(x=>!/^[(){}\[\],.;:\-+=*\/\\|_~`'"!@#$%^&<>?\s\d]+$/.test(x)||/\d{2,}/.test(x))}
+async function toJpeg(bytes,max){const bm=await createImageBitmap(new Blob([bytes]));const k=Math.min(1,max/Math.max(bm.width,bm.height));
+  const c=document.createElement("canvas");c.width=Math.max(1,Math.round(bm.width*k));c.height=Math.max(1,Math.round(bm.height*k));const x=c.getContext("2d");x.fillStyle="#fff";x.fillRect(0,0,c.width,c.height);x.drawImage(bm,0,0,c.width,c.height);
+  return await new Promise(r=>c.toBlob(r,"image/jpeg",.85))}
+async function dwfRead(file,maxImg){const buf=await file.arrayBuffer();impStatus("פותח את קובץ ה-DWF…");
+  const ents=await zipEntries(buf);if(!ents.length)throw {code:"dwfbad"};const pages=[],imgs=[];const td=new TextDecoder();let n=0;
+  for(const en of ents){const nm=en.name.toLowerCase();
+    if(/\.(png|jpe?g)$/.test(nm)){if(imgs.length<(maxImg||0)){const d=await zipData(en);if(d&&d.length>20000)try{imgs.push(await toJpeg(d,1600))}catch(_){}}continue}
+    const isPage=/\.fpage$/.test(nm),isW2d=/\.w2d$/.test(nm),isDesc=/(descriptor|manifest)\.xml$/.test(nm);if(!isPage&&!isW2d&&!isDesc)continue;
+    const d=await zipData(en);if(!d)continue;n++;impStatus(`קורא את הגיליון ${n}…`);let t="";
+    if(isPage){try{const x=new DOMParser().parseFromString(td.decode(d),"application/xml");t=[...x.getElementsByTagName("Glyphs")].map(g=>(g.getAttribute("UnicodeString")||"").replace(/^\{\}/,"")).filter(Boolean).join(" ")}catch(_){}}
+    else if(isDesc){const s=td.decode(d);t=[...s.matchAll(/\b(?:name|title|value)="([^"]{2,120})"/gi)].map(m=>m[1]).filter(v=>!/^(com\.|http|[\w.]+\.(xml|w2d|png|jpg)$)/i.test(v)).join(" · ")}
+    else t=binStrings(d).join(" ");
+    t=t.replace(/\s+/g," ").trim();if(t)pages.push({i:pages.length+1,label:en.name.split("/").slice(-2).join("/"),own:t})}
+  return {pages,imgs}}
+
+$("#imp-dwf").addEventListener("change",async e=>{const file=e.target.files[0];e.target.value="";if(!file||!SAMPLE)return;
+  const stop=$("#imp-stop");$("#imp-result").innerHTML="";impCtl=new AbortController();stop.hidden=false;stop.onclick=()=>impCtl.abort();
+  try{const caps=await SAMPLE.limits().catch(()=>null);const max=caps?.images?Math.min(caps.images.maxCount||0,10):0;
+    const {pages,imgs}=await dwfRead(file,max);IMP_LEVELS={};
+    let body="",lim=52000;for(const p of pages){const add=`\n--- גיליון ${p.i} [${p.label}] ---\n${p.own.slice(0,9000)}`;if(body.length+add.length>lim){body+=add.slice(0,Math.max(0,lim-body.length));break}body+=add}
+    if(!body.trim()&&!imgs.length){impStatus("");$("#imp-result").innerHTML=`<div class="msg warn">לא נמצא טקסט בקובץ ה-DWF. אפשר להדפיס אותו ל-PDF ולטעון בלחצן PDF.</div>`;return}
+    impStatus("Claude קורא את קובץ ה-DWF…");timerStart(Math.max(30,Math.min(150,Math.round(25+body.length/2500+imgs.length*8))));
+    const prompt=IMP_PROMPT+`\n\nהקובץ: שרטוט DWF של הפרויקט (${pages.length} גיליונות/מקטעים${imgs.length?`, ${imgs.length} תמונות מוטמעות`:""}). הטקסט חולץ מהשרטוט ועשוי להיות לא מסודר – חפש/י בו שמות בניינים, קומות, מפלסים, יח"ד, טבלאות שטחים ומסחר.\n${body}`;
+    const d=await SAMPLE.json(prompt,{signal:impCtl.signal,modelTier:"default",images:imgs.length?imgs:undefined});
+    impStatus("");mergeImport(d||{},[],null);
+  }catch(err){impStatus("");const c=err&&err.code;$("#imp-result").innerHTML=`<div class="msg warn">${esc(IMP_ERR[c]||(c==="dwfbad"?"הקובץ אינו DWF תקין או שאינו נתמך. אפשר להדפיס אותו ל-PDF ולטעון בלחצן PDF.":"לא הצלחתי לקרוא את קובץ ה-DWF. נסו שוב או מלאו ידנית."))}</div>`;console.error(err)}
+  finally{stop.hidden=true}
+});
 $("#imp-file").addEventListener("change",async e=>{const file=e.target.files[0];e.target.value="";if(!file||!SAMPLE)return;
   const stop=$("#imp-stop");$("#imp-result").innerHTML="";impCtl=new AbortController();stop.hidden=false;stop.onclick=()=>impCtl.abort();
   try{
