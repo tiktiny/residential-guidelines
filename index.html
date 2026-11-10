@@ -6,7 +6,52 @@
 <meta name="color-scheme" content="light">
 <title>הכנה אוטומטית של הנחיות חשמל לפרויקט מגורים ועירוב שימושים – משרד טיקטין</title>
 <link rel="icon" href="assets/tiktin-logo.png">
-<style>[hidden]{display:none!important}</style>
+<style>[hidden]{display:none!important}
+/* ===== ממשק אחיד עם "הכנת מסמך פתיחת הזמנות חברת חשמל" ===== */
+:root{--brand:#c8202f;--line:#d5d9de;--paper:#f4f5f7;--ink:#1f2328;--ink-2:#454b53;--ink-3:#5f6670;--h:40px}
+body{padding-inline:0;font-family:"Segoe UI",Arial,"Noto Sans Hebrew","IBM Plex Sans Hebrew",sans-serif}
+header.top{background:#fff;border-bottom:3px solid var(--brand);display:flex;align-items:center;gap:16px;padding:10px 16px;margin:0;position:sticky;top:0;z-index:20;flex-wrap:nowrap}
+header.top .logo{height:52px;padding:0}
+header.top .ttl{flex:1;min-width:0}header.top h1{font-size:20px}header.top .ttl p{margin:0;color:var(--ink-3);font-size:12.5px}
+header.top .ver{color:var(--ink-3);font-size:13px;white-space:nowrap}
+.zoombox .zlbl{color:var(--ink-3);font-size:13px;margin-inline-end:4px;white-space:nowrap}
+.zoombox .btn{height:32px;min-width:32px;padding:0 8px;font-size:14px}#z-in,#z-out{color:var(--brand);font-size:18px}
+#z-val{height:32px;width:58px}
+.toolbar{display:flex;flex-wrap:wrap;gap:8px 16px;justify-content:space-between;padding:10px 16px;background:#fff;border-bottom:1px solid var(--line);position:relative;z-index:15}
+.tgrp{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.btn{height:var(--h);padding:0 14px;border:1px solid var(--line);background:#fff;border-radius:8px;display:inline-flex;align-items:center;gap:6px;font-weight:500;cursor:pointer}
+.btn:hover{border-color:var(--brand)}
+.btn.primary{background:var(--brand);border-color:var(--brand);color:#fff}
+.savebox>summary.btn{display:inline-flex}
+.layout{padding:14px 16px;gap:14px}
+.card{border-radius:10px;padding:14px;border:1px solid var(--line)}
+.card h2,.bldbody h2{font-size:16px;margin:0 0 10px;display:flex;align-items:center;gap:8px}
+.num{background:var(--brand);color:#fff;border-radius:50%;width:26px;height:26px;display:inline-flex;align-items:center;justify-content:center;font-size:14px;flex:none}
+label.f{font-size:12.5px;color:var(--ink-3)}
+input[type=text],input[type=number],select{height:var(--h);border:1px solid #b9c0c8;border-radius:7px;padding:0 10px}
+input:focus,select:focus{outline:2px solid #f3b38a;border-color:#f07a24}
+.bldwrap{border:2px solid var(--brand);border-radius:12px;background:#fff;box-shadow:0 2px 10px rgba(200,32,47,.08);overflow:hidden}
+.bldwrap .tabs{display:flex;flex-wrap:wrap;gap:6px;align-items:center;padding:10px 12px 8px;background:#fdf3f3;border-bottom:1px solid #f1c9cc}
+.bldwrap .tab{height:38px;padding:0 14px;border:1px solid var(--line);background:#fff;border-radius:8px;font:inherit;font-size:14px;cursor:pointer;display:inline-flex;align-items:center;gap:8px;color:var(--ink)}
+.bldwrap .tab small{color:var(--ink-3);font-size:12px}
+.bldwrap .tab.on{background:var(--brand);border-color:var(--brand);color:#fff;font-weight:700}.bldwrap .tab.on small{color:#fbe3e5}
+.bldwrap .tab .tx{background:rgba(255,255,255,.25);border-radius:50%;width:18px;height:18px;font-size:12px;line-height:18px;text-align:center}
+.bldwrap .tab .tx:hover{background:#fff;color:var(--brand)}
+.bldwrap .tab.add{color:var(--ink-3)}.bldwrap .tab.add:hover{border-color:var(--brand);color:var(--brand)}.bldwrap .tab:disabled{opacity:.5;cursor:default}
+.tab-g{display:inline-flex;flex-wrap:wrap;align-items:center;gap:6px;padding-inline-start:10px;border-inline-start:3px solid var(--brand)}.tab-g:first-child{border:0;padding-inline-start:0}
+.tab-grp{color:var(--brand);font-weight:700;font-size:14px;white-space:nowrap}
+.bldbody{padding:14px}.bldbody h2 .hl{color:var(--brand)}
+.bldbody .bld{border:0;box-shadow:none;padding:0;background:none}
+.catseg{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));border:1px solid #b9c0c8;border-radius:7px;overflow:hidden;max-width:420px}
+.catseg label{position:relative}.catseg input{position:absolute;opacity:0;pointer-events:none}
+.catseg span{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:var(--h);padding:3px 6px;cursor:pointer;background:#fff;border-inline-start:1px solid #b9c0c8;line-height:1.2}
+.catseg label:first-child span{border-inline-start:0}
+.catseg b{font-size:14px}.catseg small{font-size:11.5px;color:var(--ink-3)}
+.catseg input:checked+span{background:#fff6f2;box-shadow:inset 0 -3px 0 var(--brand)}.catseg input:checked+span b{color:var(--brand)}
+.catseg input:focus-visible+span{outline:2px solid var(--focus);outline-offset:-2px}
+.preview-col .export{top:0}
+@media (max-width:560px){header.top{flex-wrap:wrap;gap:6px 10px}header.top .logo{height:40px}header.top h1{font-size:16px}header.top .ttl{flex:1 1 55%}}
+</style>
 <script data-goatcounter="https://tiktin-apps.goatcounter.com/count" async src="https://gc.zgo.at/count.js"></script>
 </head>
 <body>
@@ -40,7 +85,7 @@ header.top p{margin:2px 0 0;color:var(--ink-3);font-size:13px}
 @media (min-width:1500px){header.top,.form,.export,.modal-box,.toast div{zoom:2}.preview-col .sheet{max-width:1500px;font-size:17px}}
 @media (min-width:1100px) and (max-width:1499px){header.top,.form,.export,.modal-box,.toast div{zoom:1.5}.preview-col .sheet{font-size:15.5px}}
 .help .body input[type=password],.help .body input[type=text]{width:100%}
-html.uz header.top,html.uz .form,html.uz .export,html.uz .modal-box,html.uz .toast div{zoom:var(--uz)!important}
+html.uz header.top,html.uz .toolbar,html.uz .form,html.uz .export,html.uz .modal-box,html.uz .toast div{zoom:var(--uz)!important}
 .zoombox{display:inline-flex;align-items:center;gap:4px}.zv-wrap{display:inline-flex;align-items:center;gap:2px;font-weight:700}#z-val{width:64px;padding:8px 6px;text-align:center;font-weight:700;border:1px solid var(--line);border-radius:8px;background:#fff;font:inherit}#z-save.dirty{background:var(--brand);color:#fff;border-color:var(--brand)}.zoombox .btn{min-width:42px;padding:9px 10px;font-weight:700}
 .zoombox .zv{font-size:13px;color:var(--ink-3);min-width:40px;text-align:center;font-variant-numeric:tabular-nums}
 @media (max-width:1000px){.layout{grid-template-columns:1fr}}
@@ -195,16 +240,18 @@ table.cmp td:first-child{width:28px}
 
 <div class="wrap">
   <header class="top">
-    <div style="display:flex;align-items:center;gap:14px;flex-wrap:wrap">
-      <img class="logo" src="assets/tiktin-logo.png" alt="טיקטין תכנון חשמל">
-      <div>
-        <h1>הכנה אוטומטית של הנחיות חשמל לפרויקט מגורים ועירוב שימושים</h1>
-        <p>הנחיות ראשוניות לאדריכל · טופס לכל מגרש · <span class="ver">גרסה V23 · 07.11.2026</span></p>
-      </div>
-    </div>
-    <div class="head-actions">
+    <img class="logo" src="assets/tiktin-logo.png" alt="טיקטין תכנון חשמל">
+    <div class="ttl"><h1>הכנה אוטומטית של הנחיות חשמל לפרויקט מגורים ועירוב שימושים</h1><p>הנחיות ראשוניות לאדריכל · טופס לכל מגרש</p></div>
+    <span class="zoombox" role="group" aria-label="גודל הטופס"><span class="zlbl">גודל טופס</span><button type="button" class="btn" id="z-out" title="הקטנת הטופס">−</button><span class="zv-wrap"><input type="number" id="z-val" min="50" max="300" step="5" inputmode="numeric" title="גודל הטופס באחוזים – אפשר להקליד ערך. שדה ריק = גודל אוטומטי" aria-label="גודל הטופס באחוזים"><span>%</span></span><button type="button" class="btn" id="z-in" title="הגדלת הטופס">+</button><button type="button" class="btn" id="z-save" title="שמירת הגודל הנוכחי – יישאר בפעם הבאה שתפתח את הטופס במחשב ובדפדפן הזה">שמירת גודל</button></span>
+    <span class="ver">גרסה V24 · 10.11.2026</span>
+  </header>
+  <div class="toolbar">
+    <div class="tgrp">
+      <label class="btn primary" for="imp-file" id="tb-imp">📥 קליטה מקובץ PDF</label>
+      <label class="btn primary" for="imp-dwf" id="tb-dwf">📥 קליטה מקובץ DWF</label>
+      <button type="button" class="btn" id="btn-reset" title="מחיקת כל הנתונים שהוזנו">↻ איפוס טופס</button>
       <details class="savebox" id="savebox">
-        <summary class="btn">שמירת טופס</summary>
+        <summary class="btn">💾 שמירת טופס</summary>
         <div class="savepanel" id="sp-save">
           <div class="sp-sec" id="sp-cloud" hidden>
             <b>בענן (לאנשי המשרד)</b>
@@ -219,7 +266,7 @@ table.cmp td:first-child{width:28px}
         </div>
       </details>
       <details class="savebox" id="openbox">
-        <summary class="btn">פתיחת טופס קיים</summary>
+        <summary class="btn">📂 טעינת טופס</summary>
         <div class="savepanel" id="sp-open">
           <div class="sp-sec" id="sp-cloud-o" hidden>
             <b>בענן (לאנשי המשרד)</b>
@@ -233,19 +280,20 @@ table.cmp td:first-child{width:28px}
           </div>
         </div>
       </details>
-      <button type="button" class="btn" id="btn-reset" title="מחיקת כל הנתונים שהוזנו">טופס חדש</button>
-      <span class="zoombox" role="group" aria-label="גודל הטופס"><button type="button" class="btn" id="z-out" title="הקטנת הטופס">−</button><span class="zv-wrap"><input type="number" id="z-val" min="50" max="300" step="5" inputmode="numeric" title="גודל הטופס באחוזים – אפשר להקליד ערך. שדה ריק = גודל אוטומטי" aria-label="גודל הטופס באחוזים"><span>%</span></span><button type="button" class="btn" id="z-in" title="הגדלת הטופס">+</button><button type="button" class="btn" id="z-save" title="שמירת הגודל הנוכחי – יישאר בפעם הבאה שתפתח את הטופס במחשב ובדפדפן הזה">שמירת גודל</button></span>
     </div>
-  </header>
+    <div class="tgrp">
+      <button type="button" class="btn" id="x-xlsx">ייצוא Excel</button>
+      <button type="button" class="btn" id="x-docx">ייצוא Word</button>
+      <button type="button" class="btn" id="x-pdf">ייצוא PDF</button>
+    </div>
+  </div>
 
   <div class="layout">
     <form class="form" id="form" autocomplete="off" onsubmit="return false">
       <section class="card" id="imp-card" hidden>
-        <h2>ייבוא נתונים ממצגת הפרויקט</h2>
+        <h2>קליטת נתונים מקובץ הפרויקט</h2>
         <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">
-          <label class="btn primary" for="imp-file" style="cursor:pointer">בחירת קובץ PDF</label>
           <input type="file" id="imp-file" accept="application/pdf,.pdf" hidden>
-          <label class="btn primary" for="imp-dwf" style="cursor:pointer">בחירת קובץ DWF</label>
           <input type="file" id="imp-dwf" accept=".dwf,.dwfx,model/vnd.dwf" hidden>
           <button type="button" class="btn" id="imp-stop" hidden>עצירה</button>
           <span class="hg" id="imp-hg" hidden aria-hidden="true"></span><span class="muted" id="imp-status" role="status"></span><span class="timer" id="imp-timer" hidden></span>
@@ -254,7 +302,7 @@ table.cmp td:first-child{width:28px}
         <details class="help" style="margin-top:6px"><summary>הסבר</summary><div class="body">המערכת קוראת את המצגת (PDF) או שרטוט DWF / DWFX ומחפשת שם פרויקט, יזם, אדריכל, עיר, בניינים (קומות, יח"ד, דירות בקומה, גובה, מסחר, תעסוקה, ציבור) וחניון (שטח, קומות, חניות). אם הטופס ריק – הנתונים שנמצאו ממלאים אותו. אם כבר הוקלדו נתונים – מוצגת השוואה בין מה שהוקלד למה שבמצגת, ובוחרים מה לעדכן. הקריאה נעשית ע"י Claude דרך מפתח API (ראו "הגדרות קריאה").</div></details>
       </section>
       <section class="card">
-        <h2><span class="step">1</span>פרטי הפרויקט</h2>
+        <h2><span class="num">1</span>פרטי הפרויקט</h2>
         <div class="grid pgrid">
           <label class="f f-name">שם הפרויקט<input type="text" id="p-name" data-k="project.name"></label>
           <label class="f f-iso">מספר ISO<input type="text" id="p-iso" data-k="project.iso" inputmode="numeric" maxlength="7" pattern="[0-9]{0,7}" title="עד 7 ספרות"></label>
@@ -275,23 +323,15 @@ table.cmp td:first-child{width:28px}
         <datalist id="cities"></datalist><datalist id="structs"></datalist><datalist id="pubtypes"><option value="גן ילדים"><option value="בית ספר"><option value="מתנ״ס"><option value="מעון יום"><option value="בית כנסת"><option value="מבנה ציבור"></datalist>
       </section>
 
-      <section class="card">
-        <h2><span class="step">2</span>בניינים במגרש</h2>
-        <div class="grid" style="margin-bottom:12px">
-          <label class="f">מספר בניינים
-            <select id="b-count"></select>
-          </label>
-        </div>
-        <div id="buildings"></div>
-      </section>
+      <section class="bldwrap" id="buildings"></section>
 
       <section class="card">
-        <h2><span class="step">3</span>חניון / מרתף משותף</h2>
+        <h2><span class="num">3</span>חניון / מרתף משותף</h2>
         <div id="parking"></div>
       </section>
 
       <section class="card">
-        <h2><span class="step">4</span>חדר שנאים חח"י</h2>
+        <h2><span class="num">4</span>חדר שנאים חח"י</h2>
         <div id="trafo"></div>
       </section>
 
@@ -304,9 +344,6 @@ table.cmp td:first-child{width:28px}
     <div class="preview-col">
       <div class="export">
         <span class="t">הפקת מסמך לאדריכל</span>
-        <button type="button" class="btn primary" id="x-docx">Word</button>
-        <button type="button" class="btn" id="x-pdf">PDF</button>
-        <button type="button" class="btn" id="x-xlsx">Excel</button>
         <div class="status" id="x-status"></div>
       </div>
       <div class="sheet" id="sheet"></div>
@@ -535,14 +572,26 @@ function pickGen(kva){const n=num(kva);if(!n||!GEN.length)return null;const exac
 const dims=s=>{if(!s)return null;const p=String(s).split(/x/i).map(x=>x.trim());return p.length===3?p:null};
 function toast(t){const el=$("#toast");el.firstElementChild.textContent=t;el.hidden=false;clearTimeout(toast.t);toast.t=setTimeout(()=>el.hidden=true,2600)}
 function seg(name,path,opts,cur){return `<div class="seg" role="radiogroup">${opts.map(o=>`<label><input type="radio" name="${name}" value="${o.v}" data-k="${path}" ${String(cur)===String(o.v)?"checked":""}><span>${o.t}</span></label>`).join("")}</div>`}
+const CAT_SEG=[{v:"low",t:"נמוך",s:"עד 29 מ'"},{v:"mid",t:"רב קומות",s:"29 עד 42 מ'"},{v:"high",t:"מגדל",s:"מעל 42 מ'"}];
+function catSeg(name,path,cur){return `<div class="catseg" role="radiogroup">${CAT_SEG.map(o=>`<label><input type="radio" name="${name}" value="${o.v}" data-k="${path}" ${String(cur)===o.v?"checked":""}><span><b>${o.t}</b><small>${o.s}</small></span></label>`).join("")}</div>`}
 function help(html){return `<details class="help"><summary>הסבר</summary><div class="body">${html}</div></details>`}
 
 /* ================= form rendering ================= */
 let ACT_B=0;
+document.addEventListener("click",async e=>{const t=e.target;
+  if(t.closest?.("#b-add")){if(S.buildings.length>=12)return;S.buildings.push(newBuilding(S.buildings.length));S.parking.over.push(S.buildings.length-1);ACT_B=S.buildings.length-1;save();renderAll();toast("נוסף בניין");return}
+  if(t.closest?.("#b-dup")){if(S.buildings.length>=12)return;const src=S.buildings[ACT_B];const c=JSON.parse(JSON.stringify(src));const used=new Set(S.buildings.map(b=>String(b.name)));
+    let nm=newBuilding(S.buildings.length).name;if(used.has(nm)){let k=2;while(used.has(`${src.name} (${k})`))k++;nm=`${src.name} (${k})`}c.name=nm;
+    S.buildings.splice(ACT_B+1,0,c);S.parking.over=S.parking.over.map(x=>x>ACT_B?x+1:x);if(S.parking.over.includes(ACT_B))S.parking.over.push(ACT_B+1);S.parking.over.sort((a,b)=>a-b);
+    if(S.parking.baseBld>ACT_B)S.parking.baseBld++;ACT_B++;save();renderAll();toast(`הבניין שוכפל – ${bldLabel(nm)}`);return}
+  const d=t.closest?.("[data-bdel]");if(d){e.stopPropagation();const i=+d.dataset.bdel;if(S.buildings.length<2)return;
+    if(!await askConfirm(`למחוק את ${bldLabel(S.buildings[i].name||String(i+1))} עם כל הנתונים שלו?`,"מחיקת בניין","כן, למחוק"))return;
+    S.buildings.splice(i,1);S.parking.over=S.parking.over.filter(x=>x!==i).map(x=>x>i?x-1:x);if(S.parking.baseBld===i)S.parking.baseBld=-1;else if(S.parking.baseBld>i)S.parking.baseBld--;
+    ACT_B=Math.max(0,Math.min(ACT_B,S.buildings.length-1));save();renderAll();toast("הבניין נמחק")}},true);
 document.addEventListener("click",e=>{const t=e.target.closest?.("[data-btab]");if(!t)return;ACT_B=+t.dataset.btab;reRenderBuildings();document.querySelector(`[data-btab="${ACT_B}"]`)?.focus()});
 function renderBuildings(){
   {const st=[...new Set(S.buildings.map(b=>(b.struct||"").trim()).filter(Boolean))];const dl=document.getElementById("structs");if(dl)dl.innerHTML=st.map(s=>`<option value="${esc(s)}">`).join("")}
-  $("#b-count").innerHTML=Array.from({length:12},(_,i)=>`<option value="${i+1}" ${S.buildings.length===i+1?"selected":""}>${i+1}</option>`).join("");
+
   if(ACT_B>=S.buildings.length||ACT_B<0)ACT_B=0;
   const cards=S.buildings.map((b,i)=>{
     const p=`buildings.${i}`;const g=pickGen(b.kva);const needGen=high(b)||b.genReq;
@@ -553,20 +602,20 @@ function renderBuildings(){
     const w=roomWidth(b);const st=String(b.struct||"").trim(),pst=i>0?String(S.buildings[i-1].struct||"").trim():null;
     const sep="";
     return `${sep}<div class="bld">
-      <div class="bld-head"><span class="tag">בניין ${i+1}</span>
+      <div class="bld-head">
         <label class="f" style="flex:1">שם הבניין<input type="text" id="b${i}-name" data-k="${p}.name" value="${esc(b.name)}" placeholder="A / 1 / מזרחי"></label>
         <label class="f" style="width:90px">יח"ד<input type="number" min="0" id="b${i}-units" data-k="${p}.units" value="${esc(b.units)}"></label>
       </div>
       <div class="grid"><label class="f">מבנן / מבנה (אם כמה בניינים יחד)<input type="text" id="b${i}-st" data-k="${p}.struct" value="${esc(b.struct||"")}" placeholder="למשל A או מבנן 1" list="structs"></label></div>
       <div class="grid"><label class="f">קומות מעל הקרקע<input type="number" min="0" id="b${i}-fl" data-k="${p}.floors" value="${esc(b.floors)}"></label>
         <label class="f">מקסימום דירות בקומה<input type="number" min="0" id="b${i}-pf" data-k="${p}.perFloor" value="${esc(b.perFloor)}"></label></div>
-      <div class="fieldset"><span class="lbl">קטגוריית גובה</span>${seg(`cat${i}`,`${p}.cat`,CATS,b.cat)}
+      <div class="fieldset"><span class="lbl">קטגוריית גובה</span>${catSeg(`cat${i}`,`${p}.cat`,b.cat)}
         ${(()=>{const cf=catFromFloors(b.floors,b.com);return cf&&cf!==b.cat?`<div class="msg warn">לפי ${esc(b.floors)} קומות${b.com?" עם מסחר":""} צפוי: ${catText(cf)} – יש לבדוק מול הגובה הקובע בחתכים.</div>`:""})()}
         ${help(`הגובה הקובע: מרצפת קומת הקרקע עד רצפת קומת המגורים האחרונה.<br>הערכה לפי קומות מעל הקרקע (כ-3 מ' לקומה): עד 9 – עד 29 מ'; 10 – עד 29 מ' (מעל 29 מ' כשיש מסחר גבוה בקרקע); 11–14 – 29–42 מ' (14 קומות עם מסחר בקרקע – מעל 42 מ'); 15 ומעלה – מעל 42 מ'. הגובה בחתכים קובע.<br>בבניין מעל 29 מ' נדרשים 2 חדרי מדרגות.`)}</div>
       <div class="sub"><h4>מוני חח"י</h4>
         ${seg(`met${i}`,`${p}.meters`,[{v:"down",t:"למטה (קרקע / מרתף עליון)"},{v:"floors",t:"בקומות"}],b.meters)}
+        <div class="grid"><label class="f">חיבור ציבורי בניין<select id="b${i}-pubsz" data-k="${p}.pubSize"><option value="">אוטומטי – ${pubAuto(b)}</option>${MR_SIZES.map(z=>`<option ${b.pubSize===z?"selected":""}>${z}</option>`).join("")}</select></label></div>
         ${b.meters==="down"?`
-          ${b.cat==="low"?`<div class="grid"><label class="f">חיבור ציבורי בניין<select id="b${i}-pubsz" data-k="${p}.pubSize"><option value="">אוטומטי – ${pubAuto(b)}</option>${PUB_LOW.map(z=>`<option ${b.pubSize===z?"selected":""}>${z}</option>`).join("")}</select></label></div>`:""}
           ${canChooseMType(b)?`<div class="fieldset"><span class="lbl">ריכוז מונים (עד 36 יח"ד)</span>${seg(`mt${i}`,`${p}.mtype`,[{v:"niche",t:"נישה במרתף עליון (ברירת מחדל)"},{v:"room",t:"חדר מונים"}],b.mtype==="room"?"room":"niche")}</div>`:""}
           ${isRoom(b)?(()=>{const c=mrCalc(b);return `<div class="fieldset"><span class="lbl">העמדת ארונות בחדר המונים</span>${seg(`sd${i}`,`${p}.msides`,[{v:"one",t:`צד אחד (${high(b)?200:180})`},{v:"two",t:"שני צדדים (320)"}],mSides(b))}</div>
           <div class="fieldset"><span class="lbl">חיבור ציבורי מרתף משותף (חניון) בחדר זה</span>${seg(`bs${i}`,`base.${i}`,[{v:"false",t:"לא"},{v:"true",t:"כן"}],S.parking.baseBld===i)}
@@ -578,7 +627,9 @@ function renderBuildings(){
           ${c?`<details class="help"><summary>תוכנית העמדה בחדר</summary><div class="body mplan">${mrPlanSVG(c,num(b.roomLen),num(b.roomWid))}</div></details>`:""}`})():`<div class="msg info">נישת מונים בגרעין הבניין, במרתף העליון.</div>`}
           ${meterMsg}
           ${help(`גודל החדר מחושב כמו באפליקציית "תיכנון חדר מונים של חברת חשמל בבניני מגורים": פילר ראשי לפי גובה הבניין ומספר הדירות, ארונות 12 ו-6 מונים, חיבור ציבורי לפי גובה הבניין (עד 29 מ' – 3X40 עד 3X100 לפי המעליות: עד 3 דירות בקומה 3X40, 4 ומעלה 3X63, ניתן לשנות; 29–42 מ' – 3X200, מעל 42 מ' – 3X400), מרווחים 15 ס"מ, רזרבה 10 ס"מ, 65 ס"מ מול דלת ארון פתוחה ומילוט 65 ס"מ ליד דלת 90.<br>ברירת המחדל: עד 29 מ' – ארונות בצד אחד; מעל 29 מ' – שני צדדים (320 ס"מ). המונה הציבורי נכנס למקום פנוי בארון הדירות האחרון; אם אין מקום – ארון 6 מונים, ומוני המסחר עד 3X100 נכנסים לאותו ארון. אחרת – ארון נפרד למסחר.<br>מסחר – גודל החיבור מוצע לפי 0.6 אמפר למ"ר משטח המסחר (אפשר לשנות ולהוסיף חיבורים): חיבורים עד 3X100 בארונות מונים, חיבורים גדולים יותר – ארון מדידה ומפסק ראשי לכל חיבור.<br>אפשר להזין אורך ורוחב אחרים לחדר; הם יופיעו במסמך במקום החישוב.`)}`
-        :`${(num(b.perFloor)||0)>6?`<div class="fieldset"><span class="lbl">כבלי חח"י בקומות (מעל 6 דירות בקומה)</span>${seg(`ic${i}`,`${p}.iecCable`,[{v:"95",t:"כבל 95"},{v:"240",t:"כבל 240"}],iecCableType(b))}${(()=>{const R=iecRiser(b);return `<div class="muted">${R.net} כבלי ${R.c} + ${R.spare} ספר – רוחב נישת הכבלים ${R.width} ס"מ</div>`})()}</div>`:""}
+        :`${(()=>{const A=iecRiserC(b,"95"),B=iecRiserC(b,"240"),c=iecCableType(b),R=c==="240"?B:A;return `<div class="fieldset"><span class="lbl">כבלי חח"י בקומות – כמו באפליקציית חישוב הפיר</span>${seg(`ic${i}`,`${p}.iecCable`,[{v:"95",t:`כבל 95 – ${A.width} ס"מ`},{v:"240",t:`כבל 240 – ${B.width} ס"מ`}],c)}
+          <div class="msg ok">רוחב נישת כבלי חח"י: ${R.width} ס"מ – ${R.net} כבלי ${R.c} + ${R.spare} ספר${R.byFloors?` · ${R.floors.length} קומות מגורים, ${fmt(R.floors.reduce((x,y)=>x+y,0))} דירות`:""}${!b.iecCable?" · נבחר אוטומטית הכבל עם הנישה הצרה יותר":""}</div>
+          <div class="muted">ארון מונים קומתי: ${R.big?`ארון 12 מונים בקומות עם 7 עד 12 דירות${R.small?`, ארון 6 מונים בקומות עם עד 6 דירות`:""}`:"ארון 6 מונים (עד 6 דירות בקומה)"}.</div></div>`})()}
           <div class="fieldset"><span class="lbl">רמת גמר</span>${seg(`lux${i}`,`${p}.lux`,[{v:"false",t:"בניין רגיל (עומק ארון 45)"},{v:"true",t:"בניין יוקרה (עומק 60)"}],!!b.lux)}</div>
           <div class="msg info">נישת כבלי חח"י, ארון מונים קומתי וחדר פילרים – לפי יח"ד, קומות ודירות בקומה (ניתן לשנות ב"מידות הפריטים").</div>`}
       </div>
@@ -608,13 +659,14 @@ function renderBuildings(){
       </div>
       ${ovTable(String(i),buildingItems(b,i,true),b.ov||{})}
     </div>`});
-  if(S.buildings.length<2){$("#buildings").innerHTML=cards[0]||"";return}
-  // tabs – one tab per building, grouped by מבנן with a red label
+  // כרטיסיות בניינים – כמו בטופס פתיחת ההזמנות: כרטיסייה לכל בניין, הוספה ושכפול, הכול בתוך מסגרת הבניין
   const tg=[];S.buildings.forEach((b,i)=>{const st=String(b.struct||"").trim();let g=tg[tg.length-1];if(!g||g.st!==st){g={st,html:""};tg.push(g)}
-    g.html+=`<button type="button" class="btab${i===ACT_B?" on":""}" data-btab="${i}" aria-pressed="${i===ACT_B}">${esc(bldLabel(b.name||String(i+1)))}${b.units?` <small>${esc(b.units)} יח"ד</small>`:""}</button>`});
+    g.html+=`<button type="button" class="tab${i===ACT_B?" on":""}" data-btab="${i}" aria-pressed="${i===ACT_B}">${esc(bldLabel(b.name||String(i+1)))}${b.units?` <small>${esc(b.units)} יח"ד</small>`:""}${S.buildings.length>1&&i===ACT_B?`<span class="tx" data-bdel="${i}" title="מחיקת הבניין" role="button">×</span>`:""}</button>`});
   const multi=tg.length>1||tg[0]?.st;
-  const tabs=tg.map(g=>`<span class="btab-g">${multi?`<span class="btab-grp">${g.st?esc(grpLabel(g.st)):"ללא מבנן"}</span>`:""}${g.html}</span>`).join("");
-  $("#buildings").innerHTML=`<div class="btabs" role="tablist">${tabs}</div>`+cards[ACT_B];
+  const tabs=tg.map(g=>`<span class="tab-g">${multi?`<span class="tab-grp">${g.st?esc(grpLabel(g.st)):"ללא מבנן"}</span>`:""}${g.html}</span>`).join("");
+  const b0=S.buildings[ACT_B];
+  $("#buildings").innerHTML=`<div class="tabs" role="tablist">${tabs}<button type="button" class="tab add" id="b-add" ${S.buildings.length>=12?"disabled":""}>＋ בניין</button><button type="button" class="tab add" id="b-dup" ${S.buildings.length>=12?"disabled":""}>⧉ שכפול בניין</button></div>
+    <div class="bldbody"><h2><span class="num">2</span>נתוני הבניין – <span class="hl">${esc(bldLabel(b0.name||String(ACT_B+1)))}</span></h2>${cards[ACT_B]}</div>`;
 }
 function ovRows(id,items,ov){
   const lvName={ground:"קרקע",typical:"טיפוסית",upper:"מרתף עליון",lower:"מרתף תחתון"};const seen={};const list=[];
@@ -652,7 +704,7 @@ const MR={DOOR:90,ESC:65,CLR:65,GAP:15,RES:10,SG:10,WALL:20};
 const MR_PUB={low:"3X63",mid:"3X200",high:"3X400"};
 const PUB_LOW=["3X40","3X63","3X80","3X100"];
 function pubAuto(b){if(b.cat!=="low")return MR_PUB[b.cat]||"3X63";const pf=num(b.perFloor);return pf&&pf<=3?"3X40":"3X63"}
-function pubSize(b){return b.cat==="low"&&PUB_LOW.includes(b.pubSize)?b.pubSize:pubAuto(b)}
+function pubSize(b){return MR_SIZES.includes(b.pubSize)?b.pubSize:pubAuto(b)}
 const MR_SIZES=["3X25","3X40","3X63","3X80","3X100","3X125","3X160","3X200","3X250","3X315","3X400","3X500","3X630","3X800","3X910"];
 const mrAmps=sz=>parseInt(String(sz).split("X")[1])||0;
 const COM_A_M2=0.6;
@@ -718,7 +770,8 @@ function mrCalc(b){
   const u=Math.max(0,Math.floor(num(b.units)||0));if(!u)return null;
   const one=mSides(b)==="one";const sg=mrSuggest(u,b.cat);const pubSz=pubSize(b),pa=mrAmps(pubSz);
   const extras=[];let pubSlot=0;if(pa<=100)pubSlot=1;else extras.push({pair:true,gt:pa>315,amps:pa,label:"ציבורי בניין"});
-  const bi=S.buildings.indexOf(b);if(bi>=0&&S.parking.baseBld===bi){const ba=mrAmps(S.parking.baseSize||"3X400");if(ba<=100)pubSlot++;else extras.push({pair:true,gt:ba>315,amps:ba,label:"מרתף"})}
+  const bi=S.buildings.indexOf(b);if(bi>=0&&S.parking.baseBld===bi){const ba=mrAmps(S.parking.baseSize||"3X400");if(ba<=100)pubSlot++;else extras.push({pair:true,gt:ba>315,amps:ba,label:S.parking.evSep?"חניון":"מרתף"});
+    if(S.parking.evSep){const ea=mrAmps(S.parking.evSize||"3X400");if(ea<=100)pubSlot++;else extras.push({pair:true,gt:ea>315,amps:ea,label:"טעינת רכבים"})}}
   // מונה ציבורי בארון 6 שנפתח רק בשבילו (למשל 12 / 24 דירות) – מוני המסחר עד 3X100 נכנסים לאותו ארון
   const mt=u+pubSlot,rem=mt%12;let comShare=0;if(pubSlot&&rem>=1&&rem<=6&&rem<=pubSlot)comShare=Math.min(comSmall(b),6-rem);
   extras.push(...comExtras(b,comShare));
@@ -776,7 +829,10 @@ function renderParking(){
         ${rooms.map(([b,i])=>`<option value="b:${i}" ${loc==="b:"+i?"selected":""}>בחדר המונים של ${esc(bldLabel(b.name||String(i+1)))}</option>`).join("")}
         <option value="trafo" ${loc==="trafo"?"selected":""}>צמוד לתחנת חברת החשמל</option>
         <option value="hv" ${loc==="hv"?"selected":""}>חיבור מתח גבוה</option></select></label>
-        ${loc&&loc!=="hv"?`<label class="f">גודל החיבור<select id="pk-bsz" data-k="parking.baseSize">${MR_SIZES.map(z=>`<option ${P.baseSize===z?"selected":""}>${z}</option>`).join("")}</select></label>`:""}</div>
+        ${loc&&loc!=="hv"?`<label class="f">${P.evSep?"גודל חיבור החניון":"גודל החיבור"}<select id="pk-bsz" data-k="parking.baseSize">${MR_SIZES.map(z=>`<option ${P.baseSize===z?"selected":""}>${z}</option>`).join("")}</select></label>`:""}
+        ${loc&&loc!=="hv"&&P.evSep?`<label class="f">גודל חיבור הטעינה<select id="pk-evsz" data-k="parking.evSize">${MR_SIZES.map(z=>`<option ${(P.evSize||"3X400")===z?"selected":""}>${z}</option>`).join("")}</select></label>`:""}</div>
+      ${loc&&loc!=="hv"?`<div class="fieldset" style="margin-top:6px"><span class="lbl">טעינת רכבים</span>${seg("pkev","parking.evSep",[{v:"false",t:"החניון כולל טעינה – חיבור אחד"},{v:"true",t:"חיבור טעינה נפרד מחיבור החניון"}],!!P.evSep)}
+        ${P.evSep?`<div class="muted">לכל חיבור ארון מדידה ומפסק ראשי משלו – ${loc==="trafo"?"צמוד לתחנת חברת החשמל":"בחדר המונים של הבניין שנבחר (2 ארונות מדידה ו-2 מפסקים ראשיים)"}.</div>`:""}</div>`:""}
       ${loc==="hv"?`<label class="f" style="margin-top:6px">הנחיות חיבור מתח גבוה בחניון (שורה לכל הנחיה – יופיעו בסוף פרק המרתף)<textarea id="pk-hv" data-k="parking.hvText" rows="5" style="font:inherit;font-size:15px;border:1px solid var(--line);border-radius:7px;padding:8px 10px;background:#fff;color:#1e2226;resize:vertical" placeholder="למשל: חדר מתח גבוה צמוד לתחנת השנאים...">${esc(P.hvText||"")}</textarea></label>`:""}
       ${rooms.length?"":`<div class="muted">אין כרגע בניין עם חדר מונים – אפשר לבחור צמוד לתחנה או מתח גבוה.</div>`}</div>`})()}`;
   }
@@ -793,7 +849,7 @@ function updateParkingChecks(){
   const tA=num(P.area),sA=P.perFloor.reduce((s,f)=>s+(num(f.area)||0),0),anyA=P.perFloor.some(f=>num(f.area)!=null);
   if(tA!=null&&!anyA)out.push(`<div class="msg info">הצעה לסה"כ חניות: ${Math.floor(tA/45)} (1 ל-45 מ"ר)</div>`);
   const tS=num(P.total),sS=P.perFloor.reduce((s,f)=>s+(num(f.spaces)||0),0),anyS=P.perFloor.some(f=>num(f.spaces)!=null);
-  {const bb=S.buildings[P.baseBld];if(bb&&isRoom(bb))out.push(`<div class="msg ok">חיבור ציבורי מרתף משותף (${esc(P.baseSize||"3X400")}) – בחדר המונים של ${esc(bldLabel(bb.name||("בניין "+(P.baseBld+1))))}</div>`);
+  {const bb=S.buildings[P.baseBld];if(bb&&isRoom(bb))out.push(`<div class="msg ok">${P.evSep?`חיבור חניון (${esc(P.baseSize||"3X400")}) וחיבור טעינה (${esc(P.evSize||"3X400")}) נפרדים`:`חיבור ציבורי מרתף משותף (${esc(P.baseSize||"3X400")})`} – בחדר המונים של ${esc(bldLabel(bb.name||("בניין "+(P.baseBld+1))))}</div>`);
    else if(P.baseLoc==="trafo")out.push(`<div class="msg ok">חיבור ציבורי מרתף משותף (${esc(P.baseSize||"3X400")}) – צמוד לתחנת חברת החשמל</div>`);
    else if(P.baseLoc==="hv")out.push(`<div class="msg ok">חיבור ציבורי מרתף משותף – חיבור מתח גבוה. ההנחיות שתזינו יופיעו בסוף פרק המרתף.</div>`);
    else out.push(`<div class="msg warn">לא נקבע מיקום החיבור הציבורי של המרתף המשותף – בוחרים בשדה "מיקום החיבור" למטה.</div>`)}
@@ -803,7 +859,7 @@ function updateParkingChecks(){
 function trafoSuggest(){const u=totVal("units")||0;const nU=u?Math.ceil(u/100):0;
   const pub=S.buildings.reduce((a,b)=>a+mrAmps(pubSize(b)),0);
   const com=S.buildings.reduce((a,b)=>a+comConns(b).reduce((x,c)=>x+c.amps*c.n,0),0);
-  const pb=S.buildings.reduce((a,b)=>a+(pubConn(b)?.amps||0),0);const pk=S.parking.has&&S.parking.baseLoc!=="hv"?mrAmps(S.parking.baseSize||"3X400"):0;const A=pub+com+pk+pb;
+  const pb=S.buildings.reduce((a,b)=>a+(pubConn(b)?.amps||0),0);const pk=S.parking.has&&S.parking.baseLoc!=="hv"?mrAmps(S.parking.baseSize||"3X400")+(S.parking.evSep?mrAmps(S.parking.evSize||"3X400"):0):0;const A=pub+com+pk+pb;
   const nA=A>630?Math.ceil(A/630)-1:0;const n=Math.max(1,nU+nA);
   const rooms=[];let left=n;const nr=Math.ceil(n/3);for(let k=0;k<nr;k++){const c=Math.ceil(left/(nr-k));rooms.push(c);left-=c}
   return{u,nU,pub,com,pk,pb,A,nA,n,rooms}}
@@ -812,7 +868,7 @@ function trafoCount(id){return {1:1,2:2,3:3,4:1,5:2,6:0,7:0}[id]||0}
 function renderTrafo(){
   const T=S.trafo;const sg=trafoSuggest();const rooms=trafoRooms();const auto=!Array.isArray(T.rooms)||!T.rooms.length;
   const tot=rooms.reduce((a,id)=>a+trafoCount(id),0);
-  const sugTxt=`הצעה: ${sg.n} ${sg.n>1?"שנאים":"שנאי"}${sg.n>3?` ב-${sg.rooms.length} חדרים (${sg.rooms.join(" + ")})`:""} – ${sg.nU} לדירות (${fmt(sg.u)} יח"ד, שנאי לכל 100)${sg.nA?` + ${sg.nA} בגין החיבורים`:""}. סך החיבורים: ${fmt(sg.A)}A (ציבורי בניינים ${fmt(sg.pub)}A${sg.com?`, מסחר ${fmt(sg.com)}A`:""}${sg.pb?`, מבנה ציבור ${fmt(sg.pb)}A`:""}${sg.pk?`, חניון ${fmt(sg.pk)}A`:""})${sg.A>630?" – מעל 630A":""}.`;
+  const sugTxt=`הצעה: ${sg.n} ${sg.n>1?"שנאים":"שנאי"}${sg.n>3?` ב-${sg.rooms.length} חדרים (${sg.rooms.join(" + ")})`:""} – ${sg.nU} לדירות (${fmt(sg.u)} יח"ד, שנאי לכל 100)${sg.nA?` + ${sg.nA} בגין החיבורים`:""}. סך החיבורים: ${fmt(sg.A)}A (ציבורי בניינים ${fmt(sg.pub)}A${sg.com?`, מסחר ${fmt(sg.com)}A`:""}${sg.pb?`, מבנה ציבור ${fmt(sg.pb)}A`:""}${sg.pk?`, חניון${S.parking.evSep?" וטעינה":""} ${fmt(sg.pk)}A`:""})${sg.A>630?" – מעל 630A":""}.`;
   $("#trafo").innerHTML=seg("treq","trafo.req",[{v:"false",t:"לא נדרש"},{v:"true",t:"נדרש חדר שנאים"}],T.req)+
    `<div class="msg info" style="margin-top:8px">${esc(sugTxt)}</div>`+
    (T.req?`<div class="grid" style="margin-top:10px"><label class="f">מספר חדרי שנאים<select id="t-nrooms">${[1,2,3,4,5].map(k=>`<option ${rooms.length===k?"selected":""}>${k}</option>`).join("")}</select></label>
@@ -882,13 +938,20 @@ function spec(it){
 // כבלי חח"י בקומות – אותו חישוב כמו באפליקציית "חישוב רוחב פיר חברת חשמל מונים בקומות" (דירה טיפוסית 5 חד' 3X25, גידול 1% ל-5 שנים)
 const IEC_CB={"95":{limit:160,D:3.4,sp:10,wall:10,bend:51,spare:2},"240":{limit:315,D:5.3,sp:16,wall:10,bend:79.5,spare:1}};
 const IEC_COINC=[[1,1],[2,.95],[3,.9],[4,.87],[5,.81],[6,.75],[7,.72],[8,.7],[9,.68],[10,.65],[11,.64],[12,.63],[13,.62],[14,.61],[15,.6],[18,.59],[20,.58],[25,.57],[30,.56],[35,.55],[40,.54],[45,.53],[50,.52],[60,.51],[70,.5]];
-function iecCableType(b){return (num(b.perFloor)||0)>6&&String(b.iecCable)==="240"?"240":"95"}
-function iecRiser(b){const c=iecCableType(b),K=IEC_CB[c];const pf=num(b.perFloor)||0,fl=num(b.floors)||0,u=Math.max(1,Math.floor(num(b.units)||0));
-  const byFloors=!!(pf&&fl);const floors=byFloors?Array(fl).fill(pf):Array(u).fill(1);const P=9,gf=Math.pow(1.01,5),A=1000/(Math.sqrt(3)*400);
+function iecFloors(b){const pf=Math.floor(num(b.perFloor)||0),fl=Math.floor(num(b.floors)||0),u=Math.floor(num(b.units)||0);
+  if(!pf&&!fl)return {list:Array(Math.max(1,u)).fill(1),byFloors:false};
+  if(pf&&!u)return {list:Array(Math.max(1,fl)).fill(pf),byFloors:true};
+  const n=Math.max(fl||0,pf?Math.ceil(u/pf):0,1);const L=[];let rem=u;
+  for(let k=0;k<n;k++){const v=Math.min(pf||Infinity,Math.ceil(rem/(n-k)));L.push(v);rem-=v}
+  return {list:L,byFloors:true}}
+function iecRiserC(b,c){const K=IEC_CB[c];const F=iecFloors(b);const P=9,gf=Math.pow(1.01,5),A=1000/(Math.sqrt(3)*400);
   const k=n=>{let v=1;for(const [m,x] of IEC_COINC)if(n>=m)v=x;return v};const cur=n=>n>0?k(n)*n*P/0.95*A*gf:0;
-  let net=0,cn=0;floors.forEach(n=>{if(!net){net=1;cn=n;return}if(cn>0&&cur(cn+n)>K.limit){net++;cn=n}else cn+=n});
+  let net=0,cn=0;F.list.forEach(n=>{if(!net){net=1;cn=n;return}if(cn>0&&cur(cn+n)>K.limit){net++;cn=n}else cn+=n});
   const tot=net+K.spare;const raw=Math.max(tot===1?40:tot===2?60:0,tot*K.D+Math.max(tot-1,0)*K.sp+2*K.wall+K.bend/2);
-  return {c,...K,byFloors,net,tot,raw,width:Math.max(60,Math.ceil(raw/5-1e-9)*5)}}
+  const big=F.list.filter(n=>n>6).length,small=F.list.length-big;
+  return {c,...K,byFloors:F.byFloors,floors:F.list,big,small,net,tot,raw,width:Math.max(60,Math.ceil(raw/5-1e-9)*5)}}
+function iecCableType(b){const v=String(b.iecCable||"");if(v==="95"||v==="240")return v;return iecRiserC(b,"240").width<iecRiserC(b,"95").width?"240":"95"}
+function iecRiser(b){return iecRiserC(b,iecCableType(b))}
 function buildingItems(b,i,raw){
   const u=num(b.units)||0, hi=high(b), tower=b.cat==="high", down=b.meters==="down";
   const com=!!b.com, off=(num(b.offArea)||0)>0, pub=hasPub(b);
@@ -901,10 +964,10 @@ function buildingItems(b,i,raw){
     else apt={key:"apt",name:"פיר כבלים לדירות",w:Math.max(30,r5(2*u)),d:40,note:"לא צמוד לדירה ולא צמוד לפיר גז."};}
   else{ const pf=num(b.perFloor)||0, fl=num(b.floors)||0;
     const R=iecRiser(b);const ct=R.c;
-    iecS={key:"iecs",name:"נישת כבלי חח\"י",w:R.width,d:50,h:240,note:`${R.net} כבלי ${ct} (${R.byFloors?`${fl} קומות × ${pf} דירות`:`${fmt(u)} יח"ד, ללא חלוקה לקומות`}; עד ${R.limit}A לכבל, דירה טיפוסית 5 חד' 3X25) + ${R.spare} ${R.spare>1?"כבלי":"כבל"} ספר = ${R.tot} כבלים בקוטר ${R.D} ס"מ, מרווח ${R.sp} ס"מ, ${R.wall} ס"מ לקיר ומחצית רדיוס כיפוף ${fmt(R.bend/2)} ס"מ – ${fmt(Math.round(R.raw))} ס"מ, מעוגל ${R.width} ס"מ (מינימום 60). יאומת במחשבון חח"י. רציפה מחדר הפילרים עד הקומה העליונה, במרחק 1 מ' לפחות מדירה.`};
-    const cw=pf>6?145:90;
-    iecC={key:"iecc",name:`ארון מוני חח"י קומתי (${pf>6?"ארון 12":"ארון 6"})`,w:cw,d:b.lux?60:45,h:240,note:(b.lux?"בניין יוקרה – עומק 60 לדלתות כפולות לגמר, איחוד דירות וחיבורים מעל 100 אמפר (ארון מדידה). ":"")+"בהמשך לנישת כבלי חח\"י, בלובי הקומה, לא על קיר משותף עם דירה."};
-    iecC0={key:"iecc0",name:`ארון מוני חח"י קומתי (${pf>6?"ארון 12":"ארון 6"})`,w:cw,d:50,h:240,note:"עומק 50 כולל דלת אש. בהמשך לנישת כבלי חח\"י, לא על קיר משותף עם דירה."};}
+    iecS={key:"iecs",name:"נישת כבלי חח\"י",w:R.width,d:50,h:240,note:`${R.net} כבלי ${ct} (${R.byFloors?`${fmt(u||R.floors.reduce((x,y)=>x+y,0))} יח"ד ב-${R.floors.length} קומות, עד ${Math.max(...R.floors)} דירות בקומה`:`${fmt(u)} יח"ד, ללא חלוקה לקומות`}; עד ${R.limit}A לכבל, דירה טיפוסית 5 חד' 3X25) + ${R.spare} ${R.spare>1?"כבלי":"כבל"} ספר = ${R.tot} כבלים בקוטר ${R.D} ס"מ, מרווח ${R.sp} ס"מ, ${R.wall} ס"מ לקיר ומחצית רדיוס כיפוף ${fmt(R.bend/2)} ס"מ – ${fmt(Math.round(R.raw))} ס"מ, מעוגל ${R.width} ס"מ (מינימום 60). יאומת במחשבון חח"י. רציפה מחדר הפילרים עד הקומה העליונה, במרחק 1 מ' לפחות מדירה.`};
+    const cw=pf>6?145:90;const mix=pf>6&&R.small?` בקומות עם עד 6 דירות – ארון 6 מונים, נישה ברוחב 90 ס"מ.`:"";
+    iecC={key:"iecc",name:`ארון מוני חח"י קומתי (${pf>6?"ארון 12":"ארון 6"})`,w:cw,d:b.lux?60:45,h:240,note:(b.lux?"בניין יוקרה – עומק 60 לדלתות כפולות לגמר, איחוד דירות וחיבורים מעל 100 אמפר (ארון מדידה). ":"")+"בהמשך לנישת כבלי חח\"י, בלובי הקומה, לא על קיר משותף עם דירה."+mix};
+    iecC0={key:"iecc0",name:`ארון מוני חח"י קומתי (${pf>6?"ארון 12":"ארון 6"})`,w:cw,d:50,h:240,note:"עומק 50 כולל דלת אש. בהמשך לנישת כבלי חח\"י, לא על קיר משותף עם דירה."+mix};}
   const pubS={key:"pubs",name:"פיר חשמל ציבורי",w:u>=160?50:tower?40:30,d:tower||u>=160?30:40,note:"לא צמוד לדירה ולא צמוד לפיר גז."};
   const emS=hi?{key:"ems",name:"פיר כבלי חירום",w:u>=160?50:40,d:40,note:"לא על קיר משותף עם דירה."}:null;
   const comm={key:"comm",name:"ארון תקשורת קומתי",w:u<=34?70:u<=90?80:u<=127?90:120,d:30};
@@ -938,7 +1001,7 @@ function buildingItems(b,i,raw){
   // upper basement (or ground if no basement)
   if(down){
     if(isRoom(b)){const c=mrCalc(b);const man=num(b.roomLen)||num(b.roomWid);const w=num(b.roomWid)||(c?c.W:roomWidth(b)),l=num(b.roomLen)||(c?c.L:mrLen(u,com));
-      const eq=c?[c.sg.f1000?`${c.sg.f1000} פילר 1000`:"",c.sg.f2?"פילר 2":"",c.sg.f0?"פילר 0":"",c.r.n12?(c.r.n12>1?`${c.r.n12} ארונות 12 מונים`:"ארון 12 מונים"):"",c.r.n6?"ארון 6 מונים":"",mrAmps(c.pub)<=100?`מונה לחיבור הציבורי של הבניין ${c.pub}`:"",mrAmps(c.pub)>100?`ארון מדידה ומפסק ראשי לחיבור הציבורי ${c.pub}`:"",S.parking.baseBld===i?`ארון מדידה ומפסק ראשי לחיבור הציבורי המשותף של המרתף ${S.parking.baseSize||"3X400"}`:"",...(()=>{const sh=c.comShare||0;const ce=comExtras(b,sh);const sm=comSmall(b)-sh;const big=ce.filter(e=>e.pair);const sc=ce.filter(e=>!e.pair);return [sh?`${sh>1?sh+" מונים":"מונה"} ${smLabel(b)} בארון 6 המונים יחד עם המונה הציבורי`:"",sm?`${sc.length>1?sc.length+" ארונות":"ארון"} ${sc.every(e=>e.k==="c6")?"6":"12"} מונים ${smLabel(b)} (${sm} ${sm>1?"מונים":"מונה"})`:"",...big.map(e=>`ארון מדידה ומפסק ראשי ל${e.label}`)]})()].filter(Boolean).join(", "):"";
+      const eq=c?[c.sg.f1000?`${c.sg.f1000} פילר 1000`:"",c.sg.f2?"פילר 2":"",c.sg.f0?"פילר 0":"",c.r.n12?(c.r.n12>1?`${c.r.n12} ארונות 12 מונים`:"ארון 12 מונים"):"",c.r.n6?"ארון 6 מונים":"",mrAmps(c.pub)<=100?`מונה לחיבור הציבורי של הבניין ${c.pub}`:"",mrAmps(c.pub)>100?`ארון מדידה ומפסק ראשי לחיבור הציבורי ${c.pub}`:"",S.parking.baseBld===i?(S.parking.evSep?`ארון מדידה ומפסק ראשי לחיבור החניון ${S.parking.baseSize||"3X400"}, ארון מדידה ומפסק ראשי לחיבור טעינת הרכבים ${S.parking.evSize||"3X400"}`:`ארון מדידה ומפסק ראשי לחיבור הציבורי המשותף של המרתף ${S.parking.baseSize||"3X400"}`):"",...(()=>{const sh=c.comShare||0;const ce=comExtras(b,sh);const sm=comSmall(b)-sh;const big=ce.filter(e=>e.pair);const sc=ce.filter(e=>!e.pair);return [sh?`${sh>1?sh+" מונים":"מונה"} ${smLabel(b)} בארון 6 המונים יחד עם המונה הציבורי`:"",sm?`${sc.length>1?sc.length+" ארונות":"ארון"} ${sc.every(e=>e.k==="c6")?"6":"12"} מונים ${smLabel(b)} (${sm} ${sm>1?"מונים":"מונה"})`:"",...big.map(e=>`ארון מדידה ומפסק ראשי ל${e.label}`)]})()].filter(Boolean).join(", "):"";
       push(U,{key:"mroom",name:`חדר מוני חח"י ל-${fmt(u)} יח"ד`,room:true,w,l,
       note:(c&&eq?`החדר כולל: ${eq} (${c.one?"ארונות בצד אחד":"ארונות בשני הצדדים"}). `:"")+`גובה החדר 2.5 מ' נטו לפחות. רצפה כפולה בגובה 80 ס"מ נטו. דלת אש 30/90 נפתחת החוצה לכיוון לובי הבניין עם מנעול כפול חח"י + דיירים. מתחת לפיר הכבלים לדירות.`})}
     else{{const nc=nicheCabs(b);const cab=[nc.n12?(nc.n12>1?`${nc.n12} ארונות 12 מונים`:"ארון 12 מונים"):"",nc.n6?(nc.n6>1?`${nc.n6} ארונות 6 מונים`:"ארון 6 מונים"):""].filter(Boolean).join(" ו");
@@ -1036,8 +1099,8 @@ function buildDoc(){
     if(Pk.has){push("h3",{text:`${n}.${s}. חניון`});s++;
       push("table",{head:["קומה","שטח (מ\"ר)","חניות"],rows:[...Pk.perFloor.map((f,k)=>[`מינוס ${k+1}`,f.area?fmt(num(f.area)):"—",f.spaces?fmt(num(f.spaces)):"—"]),["סה\"כ",pkA?fmt(pkA):"—",tot!=null?fmt(tot):"—"]],num:true});
       const over=Pk.over.filter(k=>S.buildings[k]).map(k=>fl(S.buildings[k],k));if(over.length)push("p",{text:`בניינים מעל המרתף המשותף: ${over.join(", ")}.`});
-      {const bb=S.buildings[Pk.baseBld];if(bb&&isRoom(bb))push("key",{text:`החיבור הציבורי המשותף של המרתף (${Pk.baseSize||"3X400"}) – בחדר המונים של ${fl(bb,Pk.baseBld)}: ארון מדידה ומפסק ראשי.`});
-       else if(Pk.baseLoc==="trafo")push("key",{text:`החיבור הציבורי המשותף של המרתף (${Pk.baseSize||"3X400"}) – צמוד לתחנת השנאים של חברת החשמל: ארון מדידה ומפסק ראשי.`});
+      {const bb=S.buildings[Pk.baseBld];if(bb&&isRoom(bb))push("key",{text:Pk.evSep?`חיבור החניון (${Pk.baseSize||"3X400"}) וחיבור טעינת הרכבים (${Pk.evSize||"3X400"}) – נפרדים, בחדר המונים של ${fl(bb,Pk.baseBld)}: לכל חיבור ארון מדידה ומפסק ראשי משלו.`:`החיבור הציבורי המשותף של המרתף (${Pk.baseSize||"3X400"}) – בחדר המונים של ${fl(bb,Pk.baseBld)}: ארון מדידה ומפסק ראשי.`});
+       else if(Pk.baseLoc==="trafo")push("key",{text:Pk.evSep?`חיבור החניון (${Pk.baseSize||"3X400"}) וחיבור טעינת הרכבים (${Pk.evSize||"3X400"}) – נפרדים, צמוד לתחנת השנאים של חברת החשמל: לכל חיבור ארון מדידה ומפסק ראשי משלו.`:`החיבור הציבורי המשותף של המרתף (${Pk.baseSize||"3X400"}) – צמוד לתחנת השנאים של חברת החשמל: ארון מדידה ומפסק ראשי.`});
        else if(Pk.baseLoc==="hv")push("key",{text:"החיבור הציבורי המשותף של המרתף – חיבור מתח גבוה. ראו הנחיות חיבור מתח גבוה בחניון בסוף פרק זה."})}
 }
     if(anyRoom){
@@ -1348,7 +1411,7 @@ document.addEventListener("click",async e=>{const t=e.target.closest?.("[data-ov
     save();refreshOv();renderDoc();toast("השורה נוספה לפרויקט זה");return}
 });
 document.addEventListener("click",e=>{const r=e.target.closest?.("[data-ovreset]");if(!r)return;const id=r.dataset.ovreset;if(id==="P")S.parking.ov={};else S.buildings[+id].ov={};save();refreshOv();renderDoc();toast("המידות הוחזרו לברירת המחדל")});
-function askConfirm(text){return new Promise(res=>{const M=$("#ask-modal");$("#ask-text").textContent=text;M.hidden=false;$("#ask-yes").focus();
+function askConfirm(text,title,yes){return new Promise(res=>{const M=$("#ask-modal");$("#ask-text").textContent=text;$("#ask-title").textContent=title||"חיבור ציבורי מרתף משותף";$("#ask-yes").textContent=yes||"כן, להעביר";M.hidden=false;$("#ask-yes").focus();
   const done=v=>{M.hidden=true;$("#ask-yes").onclick=$("#ask-no").onclick=null;M.onclick=null;res(v)};$("#ask-yes").onclick=()=>done(true);$("#ask-no").onclick=()=>done(false);M.onclick=e=>{if(e.target===M)done(false)}})}
 document.addEventListener("change",async e=>{const el=e.target;
   if(el.id==="b-count"){const n=+el.value;while(S.buildings.length<n){S.buildings.push(newBuilding(S.buildings.length));S.parking.over.push(S.buildings.length-1)}S.buildings.length=n;S.parking.over=S.parking.over.filter(i=>i<n);if(S.parking.baseBld>=n)S.parking.baseBld=-1;save();renderAll();return}
@@ -1360,10 +1423,10 @@ document.addEventListener("change",async e=>{const el=e.target;
       const ok=await askConfirm(`החיבור הציבורי המשותף של המרתף (מונה החניון) נמצא כרגע ב${from}. להעביר את המונה הציבורי של החניון מ${from} ל${to}?`);
       if(!ok){reRenderBuildings();return}toast(`החיבור הציבורי של המרתף הועבר ל${to}`)}
     P.baseBld=i;P.baseLoc="";save();reRenderBuildings();renderParking();renderDoc();return}
-  if(el.type==="radio"||el.tagName==="SELECT"){setPath(k,coerce(el));save();
+  if(el.type==="radio"||el.tagName==="SELECT"){setPath(k,coerce(el));if(/^buildings\.\d+\.cat$/.test(k))S.buildings[+k.split(".")[1]].pubSize="";save();
     if(/^buildings\./.test(k)||k==="parking.baseSize"){reRenderBuildings();renderParking()}else if(k.startsWith("parking.")){renderParking();refreshOv()}else if(k.startsWith("trafo."))renderTrafo();else if(k==="project.district"){renderTrafo();renderProcess()}
     renderDoc();return}
-  if(/^buildings\.\d+\.(units|floors|roomLen|roomWid|kva|struct|pubArea)$/.test(k)){if(PDOWN)PEND=true;else reRenderBuildings()}
+  if(/^buildings\.\d+\.(units|floors|perFloor|roomLen|roomWid|kva|struct|pubArea)$/.test(k)){if(PDOWN)PEND=true;else reRenderBuildings()}
 });
 // רענון שנדחה עד שחרור העכבר – כדי שלחיצה על לשונית / כפתור אחרי הקלדה לא "תיבלע"
 let PDOWN=false,PEND=false;document.addEventListener("pointerdown",()=>{PDOWN=true},true);
