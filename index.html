@@ -243,7 +243,7 @@ table.cmp td:first-child{width:28px}
     <img class="logo" src="assets/tiktin-logo.png" alt="טיקטין תכנון חשמל">
     <div class="ttl"><h1>הכנה אוטומטית של הנחיות חשמל לפרויקט מגורים ועירוב שימושים</h1><p>הנחיות ראשוניות לאדריכל · טופס לכל מגרש</p></div>
     <span class="zoombox" role="group" aria-label="גודל הטופס"><span class="zlbl">גודל טופס</span><button type="button" class="btn" id="z-out" title="הקטנת הטופס">−</button><span class="zv-wrap"><input type="number" id="z-val" min="50" max="300" step="5" inputmode="numeric" title="גודל הטופס באחוזים – אפשר להקליד ערך. שדה ריק = גודל אוטומטי" aria-label="גודל הטופס באחוזים"><span>%</span></span><button type="button" class="btn" id="z-in" title="הגדלת הטופס">+</button><button type="button" class="btn" id="z-save" title="שמירת הגודל הנוכחי – יישאר בפעם הבאה שתפתח את הטופס במחשב ובדפדפן הזה">שמירת גודל</button></span>
-    <span class="ver">גרסה V25 · 23.11.2026</span>
+    <span class="ver">גרסה V26 · 23.11.2026</span>
   </header>
   <div class="toolbar">
     <div class="tgrp">
@@ -463,6 +463,7 @@ const pubName=b=>(b.pubType&&b.pubType!=="אין")?b.pubType:"שטח ציבור�
 const GRP_RE=/^(מבנן|מבנה|אגף|מתחם|מגרש|בלוק|שלב|בניין|בנין|מגדל)/;
 const grpLabel=k=>{k=String(k||"").trim();return !k?"":GRP_RE.test(k)?k:`מבנן ${k}`};
 const bldLabel=nm=>{nm=String(nm||"").trim();return /^(בניין|בנין|מגדל|כניסה|גרעין|אגף)/.test(nm)?nm:`בניין ${nm}`};
+function roofPV(b){return (num(b.perFloor)||0)>=3}
 function newBuilding(i){return {name:"ABCDEFGHIJKL"[i]||String(i+1),struct:"",cat:"low",units:"",floors:"",perFloor:"",roofArea:"",meters:"down",sides:"two",msides:"",mtype:"",roomLen:"",shaftW:"",com:false,comArea:"",offArea:"",pubArea:"",pubType:"",genReq:false,kva:"",genLoc:"basement",lux:false,ov:{},comConns:[{sz:"3X25",n:"1"}],cust:custFor("b")}}
 function defaults(){return {project:{name:"",iso:"",dev:"",arch:"",city:"",district:"דן"},
  buildings:[newBuilding(0)],
@@ -608,9 +609,8 @@ function renderBuildings(){
       </div>
       <div class="grid"><label class="f">מבנן / מבנה (אם כמה בניינים יחד)<input type="text" id="b${i}-st" data-k="${p}.struct" value="${esc(b.struct||"")}" placeholder="למשל A או מבנן 1" list="structs"></label></div>
       <div class="grid"><label class="f">קומות מעל הקרקע<input type="number" min="0" id="b${i}-fl" data-k="${p}.floors" value="${esc(b.floors)}"></label>
-        <label class="f">מקסימום דירות בקומה<input type="number" min="0" id="b${i}-pf" data-k="${p}.perFloor" value="${esc(b.perFloor)}"></label>
-        <label class="f">שטח הגג (מ"ר)<input type="number" min="0" id="b${i}-roof" data-k="${p}.roofArea" value="${esc(b.roofArea||"")}" placeholder="לא חובה"></label></div>
-      ${(num(b.roofArea)||0)>250?`<div class="msg ok">גג מעל 250 מ"ר – במסמך תתווסף הכנה למערכת סולארית: כ-40 מ"ר על הגג, בפנייה לדרום וללא הסתרות.</div>`:""}
+        <label class="f">מקסימום דירות בקומה<input type="number" min="0" id="b${i}-pf" data-k="${p}.perFloor" value="${esc(b.perFloor)}"></label></div>
+      ${roofPV(b)?`<div class="msg ok">3 דירות בקומה ומעלה – במסמך תתווסף הכנה למערכת סולארית על הגג: כ-40 מ"ר בפנייה לדרום וללא הסתרות.</div>`:""}
       <div class="fieldset"><span class="lbl">קטגוריית גובה</span>${catSeg(`cat${i}`,`${p}.cat`,b.cat)}
         ${(()=>{const cf=catFromFloors(b.floors,b.com);return cf&&cf!==b.cat?`<div class="msg warn">לפי ${esc(b.floors)} קומות${b.com?" עם מסחר":""} צפוי: ${catText(cf)} – יש לבדוק מול הגובה הקובע בחתכים.</div>`:""})()}
         ${help(`הגובה הקובע: מרצפת קומת הקרקע עד רצפת קומת המגורים האחרונה.<br>הערכה לפי קומות מעל הקרקע (כ-3 מ' לקומה): עד 9 – עד 29 מ'; 10 – עד 29 מ' (מעל 29 מ' כשיש מסחר גבוה בקרקע); 11–14 – 29–42 מ' (14 קומות עם מסחר בקרקע – מעל 42 מ'); 15 ומעלה – מעל 42 מ'. הגובה בחתכים קובע.<br>בבניין מעל 29 מ' נדרשים 2 חדרי מדרגות.`)}</div>
@@ -1081,8 +1081,8 @@ function buildDoc(){
     lvl("קומת קרקע",it.ground);lvl("קומה טיפוסית",it.typical);
     lvl(inBasement(i)?"קומת מרתף עליונה – בגרעין הבניין":"קומת קרקע – חדרי מונים ותקשורת (אין מרתף מתחת לבניין)",it.upper);
     lvl("קומות מרתף תחתונות – בגרעין הבניין",it.lower);
-    const ra=num(b.roofArea)||0;if(ra>250){push(hL,{text:`${sec}.${s}. גג – הכנה למערכת סולארית (PV)`});s++;
-      push("ul",{items:[`שטח הגג כ-${fmt(ra)} מ"ר – יש להקצות על הגג שטח של כ-40 מ"ר כהכנה להתקנה עתידית של פנלים סולאריים (PV).`,
+    const R=roofPV(b);if(R){push(hL,{text:`${sec}.${s}. גג – הכנה למערכת סולארית (PV)`});s++;
+      push("ul",{items:[`יש להקצות על הגג שטח של כ-40 מ"ר כהכנה להתקנה עתידית של פנלים סולאריים (PV).`,
         "השטח יסומן בתוכנית הגג, בפנייה לכיוון דרום וללא הסתרות – הרחק ממעקות גבוהים, מתקנים טכניים, מעבים, חדרי מכונות וגגונים שמטילים צל על השטח."]})}};
   if(useGroups){groups.forEach((g,gi)=>{
       const names=g.idx.map(i=>bn(S.buildings[i],i));const u=g.idx.reduce((s,i)=>s+(num(S.buildings[i].units)||0),0);
